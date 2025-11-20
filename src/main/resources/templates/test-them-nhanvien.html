@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,176 +14,180 @@
         }
     </style>
 </head>
+
 <body>
-<div class="container mt-5">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <h2 class="mb-4">
-                <i class="bi bi-person-plus-fill"></i> Test SP: Thêm Nhân Viên Mới
-            </h2>
-            
-            <div class="card mb-3">
-                <div class="card-header bg-info text-white">
-                    <i class="bi bi-info-circle"></i> Thông tin SP
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h2 class="mb-4">
+                    <i class="bi bi-person-plus-fill"></i> Test SP: Thêm Nhân Viên Mới
+                </h2>
+
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">
+                        <i class="bi bi-info-circle"></i> Thông tin SP
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Tên SP:</strong> dbo.sp_ThemNhanVien</p>
+                        <p><strong>Mô tả:</strong> Thêm nhân viên mới vào hệ thống phân tán</p>
+                        <p class="mb-0"><strong>Kiểm tra:</strong></p>
+                        <ul>
+                            <li>Chi nhánh có tồn tại không</li>
+                            <li>Giới tính hợp lệ (Nam/Nữ)</li>
+                            <li>MANV không trùng (kiểm tra trên tất cả các site)</li>
+                            <li>CMND không trùng (kiểm tra trên tất cả các site)</li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <p><strong>Tên SP:</strong> dbo.sp_ThemNhanVien</p>
-                    <p><strong>Mô tả:</strong> Thêm nhân viên mới vào hệ thống phân tán</p>
-                    <p class="mb-0"><strong>Kiểm tra:</strong></p>
-                    <ul>
-                        <li>Chi nhánh có tồn tại không</li>
-                        <li>Giới tính hợp lệ (Nam/Nữ)</li>
-                        <li>MANV không trùng (kiểm tra trên tất cả các site)</li>
-                        <li>CMND không trùng (kiểm tra trên tất cả các site)</li>
-                    </ul>
+
+                <!-- Hiển thị kết quả -->
+                <div th:if="${result != null}" class="alert"
+                    th:classappend="${result.success} ? 'alert-success' : 'alert-danger'">
+                    <h5>
+                        <i class="bi"
+                            th:classappend="${result.success} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
+                        Kết quả
+                    </h5>
+                    <p class="mb-0" th:text="${result.message}"></p>
+                    <small th:if="${result.resultCode != null}">
+                        (Result Code: <span th:text="${result.resultCode}"></span>)
+                    </small>
                 </div>
-            </div>
 
-            <!-- Hiển thị kết quả -->
-            <div th:if="${result != null}" class="alert" 
-                 th:classappend="${result.success} ? 'alert-success' : 'alert-danger'">
-                <h5>
-                    <i class="bi" th:classappend="${result.success} ? 'bi-check-circle-fill' : 'bi-x-circle-fill'"></i>
-                    Kết quả
-                </h5>
-                <p class="mb-0" th:text="${result.message}"></p>
-                <small th:if="${result.resultCode != null}">
-                    (Result Code: <span th:text="${result.resultCode}"></span>)
-                </small>
-            </div>
+                <!-- Form thêm nhân viên -->
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <i class="bi bi-ui-checks"></i> Form Thêm Nhân Viên
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/test-them-nhanvien">
+                            <div class="row">
+                                <!-- Mã nhân viên -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="manv" class="form-label required">Mã Nhân Viên</label>
+                                    <input type="text" class="form-control" id="manv" name="manv" maxlength="10"
+                                        required placeholder="VD: NV0010">
+                                    <small class="text-muted">Tối đa 10 ký tự</small>
+                                </div>
 
-            <!-- Form thêm nhân viên -->
-            <div class="card">
-                <div class="card-header bg-primary text-white">
-                    <i class="bi bi-ui-checks"></i> Form Thêm Nhân Viên
-                </div>
-                <div class="card-body">
-                    <form method="post" action="/test-them-nhanvien">
-                        <div class="row">
-                            <!-- Mã nhân viên -->
-                            <div class="col-md-6 mb-3">
-                                <label for="manv" class="form-label required">Mã Nhân Viên</label>
-                                <input type="text" class="form-control" id="manv" name="manv" 
-                                       maxlength="10" required placeholder="VD: NV0010">
-                                <small class="text-muted">Tối đa 10 ký tự</small>
+                                <!-- CMND -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="cmnd" class="form-label required">CMND</label>
+                                    <input type="text" class="form-control" id="cmnd" name="cmnd" maxlength="10"
+                                        required placeholder="VD: 123456789">
+                                    <small class="text-muted">Tối đa 10 ký tự</small>
+                                </div>
                             </div>
 
-                            <!-- CMND -->
-                            <div class="col-md-6 mb-3">
-                                <label for="cmnd" class="form-label required">CMND</label>
-                                <input type="text" class="form-control" id="cmnd" name="cmnd" 
-                                       maxlength="10" required placeholder="VD: 123456789">
-                                <small class="text-muted">Tối đa 10 ký tự</small>
-                            </div>
-                        </div>
+                            <div class="row">
+                                <!-- Họ -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="ho" class="form-label required">Họ</label>
+                                    <input type="text" class="form-control" id="ho" name="ho" maxlength="50" required
+                                        placeholder="VD: Nguyễn Văn">
+                                    <small class="text-muted">Tối đa 50 ký tự</small>
+                                </div>
 
-                        <div class="row">
-                            <!-- Họ -->
-                            <div class="col-md-6 mb-3">
-                                <label for="ho" class="form-label required">Họ</label>
-                                <input type="text" class="form-control" id="ho" name="ho" 
-                                       maxlength="50" required placeholder="VD: Nguyễn Văn">
-                                <small class="text-muted">Tối đa 50 ký tự</small>
-                            </div>
-
-                            <!-- Tên -->
-                            <div class="col-md-6 mb-3">
-                                <label for="ten" class="form-label required">Tên</label>
-                                <input type="text" class="form-control" id="ten" name="ten" 
-                                       maxlength="10" required placeholder="VD: An">
-                                <small class="text-muted">Tối đa 10 ký tự</small>
-                            </div>
-                        </div>
-
-                        <!-- Địa chỉ -->
-                        <div class="mb-3">
-                            <label for="diachi" class="form-label required">Địa Chỉ</label>
-                            <input type="text" class="form-control" id="diachi" name="diachi" 
-                                   maxlength="100" required placeholder="VD: 123 Đường ABC, Quận 1, TP.HCM">
-                            <small class="text-muted">Tối đa 100 ký tự</small>
-                        </div>
-
-                        <div class="row">
-                            <!-- Giới tính -->
-                            <div class="col-md-4 mb-3">
-                                <label for="phai" class="form-label required">Giới Tính</label>
-                                <select class="form-select" id="phai" name="phai" required>
-                                    <option value="">-- Chọn --</option>
-                                    <option value="Nam">Nam</option>
-                                    <option value="Nữ">Nữ</option>
-                                </select>
+                                <!-- Tên -->
+                                <div class="col-md-6 mb-3">
+                                    <label for="ten" class="form-label required">Tên</label>
+                                    <input type="text" class="form-control" id="ten" name="ten" maxlength="10" required
+                                        placeholder="VD: An">
+                                    <small class="text-muted">Tối đa 10 ký tự</small>
+                                </div>
                             </div>
 
-                            <!-- Số điện thoại -->
-                            <div class="col-md-4 mb-3">
-                                <label for="sodt" class="form-label required">Số Điện Thoại</label>
-                                <input type="text" class="form-control" id="sodt" name="sodt" 
-                                       maxlength="15" required placeholder="VD: 0901234567">
-                                <small class="text-muted">Tối đa 15 ký tự</small>
+                            <!-- Địa chỉ -->
+                            <div class="mb-3">
+                                <label for="diachi" class="form-label required">Địa Chỉ</label>
+                                <input type="text" class="form-control" id="diachi" name="diachi" maxlength="100"
+                                    required placeholder="VD: 123 Đường ABC, Quận 1, TP.HCM">
+                                <small class="text-muted">Tối đa 100 ký tự</small>
                             </div>
 
-                            <!-- Chi nhánh -->
-                            <div class="col-md-4 mb-3">
-                                <label for="macn" class="form-label required">Chi Nhánh</label>
-                                <select class="form-select" id="macn" name="macn" required>
-                                    <option value="">-- Chọn chi nhánh --</option>
-                                    <option th:each="cn : ${danhSachChiNhanh}" 
-                                            th:value="${cn.MACN}"
+                            <div class="row">
+                                <!-- Giới tính -->
+                                <div class="col-md-4 mb-3">
+                                    <label for="phai" class="form-label required">Giới Tính</label>
+                                    <select class="form-select" id="phai" name="phai" required>
+                                        <option value="">-- Chọn --</option>
+                                        <option value="Nam">Nam</option>
+                                        <option value="Nữ">Nữ</option>
+                                    </select>
+                                </div>
+
+                                <!-- Số điện thoại -->
+                                <div class="col-md-4 mb-3">
+                                    <label for="sodt" class="form-label required">Số Điện Thoại</label>
+                                    <input type="text" class="form-control" id="sodt" name="sodt" maxlength="15"
+                                        required placeholder="VD: 0901234567">
+                                    <small class="text-muted">Tối đa 15 ký tự</small>
+                                </div>
+
+                                <!-- Chi nhánh -->
+                                <div class="col-md-4 mb-3">
+                                    <label for="macn" class="form-label required">Chi Nhánh</label>
+                                    <select class="form-select" id="macn" name="macn" required>
+                                        <option value="">-- Chọn chi nhánh --</option>
+                                        <option th:each="cn : ${danhSachChiNhanh}" th:value="${cn.MACN}"
                                             th:text="${cn.MACN} + ' - ' + ${cn.TENCN}">
-                                    </option>
-                                </select>
+                                        </option>
+                                    </select>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-plus-circle"></i> Thêm Nhân Viên
-                            </button>
-                            <button type="reset" class="btn btn-secondary">
-                                <i class="bi bi-arrow-clockwise"></i> Reset
-                            </button>
-                        </div>
-                    </form>
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-between mt-4">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-plus-circle"></i> Thêm Nhân Viên
+                                </button>
+                                <button type="reset" class="btn btn-secondary">
+                                    <i class="bi bi-arrow-clockwise"></i> Reset
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
 
-            <!-- Test Cases Gợi ý -->
-            <div class="card mt-3 border-warning">
-                <div class="card-header bg-warning">
-                    <i class="bi bi-lightbulb"></i> Test Cases Gợi Ý
+                <!-- Test Cases Gợi ý -->
+                <div class="card mt-3 border-warning">
+                    <div class="card-header bg-warning">
+                        <i class="bi bi-lightbulb"></i> Test Cases Gợi Ý
+                    </div>
+                    <div class="card-body">
+                        <h6>✅ Test Case Thành Công:</h6>
+                        <ul>
+                            <li>MANV mới (chưa tồn tại): VD NV0010, NV0011...</li>
+                            <li>CMND mới (chưa tồn tại): VD 9999999999</li>
+                            <li>Chi nhánh hợp lệ từ dropdown</li>
+                            <li>Giới tính: Nam hoặc Nữ</li>
+                        </ul>
+
+                        <h6>❌ Test Cases Lỗi:</h6>
+                        <ul>
+                            <li><strong>Lỗi -1:</strong> Chọn chi nhánh không tồn tại (thử sửa value trong HTML)</li>
+                            <li><strong>Lỗi -2:</strong> MANV đã tồn tại (thử NV0001, NV0002... từ danh sách hiện có)
+                            </li>
+                            <li><strong>Lỗi -3:</strong> CMND đã tồn tại (thử CMND từ danh sách nhân viên hiện có)</li>
+                            <li><strong>Lỗi -4:</strong> Giới tính không hợp lệ (thử sửa value thành "Male" trong HTML)
+                            </li>
+                        </ul>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <h6>✅ Test Case Thành Công:</h6>
-                    <ul>
-                        <li>MANV mới (chưa tồn tại): VD NV0010, NV0011...</li>
-                        <li>CMND mới (chưa tồn tại): VD 9999999999</li>
-                        <li>Chi nhánh hợp lệ từ dropdown</li>
-                        <li>Giới tính: Nam hoặc Nữ</li>
-                    </ul>
 
-                    <h6>❌ Test Cases Lỗi:</h6>
-                    <ul>
-                        <li><strong>Lỗi -1:</strong> Chọn chi nhánh không tồn tại (thử sửa value trong HTML)</li>
-                        <li><strong>Lỗi -2:</strong> MANV đã tồn tại (thử NV0001, NV0002... từ danh sách hiện có)</li>
-                        <li><strong>Lỗi -3:</strong> CMND đã tồn tại (thử CMND từ danh sách nhân viên hiện có)</li>
-                        <li><strong>Lỗi -4:</strong> Giới tính không hợp lệ (thử sửa value thành "Male" trong HTML)</li>
-                    </ul>
+                <!-- Navigation -->
+                <div class="mt-4 mb-4">
+                    <a href="/test-nhanvien" class="btn btn-outline-primary">
+                        <i class="bi bi-people"></i> Xem Danh Sách Nhân Viên
+                    </a>
+                    <a href="/test-connection" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Test Connection
+                    </a>
                 </div>
-            </div>
-
-            <!-- Navigation -->
-            <div class="mt-4 mb-4">
-                <a href="/test-nhanvien" class="btn btn-outline-primary">
-                    <i class="bi bi-people"></i> Xem Danh Sách Nhân Viên
-                </a>
-                <a href="/test-connection" class="btn btn-outline-secondary">
-                    <i class="bi bi-arrow-left"></i> Test Connection
-                </a>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

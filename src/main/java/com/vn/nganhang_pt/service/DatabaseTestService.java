@@ -153,33 +153,34 @@ public class DatabaseTestService {
      */
     public Map<String, Object> testDirectQuery() {
         Map<String, Object> result = new HashMap<>();
-        
+
         try (Connection conn = dataSource.getConnection()) {
             // Test 1: Đếm số records
             System.out.println("[TEST] Đang đếm tổng số nhân viên...");
             long startTime = System.currentTimeMillis();
-            
+
             String countSql = "SELECT COUNT(*) as total FROM dbo.NHANVIEN WHERE TrangThaiXoa = 0";
             try (CallableStatement stmt = conn.prepareCall(countSql);
-                 ResultSet rs = stmt.executeQuery()) {
+                    ResultSet rs = stmt.executeQuery()) {
                 rs.next();
                 int total = rs.getInt("total");
                 long countTime = System.currentTimeMillis() - startTime;
-                
+
                 result.put("totalRecords", total);
                 result.put("countTime", countTime + "ms");
-                System.out.println("[TEST] Có " + total + " nhân viên (TrangThaiXoa=0), thời gian: " + countTime + "ms");
+                System.out
+                        .println("[TEST] Có " + total + " nhân viên (TrangThaiXoa=0), thời gian: " + countTime + "ms");
             }
-            
+
             // Test 2: Query đơn giản (chỉ lấy MANV, HO, TEN)
             System.out.println("[TEST] Đang query danh sách nhân viên (đơn giản)...");
             startTime = System.currentTimeMillis();
-            
+
             String simpleSql = "SELECT TOP 10 MANV, HO, TEN FROM dbo.NHANVIEN WHERE TrangThaiXoa = 0";
             List<Map<String, Object>> sampleData = new ArrayList<>();
-            
+
             try (CallableStatement stmt = conn.prepareCall(simpleSql);
-                 ResultSet rs = stmt.executeQuery()) {
+                    ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     Map<String, Object> row = new HashMap<>();
                     row.put("MANV", rs.getObject("MANV"));
@@ -188,54 +189,54 @@ public class DatabaseTestService {
                     sampleData.add(row);
                 }
                 long queryTime = System.currentTimeMillis() - startTime;
-                
+
                 result.put("sampleData", sampleData);
                 result.put("simpleQueryTime", queryTime + "ms");
                 System.out.println("[TEST] Query đơn giản mất: " + queryTime + "ms");
             }
-            
+
             // Test 3: Query có JOIN (giống SP)
             System.out.println("[TEST] Đang query với LEFT JOIN CHINHANH...");
             startTime = System.currentTimeMillis();
-            
+
             String joinSql = "SELECT TOP 10 NV.MANV, NV.HO, NV.TEN, NV.MACN, CN.TENCN " +
-                           "FROM dbo.NHANVIEN AS NV " +
-                           "LEFT JOIN dbo.CHINHANH AS CN ON NV.MACN = CN.MACN " +
-                           "WHERE NV.TrangThaiXoa = 0";
-            
+                    "FROM dbo.NHANVIEN AS NV " +
+                    "LEFT JOIN dbo.CHINHANH AS CN ON NV.MACN = CN.MACN " +
+                    "WHERE NV.TrangThaiXoa = 0";
+
             try (CallableStatement stmt = conn.prepareCall(joinSql);
-                 ResultSet rs = stmt.executeQuery()) {
+                    ResultSet rs = stmt.executeQuery()) {
                 rs.next(); // Chỉ cần biết có chạy được không
                 long joinTime = System.currentTimeMillis() - startTime;
-                
+
                 result.put("joinQueryTime", joinTime + "ms");
                 System.out.println("[TEST] Query có JOIN mất: " + joinTime + "ms");
             }
-            
+
             result.put("status", "success");
-            
+
         } catch (Exception e) {
             result.put("status", "error");
             result.put("error", e.getMessage());
             System.err.println("[TEST] Lỗi: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return result;
     }
 
     /**
      * Test SP: Thêm nhân viên mới
      */
-    public Map<String, Object> themNhanVien(String manv, String ho, String ten, String diachi, 
-                                            String cmnd, String phai, String sodt, String macn) {
+    public Map<String, Object> themNhanVien(String manv, String ho, String ten, String diachi,
+            String cmnd, String phai, String sodt, String macn) {
         Map<String, Object> result = new HashMap<>();
-        
+
         try (Connection conn = dataSource.getConnection()) {
             System.out.println("[DEBUG] Bắt đầu gọi sp_ThemNhanVien với MANV=" + manv);
-            
+
             String sql = "{CALL dbo.sp_ThemNhanVien(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
-            
+
             try (CallableStatement stmt = conn.prepareCall(sql)) {
                 // Set input parameters
                 stmt.setString(1, manv);
@@ -246,21 +247,21 @@ public class DatabaseTestService {
                 stmt.setString(6, phai);
                 stmt.setString(7, sodt);
                 stmt.setString(8, macn);
-                
+
                 // Register output parameter
                 stmt.registerOutParameter(9, java.sql.Types.INTEGER);
-                
+
                 // Execute
                 stmt.execute();
-                
+
                 // Get result
                 int resultCode = stmt.getInt(9);
-                
+
                 System.out.println("[DEBUG] sp_ThemNhanVien trả về: " + resultCode);
-                
+
                 result.put("resultCode", resultCode);
                 result.put("success", resultCode == 1);
-                
+
                 // Map result code to message
                 switch (resultCode) {
                     case 1:
@@ -284,16 +285,16 @@ public class DatabaseTestService {
                     default:
                         result.put("message", "❌ Lỗi không xác định (code: " + resultCode + ")");
                 }
-                
+
             }
-            
+
         } catch (Exception e) {
             result.put("success", false);
             result.put("message", "❌ Lỗi khi gọi SP: " + e.getMessage());
             System.err.println("[ERROR] Lỗi khi gọi sp_ThemNhanVien: " + e.getMessage());
             e.printStackTrace();
         }
-        
+
         return result;
     }
 
@@ -302,13 +303,13 @@ public class DatabaseTestService {
      */
     public List<Map<String, Object>> layDanhSachChiNhanh() {
         List<Map<String, Object>> results = new ArrayList<>();
-        
+
         try (Connection conn = dataSource.getConnection()) {
             String sql = "SELECT MACN, TENCN FROM dbo.CHINHANH ORDER BY MACN";
-            
+
             try (CallableStatement stmt = conn.prepareCall(sql);
-                 ResultSet rs = stmt.executeQuery()) {
-                
+                    ResultSet rs = stmt.executeQuery()) {
+
                 while (rs.next()) {
                     Map<String, Object> row = new HashMap<>();
                     row.put("MACN", rs.getString("MACN"));
@@ -316,11 +317,11 @@ public class DatabaseTestService {
                     results.add(row);
                 }
             }
-            
+
         } catch (Exception e) {
             System.err.println("[ERROR] Lỗi khi lấy danh sách chi nhánh: " + e.getMessage());
         }
-        
+
         return results;
     }
 }

@@ -68,19 +68,18 @@ public class DatabaseTestController {
             @RequestParam("sodt") String sodt,
             @RequestParam("macn") String macn,
             Model model) {
-        
+
         // Gọi SP thêm nhân viên
         Map<String, Object> result = databaseTestService.themNhanVien(
-            manv, ho, ten, diachi, cmnd, phai, sodt, macn
-        );
-        
+                manv, ho, ten, diachi, cmnd, phai, sodt, macn);
+
         // Lấy lại danh sách chi nhánh
         List<Map<String, Object>> danhSachChiNhanh = databaseTestService.layDanhSachChiNhanh();
         model.addAttribute("danhSachChiNhanh", danhSachChiNhanh);
-        
+
         // Thêm kết quả vào model
         model.addAttribute("result", result);
-        
+
         return "test-them-nhanvien";
     }
 }
