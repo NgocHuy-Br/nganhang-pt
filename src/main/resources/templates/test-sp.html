@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Stored Procedure</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bank2"></i> Ngân hàng PT
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/test-connection">Test Connection</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/test-sp">Test SP</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">
+                    <i class="bi bi-gear-fill"></i> Test Stored Procedure
+                </h2>
+                <p class="lead text-muted">Kiểm tra khả năng gọi stored procedure từ database</p>
+            </div>
+        </div>
+
+        <!-- Database Selection -->
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-database"></i> Chọn Database</h5>
+                        <form action="/test-sp" method="get">
+                            <div class="mb-3">
+                                <select class="form-select" name="database" onchange="this.form.submit()">
+                                    <option value="benthanh" th:selected="${database == 'benthanh'}">BENTHANH (Chính)
+                                    </option>
+                                    <option value="tandinh" th:selected="${database == 'tandinh'}">TANDINH (Phân mảnh 1)
+                                    </option>
+                                    <option value="chinhanh1" th:selected="${database == 'chinhanh1'}">NGANHANG Chi
+                                        nhánh 1 (Phân mảnh 2)</option>
+                                    <option value="chinhanh2" th:selected="${database == 'chinhanh2'}">NGANHANG Chi
+                                        nhánh 2 (Phân mảnh 3)</option>
+                                </select>
+                            </div>
+                        </form>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i> Database đang test: <strong
+                                th:text="${database}">benthanh</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-table"></i> Kết quả từ Database</h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${results != null and !results.isEmpty()}">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr th:if="${results.size() > 0}">
+                                            <th th:each="key : ${results[0].keySet()}" th:text="${key}">Column</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="row : ${results}">
+                                            <td th:each="key : ${row.keySet()}" th:text="${row.get(key)}">Value</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <div th:if="${results == null or results.isEmpty()}" class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i> Không có dữ liệu
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <h6><i class="bi bi-lightbulb"></i> Lưu ý:</h6>
+                    <ul class="mb-0">
+                        <li>Hiện tại đang thực hiện test query đơn giản để kiểm tra kết nối</li>
+                        <li>Trong thực tế, bạn sẽ gọi các stored procedure cụ thể từ database của bạn</li>
+                        <li>Code mẫu sử dụng CallableStatement để gọi SP - có thể điều chỉnh theo nhu cầu</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="d-flex gap-2">
+                    <a href="/" class="btn btn-secondary">
+                        <i class="bi bi-house"></i> Trang chủ
+                    </a>
+                    <a href="/test-connection" class="btn btn-info">
+                        <i class="bi bi-database-check"></i> Test Connection
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test SP - Danh sách Nhân viên</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bank2"></i> Ngân hàng PT
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/test-connection">Test Connection</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/test-nhanvien">Test SP Nhân viên</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">
+                    <i class="bi bi-people-fill"></i> Test Stored Procedure: Danh sách Nhân viên
+                </h2>
+                <p class="lead text-muted">SP: <code th:text="${spName}">SP_Lay_DS_NhanVien</code></p>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="row mt-3">
+            <div class="col-md-6">
+                <div class="card shadow-sm border-success">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-database-check"></i> Kết nối Database</h5>
+                        <div class="alert alert-success mb-0">
+                            <i class="bi bi-check-circle"></i> <strong>Chỉ kết nối DB chính:</strong> NGANHANG
+                            (10.241.78.94)<br>
+                            <small class="text-muted">DB chính tự động truy vấn các phân mảnh qua Linked Server</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm bg-light">
+                    <div class="card-body">
+                        <h5 class="card-title"><i class="bi bi-info-circle"></i> Thông tin SP</h5>
+                        <p class="mb-2"><strong>Tên:</strong> dbo.SP_Lay_DS_NhanVien</p>
+                        <p class="mb-2"><strong>Mô tả:</strong> Lấy danh sách nhân viên (TrangThaiXoa = 0)</p>
+                        <p class="mb-0"><strong>Logic:</strong> Ưu tiên lấy từ site hiện tại, nếu không có thì lấy từ
+                            LINK0</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-table"></i> Kết quả từ Database</h5>
+                        <span class="badge bg-light text-dark" th:if="${results != null}"
+                            th:text="${results.size()} + ' bản ghi'">0 records</span>
+                    </div>
+                    <div class="card-body">
+                        <!-- Có dữ liệu -->
+                        <div th:if="${results != null and !results.isEmpty() and !results[0].containsKey('error')}">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover table-bordered">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>Mã NV</th>
+                                            <th>Họ</th>
+                                            <th>Tên</th>
+                                            <th>Họ tên</th>
+                                            <th>Địa chỉ</th>
+                                            <th>CMND</th>
+                                            <th>Phái</th>
+                                            <th>SĐT</th>
+                                            <th>Mã CN</th>
+                                            <th>Tên CN</th>
+                                            <th>Trạng thái</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="row : ${results}">
+                                            <td><strong th:text="${row.MANV}">-</strong></td>
+                                            <td th:text="${row.HO}">-</td>
+                                            <td th:text="${row.TEN}">-</td>
+                                            <td><strong th:text="${row.HOTEN}">-</strong></td>
+                                            <td th:text="${row.DIACHI}">-</td>
+                                            <td th:text="${row.CMND}">-</td>
+                                            <td>
+                                                <span th:if="${row.PHAI == 'Nam'}" class="badge bg-primary">Nam</span>
+                                                <span th:if="${row.PHAI == 'Nữ' or row.PHAI == 'Nu'}"
+                                                    class="badge bg-danger">Nữ</span>
+                                                <span
+                                                    th:unless="${row.PHAI == 'Nam' or row.PHAI == 'Nữ' or row.PHAI == 'Nu'}"
+                                                    th:text="${row.PHAI}">-</span>
+                                            </td>
+                                            <td th:text="${row.SODT}">-</td>
+                                            <td th:text="${row.MACN}">-</td>
+                                            <td th:text="${row.TENCN}">-</td>
+                                            <td>
+                                                <span th:if="${row.TrangThaiXoa == 0}" class="badge bg-success">
+                                                    <i class="bi bi-check-circle"></i> Hoạt động
+                                                </span>
+                                                <span th:unless="${row.TrangThaiXoa == 0}" class="badge bg-danger">
+                                                    <i class="bi bi-x-circle"></i> Đã xóa
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Không có dữ liệu -->
+                        <div th:if="${results == null or results.isEmpty()}" class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <strong>Không có dữ liệu!</strong>
+                            <p class="mb-0">Database không có nhân viên nào hoặc chưa kết nối được.</p>
+                        </div>
+
+                        <!-- Có lỗi -->
+                        <div th:if="${results != null and !results.isEmpty() and results[0].containsKey('error')}"
+                            class="alert alert-danger">
+                            <h5><i class="bi bi-x-circle"></i> Lỗi khi gọi Stored Procedure</h5>
+                            <p><strong>Lỗi:</strong> <span th:text="${results[0].error}">Error message</span></p>
+                            <p class="mb-0"><strong>Chi tiết:</strong> <span
+                                    th:text="${results[0].details}">Details</span></p>
+                            <hr>
+                            <small class="text-muted">
+                                Kiểm tra lại:
+                                <ul>
+                                    <li>SP có tồn tại trong database không?</li>
+                                    <li>Quyền truy cập của user "sa" có đủ không?</li>
+                                    <li>Kết nối database có thành công không?</li>
+                                    <li>Linked Server có được cấu hình đúng không?</li>
+                                </ul>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex gap-2">
+                    <a href="/" class="btn btn-secondary">
+                        <i class="bi bi-house"></i> Trang chủ
+                    </a>
+                    <a href="/test-connection" class="btn btn-info">
+                        <i class="bi bi-database-check"></i> Test Connection
+                    </a>
+                    <a href="/test-nhanvien-daxoa" class="btn btn-warning">
+                        <i class="bi bi-person-x"></i> Test NV đã xóa
+                    </a>
+                    <button onclick="location.reload()" class="btn btn-success">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

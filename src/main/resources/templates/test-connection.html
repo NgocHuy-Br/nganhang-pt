@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Kết nối Database</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+</head>
+
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-bank2"></i> Ngân hàng PT
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Trang chủ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/test-connection">Test Connection</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/test-sp">Test SP</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12">
+                <h2 class="mb-4">
+                    <i class="bi bi-database-check"></i> Test Kết nối đến các Database
+                </h2>
+                <p class="lead text-muted">Kiểm tra kết nối đến hệ thống phân tán: 1 DB chính (BENTHANH) và 3 phân mảnh
+                    (TANDINH, NGANHANG CN1, CN2)</p>
+            </div>
+        </div>
+
+        <div class="row g-4 mt-3">
+            <!-- NGANHANG Database (Gốc) -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm border-primary" th:with="nganhang=${results['main']}">
+                    <div class="card-header text-white"
+                        th:classappend="${nganhang.connected} ? 'bg-success' : 'bg-danger'">
+                        <h5 class="mb-0">
+                            <i class="bi bi-database-fill-check"></i>
+                            <span th:text="${nganhang.name}">NGANHANG (Gốc)</span>
+                            <span class="badge bg-warning text-dark float-end">⭐ Chính</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 th:text="${nganhang.status}">Status</h6>
+                        <div th:if="${nganhang.connected}">
+                            <p class="mb-1"><strong>Thông tin:</strong></p>
+                            <p class="small text-muted mb-1" th:text="${nganhang.info}">Database info</p>
+                            <p class="small text-muted" th:text="${nganhang.url}">URL</p>
+                        </div>
+                        <div th:if="${!nganhang.connected}" class="alert alert-danger">
+                            <strong>Lỗi:</strong> <span th:text="${nganhang.error}">Error message</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BENTHANH Database -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm" th:with="benthanh=${results['benthanh']}">
+                    <div class="card-header text-white"
+                        th:classappend="${benthanh.connected} ? 'bg-success' : 'bg-danger'">
+                        <h5 class="mb-0">
+                            <i class="bi bi-database-fill"></i>
+                            <span th:text="${benthanh.name}">BENTHANH</span>
+                            <span class="badge bg-light text-dark float-end">Phân mảnh 1</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 th:text="${benthanh.status}">Status</h6>
+                        <div th:if="${benthanh.connected}">
+                            <p class="mb-1"><strong>Thông tin:</strong></p>
+                            <p class="small text-muted mb-1" th:text="${benthanh.info}">Database info</p>
+                            <p class="small text-muted" th:text="${benthanh.url}">URL</p>
+                        </div>
+                        <div th:if="${!benthanh.connected}" class="alert alert-danger">
+                            <strong>Lỗi:</strong> <span th:text="${benthanh.error}">Error message</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TANDINH Database -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm" th:with="tandinh=${results['tandinh']}">
+                    <div class="card-header text-white"
+                        th:classappend="${tandinh.connected} ? 'bg-success' : 'bg-danger'">
+                        <h5 class="mb-0">
+                            <i class="bi bi-database-fill"></i>
+                            <span th:text="${tandinh.name}">TANDINH</span>
+                            <span class="badge bg-light text-dark float-end">Phân mảnh 2</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 th:text="${tandinh.status}">Status</h6>
+                        <div th:if="${tandinh.connected}">
+                            <p class="mb-1"><strong>Thông tin:</strong></p>
+                            <p class="small text-muted mb-1" th:text="${tandinh.info}">Database info</p>
+                            <p class="small text-muted" th:text="${tandinh.url}">URL</p>
+                        </div>
+                        <div th:if="${!tandinh.connected}" class="alert alert-danger">
+                            <strong>Lỗi:</strong> <span th:text="${tandinh.error}">Error message</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chi nhánh 1 Database -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm" th:with="cn1=${results['chinhanh1']}">
+                    <div class="card-header text-white" th:classappend="${cn1.connected} ? 'bg-success' : 'bg-danger'">
+                        <h5 class="mb-0">
+                            <i class="bi bi-database-fill"></i>
+                            <span th:text="${cn1.name}">NGANHANG Chi nhánh 1</span>
+                            <span class="badge bg-light text-dark float-end">Phân mảnh 3</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 th:text="${cn1.status}">Status</h6>
+                        <div th:if="${cn1.connected}">
+                            <p class="mb-1"><strong>Thông tin:</strong></p>
+                            <p class="small text-muted mb-1" th:text="${cn1.info}">Database info</p>
+                            <p class="small text-muted" th:text="${cn1.url}">URL</p>
+                        </div>
+                        <div th:if="${!cn1.connected}" class="alert alert-danger">
+                            <strong>Lỗi:</strong> <span th:text="${cn1.error}">Error message</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chi nhánh 2 Database -->
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm" th:with="cn2=${results['chinhanh2']}">
+                    <div class="card-header text-white" th:classappend="${cn2.connected} ? 'bg-success' : 'bg-danger'">
+                        <h5 class="mb-0">
+                            <i class="bi bi-database-fill"></i>
+                            <span th:text="${cn2.name}">NGANHANG Chi nhánh 2</span>
+                            <span class="badge bg-light text-dark float-end">Phân mảnh 4</span>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 th:text="${cn2.status}">Status</h6>
+                        <div th:if="${cn2.connected}">
+                            <p class="mb-1"><strong>Thông tin:</strong></p>
+                            <p class="small text-muted mb-1" th:text="${cn2.info}">Database info</p>
+                            <p class="small text-muted" th:text="${cn2.url}">URL</p>
+                        </div>
+                        <div th:if="${!cn2.connected}" class="alert alert-danger">
+                            <strong>Lỗi:</strong> <span th:text="${cn2.error}">Error message</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="d-flex gap-2">
+                    <a href="/" class="btn btn-secondary">
+                        <i class="bi bi-house"></i> Trang chủ
+                    </a>
+                    <a href="/test-nhanvien-daxoa" class="btn btn-success">
+                        <i class="bi bi-person-x"></i> Test SP Nhân viên đã xóa
+                    </a>
+                    <a href="/test-sp" class="btn btn-primary">
+                        <i class="bi bi-gear"></i> Test SP khác
+                    </a>
+                    <button onclick="location.reload()" class="btn btn-info">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
