@@ -7,6 +7,7 @@ import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -323,5 +324,104 @@ public class DatabaseTestService {
         }
 
         return results;
+    }
+
+    /**
+     * Thêm khách hàng mới qua sp_ThemKhachHang
+     * 
+     * @param cmnd    CMND khách hàng
+     * @param ho      Họ
+     * @param ten     Tên
+     * @param diachi  Địa chỉ
+     * @param ngaycap Ngày cấp CMND
+     * @param sodt    Số điện thoại
+     * @param phai    Giới tính (Nam/Nữ)
+     * @param macn    Mã chi nhánh
+     * @return Map chứa kết quả với các key: success, message, resultCode
+     */
+    public Map<String, Object> themKhachHang(String cmnd, String ho, String ten,
+            String diachi, String ngaycap, String sodt,
+            String phai, String macn) {
+        Map<String, Object> result = new HashMap<>();
+
+        System.out.println("[DEBUG] Bắt đầu gọi sp_ThemKhachHang với CMND=" + cmnd);
+
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = "{call dbo.sp_ThemKhachHang(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                // Set input parameters
+                stmt.setString(1, cmnd);
+                stmt.setString(2, ho);
+                stmt.setString(3, ten);
+                stmt.setString(4, diachi);
+                stmt.setDate(5, java.sql.Date.valueOf(ngaycap)); // Convert String to Date
+                stmt.setString(6, sodt);
+                stmt.setString(7, phai);
+                stmt.setString(8, macn);
+
+                // Register output parameter
+                stmt.registerOutParameter(9, java.sql.Types.INTEGER);
+
+                // Execute - SP sử dụng RAISERROR nên sẽ throw exception khi có lỗi
+                try {
+                    stmt.execute();
+
+                    // Get result code (chỉ chạy được nếu SP không RAISERROR)
+                    int resultCode = stmt.getInt(9);
+                    result.put("resultCode", resultCode);
+
+                    System.out.println("[DEBUG] sp_ThemKhachHang trả về result code: " + resultCode);
+
+                    // Map result code to user message
+                    if (resultCode == 1) {
+                        result.put("success", true);
+                        result.put("message", "✅ Thêm khách hàng thành công!");
+                    } else {
+                        result.put("success", false);
+                        result.put("message", "❌ Lỗi không xác định (code: " + resultCode + ")");
+                    }
+
+                } catch (SQLException sqlEx) {
+                    // SP đã RAISERROR, cần lấy result code từ output parameter
+                    try {
+                        int resultCode = stmt.getInt(9);
+                        result.put("resultCode", resultCode);
+                        result.put("success", false);
+
+                        System.out.println("[DEBUG] sp_ThemKhachHang RAISERROR với result code: " + resultCode);
+
+                        // Map result code to user message
+                        switch (resultCode) {
+                            case -1:
+                                result.put("message", "❌ Chi nhánh không tồn tại");
+                                break;
+                            case -2:
+                                result.put("message", "❌ CMND đã tồn tại trong hệ thống");
+                                break;
+                            case -3:
+                                result.put("message", "❌ Giới tính không hợp lệ (phải là 'Nam' hoặc 'Nữ')");
+                                break;
+                            case -99:
+                                result.put("message", "❌ Lỗi không xác định khi thực thi");
+                                break;
+                            default:
+                                result.put("message", "❌ Lỗi: " + sqlEx.getMessage());
+                        }
+                    } catch (SQLException e) {
+                        result.put("success", false);
+                        result.put("message", "❌ Lỗi: " + sqlEx.getMessage());
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            result.put("success", false);
+            result.put("message", "❌ Lỗi khi gọi SP: " + e.getMessage());
+            System.err.println("[ERROR] Lỗi khi gọi sp_ThemKhachHang: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return result;
     }
 }

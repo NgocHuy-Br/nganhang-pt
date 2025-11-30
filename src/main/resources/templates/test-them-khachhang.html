@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test sp_ThemKhachHang</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+
+        .card {
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .required::after {
+            content: " *";
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="mb-4">
+            <i class="bi bi-person-plus-fill"></i> Test Stored Procedure: sp_ThemKhachHang
+        </h1>
+
+        <!-- Thông tin về SP -->
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <i class="bi bi-info-circle"></i> Thông tin về SP
+            </div>
+            <div class="card-body">
+                <p><strong>Mô tả:</strong> Thêm khách hàng mới vào hệ thống phân tán</p>
+                <p><strong>Tham số:</strong> CMND, HO, TEN, DIACHI, NGAYCAP, SODT, PHAI, MACN, @Result (OUTPUT)</p>
+                <p><strong>Kiểm tra:</strong></p>
+                <ul>
+                    <li>Chi nhánh phải tồn tại</li>
+                    <li>Giới tính phải là "Nam" hoặc "Nữ"</li>
+                    <li>CMND không được trùng trên tất cả các site (LINK0, LINK1)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Kết quả -->
+        <div th:if="${result != null and result.message != null}" class="alert"
+            th:classappend="${result.success} ? 'alert-success' : 'alert-danger'" role="alert">
+            <h5 th:text="${result.message}"></h5>
+            <small th:if="${result != null and result.get('resultCode') != null}">
+                (Result Code: <span th:text="${result.resultCode}"></span>)
+            </small>
+        </div>
+
+        <!-- Form thêm khách hàng -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="bi bi-pencil-square"></i> Form thêm khách hàng
+            </div>
+            <div class="card-body">
+                <form method="post" action="/test-them-khachhang">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="cmnd" class="form-label required">CMND</label>
+                            <input type="text" class="form-control" id="cmnd" name="cmnd" maxlength="10" required
+                                placeholder="Nhập 9-10 ký tự">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="ho" class="form-label required">Họ</label>
+                            <input type="text" class="form-control" id="ho" name="ho" maxlength="50" required
+                                placeholder="VD: Nguyễn Văn">
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="ten" class="form-label required">Tên</label>
+                            <input type="text" class="form-control" id="ten" name="ten" maxlength="10" required
+                                placeholder="VD: An">
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label for="phai" class="form-label required">Giới tính</label>
+                            <select class="form-select" id="phai" name="phai" required>
+                                <option value="">-- Chọn giới tính --</option>
+                                <option value="Nam">Nam</option>
+                                <option value="Nữ">Nữ</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="diachi" class="form-label required">Địa chỉ</label>
+                        <input type="text" class="form-control" id="diachi" name="diachi" maxlength="100" required
+                            placeholder="VD: 123 Đường ABC, Quận XYZ">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="ngaycap" class="form-label required">Ngày cấp CMND</label>
+                            <input type="date" class="form-control" id="ngaycap" name="ngaycap" required>
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="sodt" class="form-label required">Số điện thoại</label>
+                            <input type="text" class="form-control" id="sodt" name="sodt" maxlength="15" required
+                                placeholder="VD: 0901234567">
+                        </div>
+
+                        <div class="col-md-4 mb-3">
+                            <label for="macn" class="form-label required">Chi nhánh</label>
+                            <select class="form-select" id="macn" name="macn" required>
+                                <option value="">-- Chọn chi nhánh --</option>
+                                <option th:each="cn : ${danhSachChiNhanh}" th:value="${cn.MACN}"
+                                    th:text="${cn.MACN} + ' - ' + ${cn.TENCN}"></option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-save"></i> Thêm khách hàng
+                        </button>
+                        <button type="reset" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Test cases -->
+        <div class="card">
+            <div class="card-header bg-warning">
+                <i class="bi bi-clipboard-check"></i> Các trường hợp test
+            </div>
+            <div class="card-body">
+                <h6><i class="bi bi-check-circle text-success"></i> Test case thành công:</h6>
+                <ul>
+                    <li>CMND: 1234567890 (chưa tồn tại), Giới tính: Nam/Nữ, Chi nhánh hợp lệ, Ngày cấp hợp lệ</li>
+                </ul>
+
+                <h6><i class="bi bi-x-circle text-danger"></i> Test case lỗi:</h6>
+                <ul>
+                    <li><strong>Result = -1:</strong> Nhập mã chi nhánh không tồn tại (VD: CN999)</li>
+                    <li><strong>Result = -2:</strong> Nhập CMND đã tồn tại (kiểm tra table KHACHHANG trên 3 site)</li>
+                    <li><strong>Result = -3:</strong> Nhập giới tính không hợp lệ (cần sửa HTML để test)</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="card">
+            <div class="card-body">
+                <h5><i class="bi bi-list"></i> Các trang test khác</h5>
+                <a href="/test-connection" class="btn btn-sm btn-outline-primary">Test Connection</a>
+                <a href="/test-nhanvien" class="btn btn-sm btn-outline-primary">Test Danh Sách Nhân Viên</a>
+                <a href="/test-nhanvien-daxoa" class="btn btn-sm btn-outline-primary">Test Nhân Viên Đã Xóa</a>
+                <a href="/test-them-nhanvien" class="btn btn-sm btn-outline-primary">Test Thêm Nhân Viên</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

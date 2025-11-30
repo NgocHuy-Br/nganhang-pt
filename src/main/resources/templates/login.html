@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Hệ thống Ngân hàng Phân tán</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-container {
+            max-width: 450px;
+            width: 100%;
+        }
+
+        .login-card {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .login-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .login-header i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .login-body {
+            background: white;
+            padding: 40px 30px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            padding: 12px;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .alert {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <i class="bi bi-bank2"></i>
+                <h3 class="mb-0">Hệ thống Ngân hàng Phân tán</h3>
+                <p class="mb-0 mt-2">Đăng nhập vào hệ thống</p>
+            </div>
+
+            <div class="login-body">
+                <!-- Hiển thị lỗi nếu có -->
+                <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <span th:text="${error}"></span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+                <form method="post" action="/login">
+                    <!-- Chi nhánh -->
+                    <div class="mb-4">
+                        <label for="tenServer" class="form-label">
+                            <i class="bi bi-building"></i> Chi nhánh
+                        </label>
+                        <select class="form-select" id="tenServer" name="tenServer" required>
+                            <option value="">-- Chọn chi nhánh --</option>
+                            <option th:each="cn : ${danhSachChiNhanh}" th:value="${cn.tenServer}" th:text="${cn.tenCN}"
+                                th:selected="${cn.tenServer == selectedServer}"></option>
+                        </select>
+                    </div>
+
+                    <!-- Tên đăng nhập -->
+                    <div class="mb-4">
+                        <label for="username" class="form-label">
+                            <i class="bi bi-person-circle"></i> Tên đăng nhập
+                        </label>
+                        <input type="text" class="form-control" id="username" name="username"
+                            placeholder="Nhập tên đăng nhập" th:value="${username}" required>
+                    </div>
+
+                    <!-- Mật khẩu -->
+                    <div class="mb-4">
+                        <label for="password" class="form-label">
+                            <i class="bi bi-lock-fill"></i> Mật khẩu
+                        </label>
+                        <input type="password" class="form-control" id="password" name="password"
+                            placeholder="Nhập mật khẩu" required>
+                    </div>
+
+                    <!-- Nút đăng nhập -->
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-login">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>
+                            Đăng nhập
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Thông tin hướng dẫn -->
+                <div class="mt-4 text-center">
+                    <small class="text-muted">
+                        <i class="bi bi-info-circle"></i>
+                        Vui lòng chọn chi nhánh, nhập tên đăng nhập và mật khẩu để truy cập hệ thống
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin các phân mảnh -->
+        <div class="card mt-3" style="background: rgba(255,255,255,0.95); border-radius: 10px;">
+            <div class="card-body">
+                <h6 class="card-title"><i class="bi bi-server"></i> Thông tin các phân mảnh:</h6>
+                <small class="text-muted">
+                    <ul class="mb-0" style="font-size: 0.85rem;">
+                        <li>Chi nhánh Bến Thành: 10.241.78.94:1440</li>
+                        <li>Chi nhánh Tân Định: 10.241.78.94:1441</li>
+                        <li>Trụ cở (CN_ALL): 10.241.78.94:1443</li>
+                    </ul>
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

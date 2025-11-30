@@ -82,4 +82,43 @@ public class DatabaseTestController {
 
         return "test-them-nhanvien";
     }
+
+    /**
+     * Hiển thị form thêm khách hàng
+     */
+    @GetMapping("/test-them-khachhang")
+    public String showFormThemKhachHang(Model model) {
+        List<Map<String, Object>> danhSachChiNhanh = databaseTestService.layDanhSachChiNhanh();
+        model.addAttribute("danhSachChiNhanh", danhSachChiNhanh);
+        return "test-them-khachhang";
+    }
+
+    /**
+     * Xử lý form thêm khách hàng
+     */
+    @PostMapping("/test-them-khachhang")
+    public String themKhachHang(
+            @RequestParam("cmnd") String cmnd,
+            @RequestParam("ho") String ho,
+            @RequestParam("ten") String ten,
+            @RequestParam("diachi") String diachi,
+            @RequestParam("ngaycap") String ngaycap,
+            @RequestParam("sodt") String sodt,
+            @RequestParam("phai") String phai,
+            @RequestParam("macn") String macn,
+            Model model) {
+
+        // Gọi service để thêm khách hàng
+        Map<String, Object> result = databaseTestService.themKhachHang(
+                cmnd, ho, ten, diachi, ngaycap, sodt, phai, macn);
+
+        // Lấy lại danh sách chi nhánh
+        List<Map<String, Object>> danhSachChiNhanh = databaseTestService.layDanhSachChiNhanh();
+        model.addAttribute("danhSachChiNhanh", danhSachChiNhanh);
+
+        // Thêm kết quả vào model
+        model.addAttribute("result", result);
+
+        return "test-them-khachhang";
+    }
 }

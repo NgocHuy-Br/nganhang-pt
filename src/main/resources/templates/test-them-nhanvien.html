@@ -41,7 +41,7 @@
                 </div>
 
                 <!-- Hiển thị kết quả -->
-                <div th:if="${result != null}" class="alert"
+                <div th:if="${result != null and result.message != null}" class="alert"
                     th:classappend="${result.success} ? 'alert-success' : 'alert-danger'">
                     <h5>
                         <i class="bi"
@@ -49,7 +49,7 @@
                         Kết quả
                     </h5>
                     <p class="mb-0" th:text="${result.message}"></p>
-                    <small th:if="${result.resultCode != null}">
+                    <small th:if="${result.containsKey('resultCode') and result.resultCode != null}">
                         (Result Code: <span th:text="${result.resultCode}"></span>)
                     </small>
                 </div>
