@@ -69,10 +69,21 @@ public class AuthController {
         NhanVien nhanVien = authService.dangNhap(username, password, tenServer);
 
         if (nhanVien != null) {
+            // Lấy danh sách chi nhánh để tìm tên chi nhánh đã chọn
+            List<ChiNhanh> danhSachChiNhanh = authService.layDanhSachChiNhanh();
+            String tenChiNhanh = "";
+            for (ChiNhanh cn : danhSachChiNhanh) {
+                if (cn.getTenServer().equals(tenServer)) {
+                    tenChiNhanh = cn.getTenCN();
+                    break;
+                }
+            }
+            
             // Đăng nhập thành công, lưu vào session
             session.setAttribute("nhanVien", nhanVien);
             session.setAttribute("username", username);
             session.setAttribute("tenServer", tenServer);
+            session.setAttribute("tenChiNhanh", tenChiNhanh);
 
             // Redirect về trang home
             return "redirect:/home";

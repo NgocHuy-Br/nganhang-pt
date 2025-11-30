@@ -137,9 +137,9 @@
                     <div class="col-md-6">
                         <div class="info-item">
                             <span class="info-label">
-                                <i class="bi bi-building"></i> Chi nhánh
+                                <i class="bi bi-building"></i> Phân mảnh đang làm việc
                             </span>
-                            <span class="info-value" th:text="${nhanVien.maCN}"></span>
+                            <span class="info-value" th:text="${tenChiNhanh}"></span>
                         </div>
                     </div>
                 </div>
@@ -148,11 +148,22 @@
                     <div class="col-md-6">
                         <div class="info-item">
                             <span class="info-label">
+                                <i class="bi bi-geo-alt-fill"></i> Chi nhánh gốc
+                            </span>
+                            <span class="info-value" th:text="${nhanVien.maCN}"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <span class="info-label">
                                 <i class="bi bi-person-circle"></i> Tên đăng nhập
                             </span>
                             <span class="info-value" th:text="${username}"></span>
                         </div>
                     </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-6">
                         <div class="info-item">
                             <span class="info-label">
