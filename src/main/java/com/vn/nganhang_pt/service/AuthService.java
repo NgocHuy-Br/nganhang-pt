@@ -135,9 +135,15 @@ public class AuthService {
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
+                        String hoTen = rs.getString("HOTEN");
+                        // Kiểm tra nếu HOTEN là null, có nghĩa là không tìm thấy nhân viên
+                        if (hoTen == null || hoTen.trim().isEmpty()) {
+                            return null;
+                        }
+
                         NhanVien nhanVien = new NhanVien();
                         nhanVien.setMaNV(rs.getString("MAGV"));
-                        nhanVien.setHoTen(rs.getString("HOTEN"));
+                        nhanVien.setHoTen(hoTen);
                         nhanVien.setTenNhom(rs.getString("TENNHOM"));
                         nhanVien.setMaCN(rs.getString("MACN"));
 
