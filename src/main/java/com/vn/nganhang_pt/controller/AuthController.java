@@ -129,6 +129,11 @@ public class AuthController {
                 session.setAttribute("nhanVien", nhanVien); // Giữ lại cho backward compatibility
             } else if (userInfo instanceof KhachHang) {
                 KhachHang khachHang = (KhachHang) userInfo;
+
+                // Set thêm thông tin server và chi nhánh vào object
+                khachHang.setTenServer(tenServer);
+                khachHang.setTenChiNhanh(tenChiNhanh);
+
                 session.setAttribute("userType", "KHACHHANG");
                 session.setAttribute("userInfo", khachHang);
                 session.setAttribute("khachHang", khachHang);
@@ -180,8 +185,8 @@ public class AuthController {
         } else if ("KHACHHANG".equals(userType)) {
             KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
             model.addAttribute("khachHang", khachHang);
-            // Khách hàng vẫn dùng giao diện cũ
-            return "home";
+            // Điều hướng khách hàng đến customer dashboard
+            return "customer-dashboard";
         }
 
         return "home";

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tài khoản khách hàng - Ngân hàng PT</title>
+
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+    <style>
+        :root {
+            --primary-blue: #1e3a8a;
+            --primary-blue-light: #2563eb;
+            --primary-blue-lighter: #3b82f6;
+            --primary-blue-lightest: #60a5fa;
+            --sidebar-width: 260px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+            color: white;
+            padding: 20px 0;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .logo {
+            padding: 0 20px 20px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            margin-bottom: 20px;
+        }
+
+        .logo h3 {
+            font-size: 22px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-info {
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 15px 20px 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .user-info h5 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-info p {
+            font-size: 13px;
+            margin-bottom: 3px;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .nav-menu {
+            list-style: none;
+            padding: 0 15px;
+        }
+
+        .nav-menu li {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 15px;
+        }
+
+        .nav-link i {
+            font-size: 18px;
+            margin-right: 12px;
+            width: 20px;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .btn-logout {
+            background: rgba(220, 38, 38, 0.9);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-logout:hover {
+            background: rgba(220, 38, 38, 1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .top-navbar {
+            background: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--primary-blue);
+            margin: 0;
+        }
+
+        .content-area {
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            min-height: calc(100vh - 140px);
+        }
+
+        .content-card {
+            background: white;
+        }
+
+        .tab-content-item {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .info-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-item label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-item .fw-bold {
+            font-size: 15px;
+            color: #1f2937;
+            margin-top: 4px;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .alert {
+            border-radius: 8px;
+            border: none;
+        }
+
+        .alert-info {
+            background-color: #dbeafe;
+            color: var(--primary-blue);
+        }
+
+        .placeholder-content {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .placeholder-content i {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .placeholder-content h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #6b7280;
+        }
+
+        .placeholder-content p {
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="logo">
+            <h3>
+                <i class="bi bi-bank"></i>
+                Ngân hàng PT
+            </h3>
+        </div>
+
+        <div class="user-info">
+            <h5 th:text="${khachHang.hoten}">Nguyễn Văn A</h5>
+            <p>
+                <i class="bi bi-shield-check"></i>
+                <span th:text="${khachHang.role}">KHACHHANG</span>
+            </p>
+            <p>
+                <i class="bi bi-building"></i>
+                <span th:text="${khachHang.tenChiNhanh}">Chi nhánh Bến Thành</span>
+            </p>
+        </div>
+
+        <ul class="nav-menu">
+            <li>
+                <a href="#" class="nav-link active" data-tab="account-info">
+                    <i class="bi bi-person-circle"></i>
+                    <span>Thông tin tài khoản</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="nav-link" data-tab="statement">
+                    <i class="bi bi-receipt"></i>
+                    <span>Sao kê tài khoản</span>
+                </a>
+            </li>
+        </ul>
+
+        <div style="position: absolute; bottom: 20px; left: 20px; right: 20px;">
+            <a href="/logout" class="btn btn-logout w-100">
+                <i class="bi bi-box-arrow-right"></i> Đăng xuất
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Navbar -->
+        <div class="top-navbar">
+            <h1 class="page-title" id="page-title">Thông tin tài khoản</h1>
+            <div>
+                <span class="text-muted">
+                    <i class="bi bi-calendar3"></i>
+                    <span id="current-date"></span>
+                </span>
+            </div>
+        </div>
+
+        <!-- Content Area -->
+        <div class="content-area">
+            <div class="content-card">
+                <!-- Tab: Account Info -->
+                <div id="account-info" class="tab-content-item active">
+                    <h3 class="mb-4"><i class="bi bi-person-circle"></i> Thông tin tài khoản</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <label class="text-muted mb-1">Số tài khoản</label>
+                                <div class="fw-bold" th:text="${khachHang.sotk}">1234567890</div>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="text-muted mb-1">Họ tên</label>
+                                <div class="fw-bold" th:text="${khachHang.hoten}">Nguyễn Văn A</div>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="text-muted mb-1">CMND</label>
+                                <div class="fw-bold" th:text="${khachHang.cmnd}">123456789</div>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="text-muted mb-1">Địa chỉ</label>
+                                <div class="fw-bold" th:text="${khachHang.diaChi}">123 Nguyễn Huệ, Q1, TP.HCM</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-item mb-3">
+                                <label class="text-muted mb-1">Giới tính</label>
+                                <div class="fw-bold" th:text="${khachHang.phai}">Nam</div>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="text-muted mb-1">Số điện thoại</label>
+                                <div class="fw-bold" th:text="${khachHang.soDT}">0909123456</div>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="text-muted mb-1">Chi nhánh</label>
+                                <div class="fw-bold" th:text="${khachHang.tenChiNhanh}">Chi nhánh Bến Thành</div>
+                            </div>
+                            <div class="info-item mb-3">
+                                <label class="text-muted mb-1">Server phân mảnh</label>
+                                <div class="fw-bold text-primary" th:text="${khachHang.tenServer}">
+                                    HCM-LAPT-001\SQLSRV_NH01</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        <strong>Lưu ý:</strong> Thông tin được lưu trữ phân tán trên server
+                        <code th:text="${khachHang.tenServer}">HCM-LAPT-001\SQLSRV_NH01</code>
+                    </div>
+                </div>
+
+                <!-- Tab: Statement -->
+                <div id="statement" class="tab-content-item" style="display: none;">
+                    <div class="placeholder-content">
+                        <i class="bi bi-receipt"></i>
+                        <h4>Sao kê tài khoản</h4>
+                        <p>Chức năng đang được phát triển...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap 5 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Update current date
+        function updateDate() {
+            const dateElement = document.getElementById('current-date');
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            dateElement.textContent = now.toLocaleDateString('vi-VN', options);
+        }
+
+        // Tab navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const tabContents = document.querySelectorAll('.tab-content-item');
+        const pageTitle = document.getElementById('page-title');
+
+        const tabTitles = {
+            'account-info': 'Thông tin tài khoản',
+            'statement': 'Sao kê tài khoản'
+        };
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                // Remove active class from all links and tabs
+                navLinks.forEach(l => l.classList.remove('active'));
+                tabContents.forEach(t => t.style.display = 'none');
+
+                // Add active class to clicked link
+                this.classList.add('active');
+
+                // Show corresponding tab
+                const tabId = this.getAttribute('data-tab');
+                const tabContent = document.getElementById(tabId);
+                if (tabContent) {
+                    tabContent.style.display = 'block';
+                    // Update page title
+                    pageTitle.textContent = tabTitles[tabId] || 'Dashboard';
+                }
+            });
+        });
+
+        // Initialize
+        updateDate();
+        setInterval(updateDate, 60000); // Update every minute
+    </script>
+</body>
+
+</html>

@@ -190,6 +190,21 @@ public class AuthService {
                         khachHang.setSotk(rs.getString("SOTK"));
                         khachHang.setSodu(rs.getString("SODU"));
 
+                        // Set các thông tin bổ sung
+                        khachHang.setCmnd(rs.getString("MAKH")); // MAKH chính là CMND
+
+                        // Lấy thêm thông tin chi tiết nếu có
+                        try {
+                            khachHang.setDiaChi(rs.getString("DIACHI"));
+                            khachHang.setPhai(rs.getString("PHAI"));
+                            khachHang.setSoDT(rs.getString("SODT"));
+                        } catch (Exception e) {
+                            // Nếu SP không trả về các field này, set empty
+                            khachHang.setDiaChi("");
+                            khachHang.setPhai("");
+                            khachHang.setSoDT("");
+                        }
+
                         // Lấy role hiện tại của user
                         String roleHienTai = layRoleHienTai(conn);
                         khachHang.setRole(roleHienTai);

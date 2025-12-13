@@ -9,6 +9,14 @@ public class KhachHang {
     private String sodu; // Số dư
     private String role; // Role trong hệ thống
 
+    // Thông tin bổ sung
+    private String cmnd;
+    private String diaChi;
+    private String phai;
+    private String soDT;
+    private String tenChiNhanh;
+    private String tenServer;
+
     public KhachHang() {
     }
 
@@ -75,5 +83,53 @@ public class KhachHang {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getCmnd() {
+        return cmnd;
+    }
+
+    public void setCmnd(String cmnd) {
+        this.cmnd = cmnd;
+    }
+
+    public String getDiaChi() {
+        return diaChi;
+    }
+
+    public void setDiaChi(String diaChi) {
+        this.diaChi = diaChi;
+    }
+
+    public String getPhai() {
+        return phai;
+    }
+
+    public void setPhai(String phai) {
+        this.phai = phai;
+    }
+
+    public String getSoDT() {
+        return soDT;
+    }
+
+    public void setSoDT(String soDT) {
+        this.soDT = soDT;
+    }
+
+    public String getTenChiNhanh() {
+        return tenChiNhanh;
+    }
+
+    public void setTenChiNhanh(String tenChiNhanh) {
+        this.tenChiNhanh = tenChiNhanh;
+    }
+
+    public String getTenServer() {
+        return tenServer;
+    }
+
+    public void setTenServer(String tenServer) {
+        this.tenServer = tenServer;
     }
 }
