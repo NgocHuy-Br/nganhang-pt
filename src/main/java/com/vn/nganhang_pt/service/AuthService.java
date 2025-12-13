@@ -1,6 +1,7 @@
 package com.vn.nganhang_pt.service;
 
 import com.vn.nganhang_pt.model.ChiNhanh;
+import com.vn.nganhang_pt.model.KhachHang;
 import com.vn.nganhang_pt.model.NhanVien;
 import org.springframework.stereotype.Service;
 
@@ -73,14 +74,14 @@ public class AuthService {
     }
 
     /**
-     * Đăng nhập và lấy thông tin nhân viên
+     * Đăng nhập và lấy thông tin người dùng (nhân viên hoặc khách hàng)
      * 
      * @param username  Tên đăng nhập
      * @param password  Mật khẩu
      * @param tenServer Tên server chi nhánh
-     * @return NhanVien object nếu thành công, null nếu thất bại
+     * @return NhanVien hoặc KhachHang object nếu thành công, null nếu thất bại
      */
-    public NhanVien dangNhap(String username, String password, String tenServer) {
+    public Object dangNhap(String username, String password, String tenServer) {
         // Lấy connection string tương ứng với server
         String connectionString = serverConnections.get(tenServer);
 
@@ -92,7 +93,41 @@ public class AuthService {
         System.out.println("[DEBUG] Đang thử đăng nhập với username=" + username + " vào server=" + tenServer);
 
         try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
-            // Kết nối thành công, giờ lấy thông tin nhân viên
+            // Kết nối thành công, thử lấy thông tin nhân viên trước
+            NhanVien nhanVien = layThongTinNhanVien(conn, username);
+            if (nhanVien != null) {
+                System.out.println("[DEBUG] Đăng nhập thành công với tư cách NHÂN VIÊN: " + nhanVien.getHoTen());
+                return nhanVien;
+            }
+
+            // Nếu không phải nhân viên, thử khách hàng
+            KhachHang khachHang = layThongTinKhachHang(conn, username, tenServer);
+            if (khachHang != null) {
+                System.out.println("[DEBUG] Đăng nhập thành công với tư cách KHÁCH HÀNG: " + khachHang.getHoten());
+                return khachHang;
+            }
+
+            System.err.println("[ERROR] Không tìm thấy thông tin người dùng");
+
+        } catch (java.sql.SQLException e) {
+            // Lỗi xác thực hoặc kết nối
+            System.err.println("[ERROR] Đăng nhập thất bại: " + e.getMessage());
+            if (e.getErrorCode() == 18456) {
+                System.err.println("[ERROR] Sai tên đăng nhập hoặc mật khẩu");
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi không xác định: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
+    /**
+     * Lấy thông tin nhân viên từ SP_Lay_Thong_Tin_NV_Tu_Login
+     */
+    private NhanVien layThongTinNhanVien(Connection conn, String username) {
+        try {
             String sql = "{call dbo.SP_Lay_Thong_Tin_NV_Tu_Login(?)}";
 
             try (CallableStatement stmt = conn.prepareCall(sql)) {
@@ -106,29 +141,51 @@ public class AuthService {
                         nhanVien.setTenNhom(rs.getString("TENNHOM"));
                         nhanVien.setMaCN(rs.getString("MACN"));
 
-                        System.out.println("[DEBUG] Đăng nhập thành công: " + nhanVien.getHoTen());
-
                         // Lấy role hiện tại của user
                         String roleHienTai = layRoleHienTai(conn);
                         nhanVien.setRole(roleHienTai);
-                        System.out.println("[DEBUG] Role hiện tại: " + roleHienTai);
 
                         return nhanVien;
                     }
                 }
             }
+        } catch (Exception e) {
+            System.out.println("[DEBUG] Không phải tài khoản nhân viên");
+        }
+        return null;
+    }
 
-        } catch (java.sql.SQLException e) {
-            // Lỗi xác thực hoặc kết nối
-            System.err.println("[ERROR] Đăng nhập thất bại: " + e.getMessage());
-            if (e.getErrorCode() == 18456) {
-                System.err.println("[ERROR] Sai tên đăng nhập hoặc mật khẩu");
+    /**
+     * Lấy thông tin khách hàng từ SP_Lay_Thong_Tin_KH_Tu_Login
+     */
+    private KhachHang layThongTinKhachHang(Connection conn, String username, String tenServer) {
+        try {
+            String sql = "{call dbo.SP_Lay_Thong_Tin_KH_Tu_Login(?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                stmt.setString(1, username);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        KhachHang khachHang = new KhachHang();
+                        khachHang.setMakh(rs.getString("MAKH"));
+                        khachHang.setHoten(rs.getString("HOTEN"));
+                        khachHang.setTennhom(rs.getString("TENNHOM"));
+                        khachHang.setMacn(rs.getString("MACN"));
+                        khachHang.setSotk(rs.getString("SOTK"));
+                        khachHang.setSodu(rs.getString("SODU"));
+
+                        // Lấy role hiện tại của user
+                        String roleHienTai = layRoleHienTai(conn);
+                        khachHang.setRole(roleHienTai);
+
+                        return khachHang;
+                    }
+                }
             }
         } catch (Exception e) {
-            System.err.println("[ERROR] Lỗi không xác định: " + e.getMessage());
-            e.printStackTrace();
+            System.out.println("[DEBUG] Không phải tài khoản khách hàng: " + e.getMessage());
         }
-
         return null;
     }
 
