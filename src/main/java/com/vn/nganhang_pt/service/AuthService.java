@@ -107,6 +107,12 @@ public class AuthService {
                         nhanVien.setMaCN(rs.getString("MACN"));
 
                         System.out.println("[DEBUG] Đăng nhập thành công: " + nhanVien.getHoTen());
+
+                        // Lấy role hiện tại của user
+                        String roleHienTai = layRoleHienTai(conn);
+                        nhanVien.setRole(roleHienTai);
+                        System.out.println("[DEBUG] Role hiện tại: " + roleHienTai);
+
                         return nhanVien;
                     }
                 }
@@ -124,5 +130,34 @@ public class AuthService {
         }
 
         return null;
+    }
+
+    /**
+     * Lấy role hiện tại của user đã đăng nhập
+     * Sử dụng SP_LayDanhSachRoleTheoQuyenHienTai
+     * 
+     * @param conn Connection đã mở với user đã xác thực
+     * @return Role hiện tại (NGANHANG, CHINHANH, hoặc KHONG_CO_QUYEN)
+     */
+    private String layRoleHienTai(Connection conn) {
+        try {
+            String sql = "{call dbo.SP_LayDanhSachRoleTheoQuyenHienTai()}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql);
+                    ResultSet rs = stmt.executeQuery()) {
+
+                // Lấy role đầu tiên (TOP 1)
+                if (rs.next()) {
+                    String role = rs.getString("TENNHOM");
+                    System.out.println("[DEBUG] SP trả về role: " + role);
+                    return role;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Không thể lấy role hiện tại: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return "KHONG_XAC_DINH";
     }
 }

@@ -60,6 +60,14 @@
             font-weight: 600;
         }
 
+        .role-badge.bg-success {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+        }
+
+        .role-badge.bg-info {
+            background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+        }
+
         .action-card {
             border-radius: 10px;
             transition: transform 0.2s, box-shadow 0.2s;
@@ -137,14 +145,24 @@
                     <div class="col-md-6">
                         <div class="info-item">
                             <span class="info-label">
-                                <i class="bi bi-building"></i> Phân mảnh đang làm việc
+                                <i class="bi bi-award-fill"></i> Vai trò hệ thống
                             </span>
-                            <span class="info-value" th:text="${tenChiNhanh}"></span>
+                            <span class="role-badge"
+                                th:classappend="${nhanVien.role == 'NGANHANG'} ? 'bg-success' : 'bg-info'"
+                                th:text="${nhanVien.role}"></span>
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
+                    <div class="col-md-6">
+                        <div class="info-item">
+                            <span class="info-label">
+                                <i class="bi bi-building"></i> Phân mảnh đang làm việc
+                            </span>
+                            <span class="info-value" th:text="${tenChiNhanh}"></span>
+                        </div>
+                    </div>
                     <div class="col-md-6">
                         <div class="info-item">
                             <span class="info-label">
@@ -153,6 +171,9 @@
                             <span class="info-value" th:text="${nhanVien.maCN}"></span>
                         </div>
                     </div>
+                </div>
+
+                <div class="row">
                     <div class="col-md-6">
                         <div class="info-item">
                             <span class="info-label">
@@ -161,9 +182,6 @@
                             <span class="info-value" th:text="${username}"></span>
                         </div>
                     </div>
-                </div>
-
-                <div class="row">
                     <div class="col-md-6">
                         <div class="info-item">
                             <span class="info-label">

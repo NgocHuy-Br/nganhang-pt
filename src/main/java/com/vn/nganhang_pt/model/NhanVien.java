@@ -5,6 +5,7 @@ public class NhanVien {
     private String hoTen;
     private String tenNhom;
     private String maCN;
+    private String role; // Role của user trong hệ thống (NGANHANG, CHINHANH)
 
     public NhanVien() {
     }
@@ -46,5 +47,13 @@ public class NhanVien {
 
     public void setMaCN(String maCN) {
         this.maCN = maCN;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }
