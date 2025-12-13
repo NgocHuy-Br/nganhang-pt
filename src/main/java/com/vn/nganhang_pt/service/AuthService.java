@@ -1,48 +1,40 @@
 package com.vn.nganhang_pt.service;
 
+import com.vn.nganhang_pt.config.FragmentConfig;
 import com.vn.nganhang_pt.model.ChiNhanh;
 import com.vn.nganhang_pt.model.KhachHang;
 import com.vn.nganhang_pt.model.NhanVien;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class AuthService {
 
-    // Map server name to connection string
-    private final Map<String, String> serverConnections = new HashMap<>();
+    private final DataSource dataSource;
+    private final FragmentConfig fragmentConfig;
 
-    public AuthService() {
-        // Khởi tạo mapping các server - tên server từ view Get_Subscribes
-        serverConnections.put("HCM-LAPT-001\\SQLSRV_NH01",
-                "jdbc:sqlserver://10.241.78.94:1440;databaseName=NGANHANG;encrypt=true;trustServerCertificate=true");
-        serverConnections.put("HCM-LAPT-001\\SQLSRV_NH02",
-                "jdbc:sqlserver://10.241.78.94:1441;databaseName=NGANHANG;encrypt=true;trustServerCertificate=true");
-        serverConnections.put("HCM-LAPT-001\\SQLSRV_NH03",
-                "jdbc:sqlserver://10.241.78.94:1443;databaseName=NGANHANG;encrypt=true;trustServerCertificate=true");
+    @Autowired
+    public AuthService(DataSource dataSource, FragmentConfig fragmentConfig) {
+        this.dataSource = dataSource;
+        this.fragmentConfig = fragmentConfig;
     }
 
     /**
-     * Lấy danh sách chi nhánh từ view V_DS_PHANMANH (tương tự C# Winform)
-     * View trả về TENCN và TENSERVER của các phân mảnh đã cấu hình
+     * Lấy danh sách chi nhánh từ view Get_Subscribes
+     * Sử dụng DataSource đã cấu hình trong application.properties
      */
     public List<ChiNhanh> layDanhSachChiNhanh() {
         List<ChiNhanh> danhSach = new ArrayList<>();
 
-        // Kết nối đến CSDL gốc (Publisher) để lấy danh sách phân mảnh
-        String url = "jdbc:sqlserver://10.241.78.94;databaseName=NGANHANG;encrypt=true;trustServerCertificate=true";
-        String user = "HTKN";
-        String password = "123456";
-
-        try (Connection conn = DriverManager.getConnection(url, user, password)) {
+        try (Connection conn = dataSource.getConnection()) {
             // Query view Get_Subscribes để lấy danh sách phân mảnh
             String sql = "SELECT TENCN, TENSERVER FROM dbo.Get_Subscribes ORDER BY TENSERVER";
 
@@ -82,11 +74,13 @@ public class AuthService {
      * @return NhanVien hoặc KhachHang object nếu thành công, null nếu thất bại
      */
     public Object dangNhap(String username, String password, String tenServer) {
-        // Lấy connection string tương ứng với server
-        String connectionString = serverConnections.get(tenServer);
+        // Lấy connection string từ FragmentConfig
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
 
         if (connectionString == null) {
             System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
+            System.err.println("[ERROR] Server name: " + tenServer);
+            System.err.println("[ERROR] Available servers: " + fragmentConfig.getConnections().keySet());
             return null;
         }
 
