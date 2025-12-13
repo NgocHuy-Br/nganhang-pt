@@ -280,20 +280,35 @@
                                     <div class="fw-bold" th:text="${nhanVien.maNV}">NV001</div>
                                 </div>
                                 <div class="info-item mb-3">
-                                    <label class="text-muted mb-1">Họ tên</label>
+                                    <label class="text-muted mb-1">Họ</label>
+                                    <div class="fw-bold" th:text="${nhanVien.ho}">Nguyễn</div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Tên</label>
+                                    <div class="fw-bold" th:text="${nhanVien.ten}">Văn A</div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Họ tên đầy đủ</label>
                                     <div class="fw-bold" th:text="${nhanVien.hoTen}">Nguyễn Văn A</div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">CMND</label>
+                                    <div class="fw-bold" th:text="${nhanVien.cmnd}">123456789</div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Giới tính</label>
+                                    <div class="fw-bold" th:text="${nhanVien.phai}">Nam</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Số điện thoại</label>
+                                    <div class="fw-bold" th:text="${nhanVien.soDT}">0909123456</div>
                                 </div>
                                 <div class="info-item mb-3">
                                     <label class="text-muted mb-1">Địa chỉ</label>
                                     <div class="fw-bold" th:text="${nhanVien.diaChi}">123 Nguyễn Huệ, Q1, TP.HCM</div>
                                 </div>
-                                <div class="info-item mb-3">
-                                    <label class="text-muted mb-1">Ngày sinh</label>
-                                    <div class="fw-bold" th:text="${#dates.format(nhanVien.ngaySinh, 'dd/MM/yyyy')}">
-                                        01/01/1990</div>
-                                </div>
-                            </div>
-                            <div class="col-md-6">
                                 <div class="info-item mb-3">
                                     <label class="text-muted mb-1">Tên đăng nhập</label>
                                     <div class="fw-bold" th:text="${nhanVien.tenDangNhap}">admin</div>

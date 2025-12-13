@@ -20,6 +20,8 @@ spring:
 # Cấu hình các phân mảnh (Fragment Configuration)
 app:
   fragments:
+    username: HTKN
+    password: '123456'
     servers:
       - name: 'HCM-LAPT-001\SQLSRV_NH01'
         url: jdbc:sqlserver://10.241.78.94:1440;databaseName=NGANHANG;encrypt=true;trustServerCertificate=true

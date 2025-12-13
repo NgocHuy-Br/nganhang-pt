@@ -94,6 +94,32 @@ public class AuthController {
             // Lưu vào session tùy theo loại user
             if (userInfo instanceof NhanVien) {
                 NhanVien nhanVien = (NhanVien) userInfo;
+
+                // Lấy thông tin đầy đủ từ SP_ThongTinDangNhapHienTai
+                try {
+                    System.out.println("[DEBUG] Gọi SP_ThongTinDangNhapHienTai với maNV=" + nhanVien.getMaNV()
+                            + ", role=" + nhanVien.getRole() + ", server=" + tenServer);
+                    NhanVien thongTinDayDu = authService.layThongTinDayDuNhanVien(
+                            nhanVien.getMaNV(),
+                            nhanVien.getRole(),
+                            tenServer);
+
+                    if (thongTinDayDu != null) {
+                        System.out.println("[DEBUG] Nhận được thông tin đầy đủ: ho=" + thongTinDayDu.getHo() + ", ten="
+                                + thongTinDayDu.getTen() + ", cmnd=" + thongTinDayDu.getCmnd());
+                        // Copy thông tin đầy đủ, giữ lại tenDangNhap và ngaySinh từ object cũ
+                        thongTinDayDu.setTenDangNhap(nhanVien.getTenDangNhap());
+                        thongTinDayDu.setNgaySinh(nhanVien.getNgaySinh());
+                        nhanVien = thongTinDayDu;
+                    } else {
+                        System.out.println("[WARNING] SP_ThongTinDangNhapHienTai trả về null");
+                    }
+                } catch (Exception e) {
+                    System.err.println("[WARNING] Không lấy được thông tin đầy đủ: " + e.getMessage());
+                    e.printStackTrace();
+                    // Vẫn tiếp tục với thông tin hiện có
+                }
+
                 // Set thêm thông tin server và chi nhánh vào object
                 nhanVien.setTenServer(tenServer);
                 nhanVien.setTenChiNhanh(tenChiNhanh);

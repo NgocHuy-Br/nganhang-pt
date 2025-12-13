@@ -232,4 +232,72 @@ public class AuthService {
 
         return "KHONG_XAC_DINH";
     }
+
+    /**
+     * Lấy thông tin đầy đủ của nhân viên đã đăng nhập
+     * Sử dụng SP_ThongTinDangNhapHienTai
+     * 
+     * @param loginID   Mã nhân viên
+     * @param role      Role hiện tại
+     * @param tenServer Tên server phân mảnh
+     * @return NhanVien với đầy đủ thông tin
+     */
+    public NhanVien layThongTinDayDuNhanVien(String loginID, String role, String tenServer) {
+        System.out.println("[DEBUG AuthService] Bắt đầu lấy thông tin đầy đủ cho loginID=" + loginID + ", role=" + role
+                + ", server=" + tenServer);
+
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
+        if (connectionString == null) {
+            System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
+            System.out.println("[DEBUG] Available servers: " + fragmentConfig.getConnections().keySet());
+            return null;
+        }
+
+        System.out.println("[DEBUG] Connection string: "
+                + connectionString.substring(0, Math.min(80, connectionString.length())) + "...");
+        System.out.println("[DEBUG] Username: " + fragmentConfig.getUsername());
+
+        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
+                fragmentConfig.getPassword())) {
+            System.out.println("[DEBUG] Kết nối thành công, đang gọi SP...");
+            String sql = "{call dbo.SP_ThongTinDangNhapHienTai(?, ?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                stmt.setString(1, loginID);
+                stmt.setString(2, role);
+
+                System.out.println("[DEBUG] Executing SP với params: loginID=" + loginID + ", role=" + role);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    System.out.println("[DEBUG] SP thực thi xong, kiểm tra kết quả...");
+
+                    if (rs.next()) {
+                        System.out.println("[DEBUG] Tìm thấy kết quả từ SP!");
+                        NhanVien nhanVien = new NhanVien();
+                        nhanVien.setMaNV(rs.getString("ID"));
+                        nhanVien.setHo(rs.getString("HO"));
+                        nhanVien.setTen(rs.getString("TEN"));
+                        nhanVien.setHoTen(rs.getString("HO") + " " + rs.getString("TEN"));
+                        nhanVien.setCmnd(rs.getString("CMND"));
+                        nhanVien.setDiaChi(rs.getString("DIACHI"));
+                        nhanVien.setPhai(rs.getString("PHAI"));
+                        nhanVien.setSoDT(rs.getString("SODT"));
+                        nhanVien.setMaCN(rs.getString("MACN"));
+                        nhanVien.setRole(rs.getString("ROLE"));
+                        nhanVien.setTenNhom(rs.getString("ROLE"));
+
+                        System.out.println("[DEBUG] Đã map xong dữ liệu: maNV=" + nhanVien.getMaNV() + ", ho="
+                                + nhanVien.getHo() + ", ten=" + nhanVien.getTen());
+                        return nhanVien;
+                    } else {
+                        System.out.println("[WARNING] SP không trả về dòng nào (rs.next() = false)");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi khi lấy thông tin đầy đủ nhân viên: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
