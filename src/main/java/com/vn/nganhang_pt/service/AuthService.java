@@ -141,6 +141,21 @@ public class AuthService {
                         nhanVien.setTenNhom(rs.getString("TENNHOM"));
                         nhanVien.setMaCN(rs.getString("MACN"));
 
+                        // Set thêm các field mới từ ResultSet (nếu SP trả về)
+                        try {
+                            nhanVien.setDiaChi(rs.getString("DIACHI"));
+                        } catch (Exception e) {
+                            nhanVien.setDiaChi(""); // Set empty nếu không có
+                        }
+
+                        try {
+                            nhanVien.setNgaySinh(rs.getDate("NGAYSINH"));
+                        } catch (Exception e) {
+                            nhanVien.setNgaySinh(null);
+                        }
+
+                        nhanVien.setTenDangNhap(username);
+
                         // Lấy role hiện tại của user
                         String roleHienTai = layRoleHienTai(conn);
                         nhanVien.setRole(roleHienTai);

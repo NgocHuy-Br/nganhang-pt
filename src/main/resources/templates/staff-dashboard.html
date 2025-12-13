@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản trị hệ thống - Ngân hàng Phân tán</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --sidebar-width: 260px;
+        }
+
+        body {
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-header h4 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .user-info {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin: 20px;
+        }
+
+        .user-info .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .user-info .user-role {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+
+        .sidebar-menu li {
+            margin: 5px 0;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border-left-color: white;
+        }
+
+        .sidebar-menu a i {
+            font-size: 1.2rem;
+            width: 30px;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 0;
+        }
+
+        .top-navbar {
+            background: white;
+            padding: 20px 30px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #2d3748;
+            margin: 0;
+        }
+
+        .content-area {
+            padding: 30px;
+        }
+
+        .content-card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            min-height: 500px;
+        }
+
+        .btn-logout {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-logout:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+        }
+
+        /* Tab Content Placeholder */
+        .placeholder-content {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .placeholder-content i {
+            font-size: 5rem;
+            color: #cbd5e0;
+            margin-bottom: 20px;
+        }
+
+        .placeholder-content h3 {
+            color: #4a5568;
+            margin-bottom: 10px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .page-title {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h4><i class="bi bi-bank2"></i> Ngân hàng PT</h4>
+            </div>
+
+            <!-- User Info -->
+            <div class="user-info">
+                <div class="user-name" th:text="${nhanVien.hoTen}">Nguyễn Văn A</div>
+                <div class="user-role">
+                    <i class="bi bi-shield-check"></i>
+                    <span th:text="${nhanVien.tenNhom}">CHINHANH</span>
+                </div>
+                <div class="user-role mt-2">
+                    <i class="bi bi-building"></i>
+                    <span th:text="${nhanVien.tenChiNhanh}">Chi nhánh Bến Thành</span>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="#" class="nav-link active" data-tab="account-info">
+                        <i class="bi bi-person-circle"></i>
+                        <span>Thông tin tài khoản</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-tab="employees">
+                        <i class="bi bi-people-fill"></i>
+                        <span>Quản lý nhân viên</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-tab="customers">
+                        <i class="bi bi-person-badge"></i>
+                        <span>Quản lý khách hàng</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-tab="transactions">
+                        <i class="bi bi-arrow-left-right"></i>
+                        <span>Giao dịch</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="nav-link" data-tab="statistics">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Thống kê & Báo cáo</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div style="position: absolute; bottom: 20px; left: 20px; right: 20px;">
+                <a href="/logout" class="btn btn-logout w-100">
+                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <div class="top-navbar">
+                <h1 class="page-title" id="page-title">Thông tin tài khoản</h1>
+                <div>
+                    <span class="text-muted">
+                        <i class="bi bi-calendar3"></i>
+                        <span id="current-date"></span>
+                    </span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <div class="content-card">
+                    <!-- Tab: Account Info -->
+                    <div id="account-info" class="tab-content-item active">
+                        <h3 class="mb-4"><i class="bi bi-person-circle"></i> Thông tin tài khoản</h3>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Mã nhân viên</label>
+                                    <div class="fw-bold" th:text="${nhanVien.maNV}">NV001</div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Họ tên</label>
+                                    <div class="fw-bold" th:text="${nhanVien.hoTen}">Nguyễn Văn A</div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Địa chỉ</label>
+                                    <div class="fw-bold" th:text="${nhanVien.diaChi}">123 Nguyễn Huệ, Q1, TP.HCM</div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Ngày sinh</label>
+                                    <div class="fw-bold" th:text="${#dates.format(nhanVien.ngaySinh, 'dd/MM/yyyy')}">
+                                        01/01/1990</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Tên đăng nhập</label>
+                                    <div class="fw-bold" th:text="${nhanVien.tenDangNhap}">admin</div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Vai trò</label>
+                                    <div>
+                                        <span class="badge bg-primary" th:text="${nhanVien.tenNhom}">CHINHANH</span>
+                                    </div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Chi nhánh</label>
+                                    <div class="fw-bold" th:text="${nhanVien.tenChiNhanh}">Chi nhánh Bến Thành</div>
+                                </div>
+                                <div class="info-item mb-3">
+                                    <label class="text-muted mb-1">Server phân mảnh</label>
+                                    <div class="fw-bold text-primary" th:text="${nhanVien.tenServer}">
+                                        HCM-LAPT-001\SQLSRV_NH01</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Lưu ý:</strong> Thông tin được lưu trữ phân tán trên server
+                            <code th:text="${nhanVien.tenServer}">HCM-LAPT-001\SQLSRV_NH01</code>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Employees -->
+                    <div id="employees" class="tab-content-item" style="display: none;">
+                        <div class="placeholder-content">
+                            <i class="bi bi-people-fill"></i>
+                            <h3>Quản lý nhân viên</h3>
+                            <p>Chức năng CRUD nhân viên và tạo tài khoản mới</p>
+                            <p class="text-muted">Đang phát triển...</p>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Customers -->
+                    <div id="customers" class="tab-content-item" style="display: none;">
+                        <div class="placeholder-content">
+                            <i class="bi bi-person-badge"></i>
+                            <h3>Quản lý khách hàng</h3>
+                            <p>Chức năng CRUD khách hàng và tạo tài khoản mới</p>
+                            <p class="text-muted">Đang phát triển...</p>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Transactions -->
+                    <div id="transactions" class="tab-content-item" style="display: none;">
+                        <div class="placeholder-content">
+                            <i class="bi bi-arrow-left-right"></i>
+                            <h3>Giao dịch</h3>
+                            <p>Nhập giao dịch: Rút tiền, Nộp tiền, Chuyển tiền</p>
+                            <p class="text-muted">Đang phát triển...</p>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Statistics -->
+                    <div id="statistics" class="tab-content-item" style="display: none;">
+                        <div class="placeholder-content">
+                            <i class="bi bi-graph-up"></i>
+                            <h3>Thống kê & Báo cáo</h3>
+                            <p>Sao kê giao dịch, Thống kê tài khoản mở theo ngày</p>
+                            <p class="text-muted">Đang phát triển...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Display current date
+        const dateElement = document.getElementById('current-date');
+        const today = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        dateElement.textContent = today.toLocaleDateString('vi-VN', options);
+
+        // Tab navigation
+        const navLinks = document.querySelectorAll('.nav-link');
+        const tabContents = document.querySelectorAll('.tab-content-item');
+        const pageTitle = document.getElementById('page-title');
+
+        const tabTitles = {
+            'account-info': 'Thông tin tài khoản',
+            'employees': 'Quản lý nhân viên',
+            'customers': 'Quản lý khách hàng',
+            'transactions': 'Giao dịch',
+            'statistics': 'Thống kê & Báo cáo'
+        };
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tabId = link.getAttribute('data-tab');
+
+                // Update active nav link
+                navLinks.forEach(l => l.classList.remove('active'));
+                link.classList.add('active');
+
+                // Show corresponding tab content
+                tabContents.forEach(content => {
+                    content.style.display = 'none';
+                });
+                document.getElementById(tabId).style.display = 'block';
+
+                // Update page title
+                pageTitle.textContent = tabTitles[tabId];
+            });
+        });
+    </script>
+</body>
+
+</html>

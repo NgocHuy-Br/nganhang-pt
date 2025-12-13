@@ -94,6 +94,10 @@ public class AuthController {
             // Lưu vào session tùy theo loại user
             if (userInfo instanceof NhanVien) {
                 NhanVien nhanVien = (NhanVien) userInfo;
+                // Set thêm thông tin server và chi nhánh vào object
+                nhanVien.setTenServer(tenServer);
+                nhanVien.setTenChiNhanh(tenChiNhanh);
+
                 session.setAttribute("userType", "NHANVIEN");
                 session.setAttribute("userInfo", nhanVien);
                 session.setAttribute("nhanVien", nhanVien); // Giữ lại cho backward compatibility
@@ -145,9 +149,13 @@ public class AuthController {
         if ("NHANVIEN".equals(userType)) {
             NhanVien nhanVien = (NhanVien) session.getAttribute("nhanVien");
             model.addAttribute("nhanVien", nhanVien);
+            // Điều hướng nhân viên đến dashboard
+            return "staff-dashboard";
         } else if ("KHACHHANG".equals(userType)) {
             KhachHang khachHang = (KhachHang) session.getAttribute("khachHang");
             model.addAttribute("khachHang", khachHang);
+            // Khách hàng vẫn dùng giao diện cũ
+            return "home";
         }
 
         return "home";
