@@ -156,7 +156,7 @@
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="info-item">
@@ -171,8 +171,8 @@
                                 <span class="info-label">
                                     <i class="bi bi-cash-stack"></i> Số dư
                                 </span>
-                                <span class="info-value" style="color: #28a745; font-weight: bold;" 
-                                      th:text="${#numbers.formatDecimal(khachHang.sodu, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
+                                <span class="info-value" style="color: #28a745; font-weight: bold;"
+                                    th:text="${#numbers.formatDecimal(khachHang.sodu, 0, 'COMMA', 0, 'POINT')} + ' VNĐ'"></span>
                             </div>
                         </div>
                     </div>
@@ -184,8 +184,8 @@
                             <span class="info-label">
                                 <i class="bi bi-shield-check"></i> Nhóm quyền
                             </span>
-                            <span class="role-badge" 
-                                  th:text="${userType == 'NHANVIEN' ? nhanVien.tenNhom : khachHang.tennhom}"></span>
+                            <span class="role-badge"
+                                th:text="${userType == 'NHANVIEN' ? nhanVien.tenNhom : khachHang.tennhom}"></span>
                         </div>
                     </div>
                     <div class="col-md-6">
@@ -214,8 +214,8 @@
                             <span class="info-label">
                                 <i class="bi bi-geo-alt-fill"></i> Chi nhánh gốc
                             </span>
-                            <span class="info-value" 
-                                  th:text="${userType == 'NHANVIEN' ? nhanVien.maCN : khachHang.macn}"></span>
+                            <span class="info-value"
+                                th:text="${userType == 'NHANVIEN' ? nhanVien.maCN : khachHang.macn}"></span>
                         </div>
                     </div>
                 </div>

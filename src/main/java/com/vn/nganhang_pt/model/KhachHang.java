@@ -1,13 +1,13 @@
 package com.vn.nganhang_pt.model;
 
 public class KhachHang {
-    private String makh;      // CMND
+    private String makh; // CMND
     private String hoten;
     private String tennhom;
     private String macn;
-    private String sotk;      // Số tài khoản
-    private String sodu;      // Số dư
-    private String role;      // Role trong hệ thống
+    private String sotk; // Số tài khoản
+    private String sodu; // Số dư
+    private String role; // Role trong hệ thống
 
     public KhachHang() {
     }

@@ -129,7 +129,7 @@ public class AuthController {
     public String home(HttpSession session, Model model) {
         // Kiểm tra loại user
         String userType = (String) session.getAttribute("userType");
-        
+
         if (userType == null) {
             // Chưa đăng nhập, redirect về trang login
             return "redirect:/login";
