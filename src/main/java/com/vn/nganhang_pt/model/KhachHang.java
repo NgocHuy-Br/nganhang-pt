@@ -10,6 +10,8 @@ public class KhachHang {
     private String role; // Role trong hệ thống
 
     // Thông tin bổ sung
+    private String ho;
+    private String ten;
     private String cmnd;
     private String diaChi;
     private String phai;
@@ -83,6 +85,22 @@ public class KhachHang {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public String getHo() {
+        return ho;
+    }
+
+    public void setHo(String ho) {
+        this.ho = ho;
+    }
+
+    public String getTen() {
+        return ten;
+    }
+
+    public void setTen(String ten) {
+        this.ten = ten;
     }
 
     public String getCmnd() {

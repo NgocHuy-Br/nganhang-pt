@@ -130,6 +130,41 @@ public class AuthController {
             } else if (userInfo instanceof KhachHang) {
                 KhachHang khachHang = (KhachHang) userInfo;
 
+                // Lấy thông tin đầy đủ từ bảng KHACHHANG
+                try {
+                    System.out.println("[DEBUG CONTROLLER] Khách hàng trước khi query: cmnd=" + khachHang.getCmnd()
+                            + ", hoten=" + khachHang.getHoten() + ", server=" + tenServer);
+
+                    KhachHang thongTinDayDu = authService.layThongTinDayDuKhachHang(
+                            khachHang.getCmnd(),
+                            tenServer);
+
+                    if (thongTinDayDu != null) {
+                        System.out.println("[DEBUG CONTROLLER] Nhận được thông tin đầy đủ khách hàng: ho="
+                                + thongTinDayDu.getHo() + ", ten=" + thongTinDayDu.getTen() + ", cmnd="
+                                + thongTinDayDu.getCmnd() + ", diaChi=" + thongTinDayDu.getDiaChi() + ", phai="
+                                + thongTinDayDu.getPhai() + ", soDT=" + thongTinDayDu.getSoDT());
+
+                        // Copy thông tin đầy đủ, giữ lại các trường từ object cũ
+                        thongTinDayDu.setMakh(khachHang.getMakh());
+                        thongTinDayDu.setSotk(khachHang.getSotk());
+                        thongTinDayDu.setSodu(khachHang.getSodu());
+                        thongTinDayDu.setRole(khachHang.getRole());
+                        thongTinDayDu.setTennhom(khachHang.getTennhom());
+                        khachHang = thongTinDayDu;
+
+                        System.out.println("[DEBUG CONTROLLER] Đã update khách hàng: ho=" + khachHang.getHo()
+                                + ", ten=" + khachHang.getTen() + ", hoten=" + khachHang.getHoten());
+                    } else {
+                        System.out.println("[WARNING CONTROLLER] Không query được thông tin khách hàng từ CMND");
+                    }
+                } catch (Exception e) {
+                    System.err.println("[WARNING CONTROLLER] Lỗi khi query thông tin khách hàng: "
+                            + e.getMessage());
+                    e.printStackTrace();
+                    // Vẫn tiếp tục với thông tin hiện có
+                }
+
                 // Set thêm thông tin server và chi nhánh vào object
                 khachHang.setTenServer(tenServer);
                 khachHang.setTenChiNhanh(tenChiNhanh);

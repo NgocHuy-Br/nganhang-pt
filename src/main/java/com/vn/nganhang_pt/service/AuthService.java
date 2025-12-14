@@ -11,6 +11,7 @@ import javax.sql.DataSource;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
@@ -311,6 +312,66 @@ public class AuthService {
             }
         } catch (Exception e) {
             System.err.println("[ERROR] Lỗi khi lấy thông tin đầy đủ nhân viên: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /**
+     * Lấy thông tin đầy đủ của khách hàng đã đăng nhập
+     * Query trực tiếp bảng KHACHHANG
+     * 
+     * @param cmnd      CMND khách hàng
+     * @param tenServer Tên server phân mảnh
+     * @return KhachHang với đầy đủ thông tin
+     */
+    public KhachHang layThongTinDayDuKhachHang(String cmnd, String tenServer) {
+        System.out.println("[DEBUG AuthService] Bắt đầu query thông tin đầy đủ khách hàng cho CMND=" + cmnd
+                + ", server=" + tenServer);
+
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
+        if (connectionString == null) {
+            System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
+            return null;
+        }
+
+        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
+                fragmentConfig.getPassword())) {
+            System.out.println("[DEBUG] Kết nối thành công, đang query KHACHHANG...");
+
+            // Query trực tiếp bảng KHACHHANG để lấy thông tin chi tiết
+            String sql = "SELECT KH.CMND, KH.HO, KH.TEN, KH.DIACHI, KH.PHAI, KH.SODT, KH.MACN " +
+                    "FROM KHACHHANG KH WHERE KH.CMND = ?";
+
+            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+                stmt.setString(1, cmnd);
+
+                System.out.println("[DEBUG] Executing query với CMND=" + cmnd);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        System.out.println("[DEBUG] Tìm thấy thông tin khách hàng từ bảng KHACHHANG!");
+                        KhachHang khachHang = new KhachHang();
+                        khachHang.setCmnd(rs.getString("CMND"));
+                        khachHang.setHo(rs.getString("HO"));
+                        khachHang.setTen(rs.getString("TEN"));
+                        khachHang.setHoten(rs.getString("HO") + " " + rs.getString("TEN"));
+                        khachHang.setDiaChi(rs.getString("DIACHI"));
+                        khachHang.setPhai(rs.getString("PHAI"));
+                        khachHang.setSoDT(rs.getString("SODT"));
+                        khachHang.setMacn(rs.getString("MACN"));
+
+                        System.out.println("[DEBUG] Đã map dữ liệu: ho=" + khachHang.getHo() + ", ten="
+                                + khachHang.getTen() + ", diaChi=" + khachHang.getDiaChi() + ", phai="
+                                + khachHang.getPhai() + ", soDT=" + khachHang.getSoDT());
+                        return khachHang;
+                    } else {
+                        System.out.println("[WARNING] Không tìm thấy khách hàng với CMND=" + cmnd);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi khi query thông tin khách hàng: " + e.getMessage());
             e.printStackTrace();
         }
         return null;
