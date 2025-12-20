@@ -2,8 +2,10 @@ package com.vn.nganhang_pt.service;
 
 import com.vn.nganhang_pt.config.FragmentConfig;
 import com.vn.nganhang_pt.model.ChiNhanh;
+import com.vn.nganhang_pt.model.GiaoDich;
 import com.vn.nganhang_pt.model.KhachHang;
 import com.vn.nganhang_pt.model.NhanVien;
+import com.vn.nganhang_pt.model.TaiKhoan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +15,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -375,5 +378,98 @@ public class AuthService {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Lấy danh sách tài khoản của khách hàng
+     * 
+     * @param cmnd      CMND khách hàng
+     * @param tenServer Tên server phân mảnh
+     * @return Danh sách tài khoản
+     */
+    public List<TaiKhoan> layDanhSachTaiKhoan(String cmnd, String tenServer) {
+        System.out.println("[DEBUG] Lấy danh sách tài khoản cho CMND=" + cmnd + ", server=" + tenServer);
+
+        List<TaiKhoan> danhSach = new ArrayList<>();
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
+        if (connectionString == null) {
+            System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
+            return danhSach;
+        }
+
+        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
+                fragmentConfig.getPassword())) {
+            String sql = "{call dbo.sp_LayDSTaiKhoan_KhachHang(?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                stmt.setString(1, cmnd);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        TaiKhoan tk = new TaiKhoan();
+                        tk.setSotk(rs.getString("SOTK"));
+                        tk.setSodu(rs.getBigDecimal("SODU"));
+                        tk.setNgayMotk(rs.getDate("NGAYMOTK") != null ? rs.getDate("NGAYMOTK").toLocalDate() : null);
+                        tk.setMacn(rs.getString("MACN"));
+                        tk.setTencn(rs.getString("TENCN"));
+                        tk.setSite(rs.getString("SITE"));
+                        danhSach.add(tk);
+                    }
+                    System.out.println("[DEBUG] Tìm thấy " + danhSach.size() + " tài khoản");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi khi lấy danh sách tài khoản: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return danhSach;
+    }
+
+    /**
+     * Lấy sao kê tài khoản
+     * 
+     * @param sotk      Số tài khoản
+     * @param tuNgay    Từ ngày
+     * @param denNgay   Đến ngày
+     * @param tenServer Tên server phân mảnh
+     * @return Danh sách giao dịch
+     */
+    public List<GiaoDich> xemSaoKe(String sotk, LocalDate tuNgay, LocalDate denNgay, String tenServer) {
+        System.out.println("[DEBUG] Xem sao kê cho SOTK=" + sotk + ", từ " + tuNgay + " đến " + denNgay);
+
+        List<GiaoDich> danhSach = new ArrayList<>();
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
+        if (connectionString == null) {
+            System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
+            return danhSach;
+        }
+
+        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
+                fragmentConfig.getPassword())) {
+            String sql = "{call dbo.SP_XemSaoKeKhachHang(?, ?, ?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                stmt.setString(1, sotk);
+                stmt.setDate(2, java.sql.Date.valueOf(tuNgay));
+                stmt.setDate(3, java.sql.Date.valueOf(denNgay));
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        GiaoDich gd = new GiaoDich();
+                        gd.setSoDuDau(rs.getBigDecimal("Số dư đầu"));
+                        gd.setNgay(rs.getTimestamp("Ngày") != null ? rs.getTimestamp("Ngày").toLocalDateTime() : null);
+                        gd.setLoaiGiaoDich(rs.getString("Loại giao dịch"));
+                        gd.setSoTien(rs.getBigDecimal("Số tiền"));
+                        gd.setSoDuSau(rs.getBigDecimal("Số dư sau"));
+                        danhSach.add(gd);
+                    }
+                    System.out.println("[DEBUG] Tìm thấy " + danhSach.size() + " giao dịch");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi khi xem sao kê: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return danhSach;
     }
 }

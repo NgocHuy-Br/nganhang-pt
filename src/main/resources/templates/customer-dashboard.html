@@ -263,6 +263,14 @@
         .placeholder-content p {
             font-size: 14px;
         }
+
+        .bg-gradient-blue {
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-light) 100%);
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f0f9ff;
+        }
     </style>
 </head>
 
@@ -280,11 +288,7 @@
             <h5 th:text="${khachHang.hoten}">Nguyễn Văn A</h5>
             <p>
                 <i class="bi bi-shield-check"></i>
-                <span th:text="${khachHang.role}">KHACHHANG</span>
-            </p>
-            <p>
-                <i class="bi bi-building"></i>
-                <span th:text="${khachHang.tenChiNhanh}">Chi nhánh Bến Thành</span>
+                <span th:text="${khachHang.role == 'KHONG_CO_QUYEN' ? 'Khách hàng' : khachHang.role}">Khách hàng</span>
             </p>
         </div>
 
@@ -292,7 +296,7 @@
             <li>
                 <a href="#" class="nav-link active" data-tab="account-info">
                     <i class="bi bi-person-circle"></i>
-                    <span>Thông tin tài khoản</span>
+                    <span>Thông tin cá nhân</span>
                 </a>
             </li>
             <li>
@@ -328,21 +332,9 @@
             <div class="content-card">
                 <!-- Tab: Account Info -->
                 <div id="account-info" class="tab-content-item active">
-                    <h3 class="mb-4"><i class="bi bi-person-circle"></i> Thông tin tài khoản</h3>
+                    <h3 class="mb-4"><i class="bi bi-person-circle"></i> Thông tin cá nhân</h3>
                     <div class="row">
                         <div class="col-md-6">
-                            <div class="info-item mb-3">
-                                <label class="text-muted mb-1">Số tài khoản</label>
-                                <div class="fw-bold" th:text="${khachHang.sotk}">1234567890</div>
-                            </div>
-                            <div class="info-item mb-3">
-                                <label class="text-muted mb-1">Họ</label>
-                                <div class="fw-bold" th:text="${khachHang.ho}">Trần Thị</div>
-                            </div>
-                            <div class="info-item mb-3">
-                                <label class="text-muted mb-1">Tên</label>
-                                <div class="fw-bold" th:text="${khachHang.ten}">Mai Thi</div>
-                            </div>
                             <div class="info-item mb-3">
                                 <label class="text-muted mb-1">Họ tên đầy đủ</label>
                                 <div class="fw-bold" th:text="${khachHang.hoten}">Trần Thị Mai Thi</div>
@@ -351,12 +343,12 @@
                                 <label class="text-muted mb-1">CMND</label>
                                 <div class="fw-bold" th:text="${khachHang.cmnd}">123456789</div>
                             </div>
-                        </div>
-                        <div class="col-md-6">
                             <div class="info-item mb-3">
                                 <label class="text-muted mb-1">Giới tính</label>
                                 <div class="fw-bold" th:text="${khachHang.phai}">Nam</div>
                             </div>
+                        </div>
+                        <div class="col-md-6">
                             <div class="info-item mb-3">
                                 <label class="text-muted mb-1">Số điện thoại</label>
                                 <div class="fw-bold" th:text="${khachHang.soDT}">0909123456</div>
@@ -366,32 +358,92 @@
                                 <div class="fw-bold" th:text="${khachHang.diaChi}">123 Nguyễn Huệ, Q1, TP.HCM</div>
                             </div>
                             <div class="info-item mb-3">
-                                <label class="text-muted mb-1">Chi nhánh</label>
+                                <label class="text-muted mb-1">Chi nhánh gốc</label>
                                 <div class="fw-bold" th:text="${khachHang.tenChiNhanh}">Chi nhánh Bến Thành</div>
                             </div>
-                            <div class="info-item mb-3">
+                            <!-- Server info hidden but kept for debugging -->
+                            <div class="info-item mb-3" style="display: none;">
                                 <label class="text-muted mb-1">Server phân mảnh</label>
                                 <div class="fw-bold text-primary" th:text="${khachHang.tenServer}">
                                     HCM-LAPT-001\SQLSRV_NH01</div>
                             </div>
                         </div>
                     </div>
-
-                    <hr class="my-4">
-
-                    <div class="alert alert-info">
-                        <i class="bi bi-info-circle"></i>
-                        <strong>Lưu ý:</strong> Thông tin được lưu trữ phân tán trên server
-                        <code th:text="${khachHang.tenServer}">HCM-LAPT-001\SQLSRV_NH01</code>
-                    </div>
                 </div>
 
                 <!-- Tab: Statement -->
                 <div id="statement" class="tab-content-item" style="display: none;">
-                    <div class="placeholder-content">
-                        <i class="bi bi-receipt"></i>
-                        <h4>Sao kê tài khoản</h4>
-                        <p>Chức năng đang được phát triển...</p>
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-gradient-blue text-white">
+                            <h5 class="mb-0"><i class="bi bi-receipt"></i> Sao kê tài khoản</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Filter Form -->
+                            <div class="row g-3 mb-4">
+                                <div class="col-md-4">
+                                    <label class="form-label">Chọn tài khoản</label>
+                                    <select id="selectTaiKhoan" class="form-select">
+                                        <option value="">-- Chọn số tài khoản --</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Từ ngày</label>
+                                    <input type="date" id="tuNgay" class="form-control">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Đến ngày</label>
+                                    <input type="date" id="denNgay" class="form-control">
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button id="btnXemSaoKe" class="btn btn-primary w-100">
+                                        <i class="bi bi-search"></i> Xem
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Thong tin tai khoan -->
+                            <div id="thongTinTK" class="alert alert-info" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <strong>Số TK:</strong> <span id="infoSOTK"></span>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Số dư:</strong> <span id="infoSODU"></span> VNĐ
+                                    </div>
+                                    <div class="col-md-4">
+                                        <strong>Chi nhánh:</strong> <span id="infoTENCN"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Table Sao Ke -->
+                            <div id="tableSaoKeContainer" style="display: none;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>STT</th>
+                                                <th>Ngày giao dịch</th>
+                                                <th>Loại giao dịch</th>
+                                                <th class="text-end">Số tiền</th>
+                                                <th class="text-end">Số dư đầu</th>
+                                                <th class="text-end">Số dư sau</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableSaoKeBody">
+                                            <!-- Data will be loaded here -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                            <!-- Empty State -->
+                            <div id="emptyState" class="text-center py-5 text-muted">
+                                <i class="bi bi-inbox" style="font-size: 3rem;"></i>
+                                <p class="mt-3">Chọn tài khoản và khoảng thời gian để xem sao kê</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -416,7 +468,7 @@
         const pageTitle = document.getElementById('page-title');
 
         const tabTitles = {
-            'account-info': 'Thông tin tài khoản',
+            'account-info': 'Thông tin cá nhân',
             'statement': 'Sao kê tài khoản'
         };
 
@@ -438,6 +490,11 @@
                     tabContent.style.display = 'block';
                     // Update page title
                     pageTitle.textContent = tabTitles[tabId] || 'Dashboard';
+
+                    // Load tai khoan khi mo tab statement
+                    if (tabId === 'statement') {
+                        loadDanhSachTaiKhoan();
+                    }
                 }
             });
         });
@@ -445,6 +502,134 @@
         // Initialize
         updateDate();
         setInterval(updateDate, 60000); // Update every minute
+
+        // ========== SAO KE FUNCTIONS ==========
+        let danhSachTaiKhoan = [];
+
+        // Load danh sach tai khoan
+        function loadDanhSachTaiKhoan() {
+            fetch('/customer/tai-khoan')
+                .then(response => response.json())
+                .then(data => {
+                    danhSachTaiKhoan = data;
+                    const select = document.getElementById('selectTaiKhoan');
+                    select.innerHTML = '<option value="">-- Chọn số tài khoản --</option>';
+
+                    data.forEach(tk => {
+                        const option = document.createElement('option');
+                        option.value = tk.sotk;
+                        option.textContent = `${tk.sotk} - ${formatCurrency(tk.sodu)} - ${tk.tencn}`;
+                        option.dataset.sodu = tk.sodu;
+                        option.dataset.tencn = tk.tencn;
+                        select.appendChild(option);
+                    });
+
+                    console.log('Đã load', data.length, 'tài khoản');
+                })
+                .catch(error => {
+                    console.error('Lỗi load tài khoản:', error);
+                    alert('Không thể tải danh sách tài khoản');
+                });
+        }
+
+        // Hien thi thong tin tai khoan khi chon
+        document.getElementById('selectTaiKhoan').addEventListener('change', function () {
+            const sotk = this.value;
+            if (sotk) {
+                const selectedOption = this.options[this.selectedIndex];
+                document.getElementById('infoSOTK').textContent = sotk;
+                document.getElementById('infoSODU').textContent = formatCurrency(selectedOption.dataset.sodu);
+                document.getElementById('infoTENCN').textContent = selectedOption.dataset.tencn;
+                document.getElementById('thongTinTK').style.display = 'block';
+
+                // Set default date range (last 30 days)
+                const today = new Date();
+                const lastMonth = new Date(today);
+                lastMonth.setDate(today.getDate() - 30);
+
+                document.getElementById('denNgay').valueAsDate = today;
+                document.getElementById('tuNgay').valueAsDate = lastMonth;
+            } else {
+                document.getElementById('thongTinTK').style.display = 'none';
+                document.getElementById('tableSaoKeContainer').style.display = 'none';
+                document.getElementById('emptyState').style.display = 'block';
+            }
+        });
+
+        // Xem sao ke
+        document.getElementById('btnXemSaoKe').addEventListener('click', function () {
+            const sotk = document.getElementById('selectTaiKhoan').value;
+            const tuNgay = document.getElementById('tuNgay').value;
+            const denNgay = document.getElementById('denNgay').value;
+
+            if (!sotk) {
+                alert('Vui lòng chọn tài khoản');
+                return;
+            }
+            if (!tuNgay || !denNgay) {
+                alert('Vui lòng chọn khoảng thời gian');
+                return;
+            }
+
+            // Call API
+            fetch(`/customer/sao-ke?sotk=${sotk}&tuNgay=${tuNgay}&denNgay=${denNgay}`)
+                .then(response => response.json())
+                .then(data => {
+                    renderSaoKe(data);
+                })
+                .catch(error => {
+                    console.error('Lỗi xem sao kê:', error);
+                    alert('Không thể tải sao kê tài khoản');
+                });
+        });
+
+        // Render bang sao ke
+        function renderSaoKe(data) {
+            const tbody = document.getElementById('tableSaoKeBody');
+            tbody.innerHTML = '';
+
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Không có giao dịch trong khoảng thời gian này</td></tr>';
+                document.getElementById('tableSaoKeContainer').style.display = 'block';
+                document.getElementById('emptyState').style.display = 'none';
+                return;
+            }
+
+            data.forEach((gd, index) => {
+                const tr = document.createElement('tr');
+                const loaiClass = gd.loaiGiaoDich.includes('Rút') || gd.loaiGiaoDich.includes('Chuyển đi') ? 'text-danger' : 'text-success';
+
+                tr.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${formatDateTime(gd.ngay)}</td>
+                    <td><span class="badge ${loaiClass === 'text-danger' ? 'bg-danger' : 'bg-success'}">${gd.loaiGiaoDich}</span></td>
+                    <td class="text-end ${loaiClass}">${formatCurrency(gd.soTien)}</td>
+                    <td class="text-end">${formatCurrency(gd.soDuDau)}</td>
+                    <td class="text-end fw-bold">${formatCurrency(gd.soDuSau)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('tableSaoKeContainer').style.display = 'block';
+            document.getElementById('emptyState').style.display = 'none';
+        }
+
+        // Format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('vi-VN').format(value);
+        }
+
+        // Format datetime
+        function formatDateTime(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleString('vi-VN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
     </script>
 </body>
 
