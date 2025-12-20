@@ -450,8 +450,13 @@ public class AuthService {
 
             try (CallableStatement stmt = conn.prepareCall(sql)) {
                 stmt.setString(1, sotk);
-                stmt.setDate(2, java.sql.Date.valueOf(tuNgay));
-                stmt.setDate(3, java.sql.Date.valueOf(denNgay));
+                java.sql.Date sqlTuNgay = java.sql.Date.valueOf(tuNgay);
+                java.sql.Date sqlDenNgay = java.sql.Date.valueOf(denNgay);
+                stmt.setDate(2, sqlTuNgay);
+                stmt.setDate(3, sqlDenNgay);
+
+                System.out.println("[DEBUG SQL] Calling SP with params: SOTK=" + sotk + ", TuNgay=" + sqlTuNgay
+                        + ", DenNgay=" + sqlDenNgay);
 
                 try (ResultSet rs = stmt.executeQuery()) {
                     while (rs.next()) {

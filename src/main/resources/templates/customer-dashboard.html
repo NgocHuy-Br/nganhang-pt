@@ -10,6 +10,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <!-- Bootstrap Datepicker CSS -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
 
     <style>
         :root {
@@ -272,6 +275,10 @@
             background-color: #f0f9ff;
         }
     </style>
+
+    <!-- jsPDF Library for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 </head>
 
 <body>
@@ -374,51 +381,86 @@
                 <!-- Tab: Statement -->
                 <div id="statement" class="tab-content-item" style="display: none;">
                     <div class="card shadow-sm">
-                        <div class="card-header bg-gradient-blue text-white">
-                            <h5 class="mb-0"><i class="bi bi-receipt"></i> Sao kê tài khoản</h5>
-                        </div>
                         <div class="card-body">
-                            <!-- Filter Form -->
-                            <div class="row g-3 mb-4">
-                                <div class="col-md-4">
-                                    <label class="form-label">Chọn tài khoản</label>
-                                    <select id="selectTaiKhoan" class="form-select">
-                                        <option value="">-- Chọn số tài khoản --</option>
-                                    </select>
+                            <!-- Chọn tài khoản -->
+                            <div class="mb-4">
+                                <label class="form-label fw-bold">Chọn tài khoản</label>
+                                <select id="selectTaiKhoan" class="form-select">
+                                    <option value="">-- Chọn số tài khoản --</option>
+                                </select>
+                            </div>
+
+                            <!-- Thông tin tài khoản -->
+                            <div id="thongTinTK" class="card border-primary mb-4" style="display: none;">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="bi bi-info-circle"></i> Thông tin tài khoản</h6>
                                 </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Từ ngày</label>
-                                    <input type="date" id="tuNgay" class="form-control">
-                                </div>
-                                <div class="col-md-3">
-                                    <label class="form-label">Đến ngày</label>
-                                    <input type="date" id="denNgay" class="form-control">
-                                </div>
-                                <div class="col-md-2">
-                                    <label class="form-label">&nbsp;</label>
-                                    <button id="btnXemSaoKe" class="btn btn-primary w-100">
-                                        <i class="bi bi-search"></i> Xem
-                                    </button>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="text-muted small">Chủ tài khoản</label>
+                                                <div class="fw-bold" id="infoCHUTK" th:text="${khachHang.hoten}"
+                                                    th:attr="data-hoten=${khachHang.hoten}">-</div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="text-muted small">Số tài khoản</label>
+                                                <div class="fw-bold text-primary" id="infoSOTK">-</div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="text-muted small">Chi nhánh</label>
+                                                <div class="fw-bold" id="infoTENCN">-</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="mb-3">
+                                                <label class="text-muted small">Ngày mở tài khoản</label>
+                                                <div class="fw-bold" id="infoNGAYMOTK">-</div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="text-muted small">Số dư hiện tại</label>
+                                                <div class="fw-bold text-success" id="infoSODU">-</div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
-                            <!-- Thong tin tai khoan -->
-                            <div id="thongTinTK" class="alert alert-info" style="display: none;">
-                                <div class="row">
-                                    <div class="col-md-4">
-                                        <strong>Số TK:</strong> <span id="infoSOTK"></span>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <strong>Số dư:</strong> <span id="infoSODU"></span> VNĐ
-                                    </div>
-                                    <div class="col-md-4">
-                                        <strong>Chi nhánh:</strong> <span id="infoTENCN"></span>
+                            <!-- Sao kê giao dịch -->
+                            <div id="filterSaoKe" class="card mb-4" style="display: none;">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="bi bi-funnel"></i> Sao kê giao dịch</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Từ ngày</label>
+                                            <input type="text" id="tuNgay" class="form-control datepicker"
+                                                placeholder="DD/MM/YYYY" autocomplete="off">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Đến ngày</label>
+                                            <input type="text" id="denNgay" class="form-control datepicker"
+                                                placeholder="DD/MM/YYYY" autocomplete="off">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">&nbsp;</label>
+                                            <button id="btnXemSaoKe" class="btn btn-primary w-100">
+                                                <i class="bi bi-search"></i> Xem sao kê
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
                             <!-- Table Sao Ke -->
                             <div id="tableSaoKeContainer" style="display: none;">
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <h6 class="mb-0"><i class="bi bi-table"></i> Chi tiết giao dịch</h6>
+                                    <button id="btnInSaoKe" class="btn btn-success">
+                                        <i class="bi bi-printer"></i> In sao kê
+                                    </button>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-hover table-bordered">
                                         <thead class="table-light">
@@ -452,8 +494,15 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery (required for Bootstrap Datepicker) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Bootstrap Datepicker JS -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.vi.min.js"></script>
 
-    <script>
+    <script th:inline="none">
         // Update current date
         function updateDate() {
             const dateElement = document.getElementById('current-date');
@@ -518,9 +567,10 @@
                     data.forEach(tk => {
                         const option = document.createElement('option');
                         option.value = tk.sotk;
-                        option.textContent = `${tk.sotk} - ${formatCurrency(tk.sodu)} - ${tk.tencn}`;
+                        option.textContent = `${tk.sotk} - ${tk.tencn}`;
                         option.dataset.sodu = tk.sodu;
                         option.dataset.tencn = tk.tencn;
+                        option.dataset.ngaymotk = tk.ngayMotk;
                         select.appendChild(option);
                     });
 
@@ -537,20 +587,37 @@
             const sotk = this.value;
             if (sotk) {
                 const selectedOption = this.options[this.selectedIndex];
+                // Lấy từ Thymeleaf variable đã render sẵn
+                const chuTK = document.getElementById('infoCHUTK').getAttribute('data-hoten');
+
+                document.getElementById('infoCHUTK').textContent = chuTK;
                 document.getElementById('infoSOTK').textContent = sotk;
-                document.getElementById('infoSODU').textContent = formatCurrency(selectedOption.dataset.sodu);
+                document.getElementById('infoSODU').textContent = formatCurrency(selectedOption.dataset.sodu) + ' VNĐ';
                 document.getElementById('infoTENCN').textContent = selectedOption.dataset.tencn;
+                document.getElementById('infoNGAYMOTK').textContent = formatDate(selectedOption.dataset.ngaymotk);
+
                 document.getElementById('thongTinTK').style.display = 'block';
+                document.getElementById('filterSaoKe').style.display = 'block';
+
+                // Khởi tạo datepicker với format DD/MM/YYYY
+                $('.datepicker').datepicker({
+                    format: 'dd/mm/yyyy',
+                    language: 'vi',
+                    autoclose: true,
+                    todayHighlight: true,
+                    orientation: 'bottom auto'
+                });
 
                 // Set default date range (last 30 days)
                 const today = new Date();
                 const lastMonth = new Date(today);
                 lastMonth.setDate(today.getDate() - 30);
 
-                document.getElementById('denNgay').valueAsDate = today;
-                document.getElementById('tuNgay').valueAsDate = lastMonth;
+                $('#denNgay').datepicker('setDate', today);
+                $('#tuNgay').datepicker('setDate', lastMonth);
             } else {
                 document.getElementById('thongTinTK').style.display = 'none';
+                document.getElementById('filterSaoKe').style.display = 'none';
                 document.getElementById('tableSaoKeContainer').style.display = 'none';
                 document.getElementById('emptyState').style.display = 'block';
             }
@@ -559,17 +626,29 @@
         // Xem sao ke
         document.getElementById('btnXemSaoKe').addEventListener('click', function () {
             const sotk = document.getElementById('selectTaiKhoan').value;
-            const tuNgay = document.getElementById('tuNgay').value;
-            const denNgay = document.getElementById('denNgay').value;
+            const tuNgayStr = document.getElementById('tuNgay').value; // DD/MM/YYYY
+            const denNgayStr = document.getElementById('denNgay').value; // DD/MM/YYYY
 
             if (!sotk) {
                 alert('Vui lòng chọn tài khoản');
                 return;
             }
-            if (!tuNgay || !denNgay) {
+            if (!tuNgayStr || !denNgayStr) {
                 alert('Vui lòng chọn khoảng thời gian');
                 return;
             }
+
+            // Convert DD/MM/YYYY to YYYY-MM-DD for API
+            function convertToApiFormat(ddmmyyyy) {
+                const parts = ddmmyyyy.split('/');
+                return `${parts[2]}-${parts[1]}-${parts[0]}`; // YYYY-MM-DD
+            }
+
+            const tuNgay = convertToApiFormat(tuNgayStr);
+            const denNgay = convertToApiFormat(denNgayStr);
+
+            console.log('[DEBUG] Xem sao kê - Từ ngày:', tuNgay, '- Đến ngày:', denNgay);
+            console.log('[DEBUG] Date objects:', new Date(tuNgay), new Date(denNgay));
 
             // Call API
             fetch(`/customer/sao-ke?sotk=${sotk}&tuNgay=${tuNgay}&denNgay=${denNgay}`)
@@ -583,8 +662,38 @@
                 });
         });
 
-        // Render bang sao ke
+        // Format currency
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('vi-VN').format(value);
+        }
+
+        // Format date - DD/MM/YYYY
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Format datetime - DD/MM/YYYY HH:mm
+        function formatDateTime(dateStr) {
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        }
+
+        // ========== IN SAO KE PDF ==========
+        let currentSaoKeData = [];
+
+        // Lưu data khi render
         function renderSaoKe(data) {
+            currentSaoKeData = data;
             const tbody = document.getElementById('tableSaoKeBody');
             tbody.innerHTML = '';
 
@@ -595,7 +704,11 @@
                 return;
             }
 
-            data.forEach((gd, index) => {
+            // Sắp xếp giao dịch từ mới đến cũ (gần nhất trước)
+            const sortedData = [...data].sort((a, b) => new Date(b.ngay) - new Date(a.ngay));
+
+            // Không update số dư - giữ nguyên số dư từ database
+            sortedData.forEach((gd, index) => {
                 const tr = document.createElement('tr');
                 const loaiClass = gd.loaiGiaoDich.includes('Rút') || gd.loaiGiaoDich.includes('Chuyển đi') ? 'text-danger' : 'text-success';
 
@@ -614,22 +727,65 @@
             document.getElementById('emptyState').style.display = 'none';
         }
 
-        // Format currency
-        function formatCurrency(value) {
-            return new Intl.NumberFormat('vi-VN').format(value);
-        }
+        // In sao ke PDF
+        document.addEventListener('DOMContentLoaded', function () {
+            const btnIn = document.getElementById('btnInSaoKe');
+            if (btnIn) {
+                btnIn.addEventListener('click', function () {
+                    if (currentSaoKeData.length === 0) {
+                        alert('Không có dữ liệu để in');
+                        return;
+                    }
 
-        // Format datetime
-        function formatDateTime(dateStr) {
-            const date = new Date(dateStr);
-            return date.toLocaleString('vi-VN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        }
+                    const { jsPDF } = window.jspdf;
+                    const doc = new jsPDF();
+
+                    // Thông tin tài khoản
+                    const chuTK = document.getElementById('infoCHUTK').textContent;
+                    const soTK = document.getElementById('infoSOTK').textContent;
+                    const chiNhanh = document.getElementById('infoTENCN').textContent;
+                    const soDu = document.getElementById('infoSODU').textContent;
+                    const tuNgay = document.getElementById('tuNgay').value;
+                    const denNgay = document.getElementById('denNgay').value;
+
+                    // Tiêu đề
+                    doc.setFontSize(18);
+                    doc.text('SAO KE TAI KHOAN', 105, 15, { align: 'center' });
+                    doc.setFontSize(12);
+                    doc.text('Ngan Hang Phan Tan', 105, 22, { align: 'center' });
+
+                    // Thông tin
+                    doc.setFontSize(11);
+                    doc.text('Chu tai khoan: ' + chuTK, 14, 35);
+                    doc.text('So tai khoan: ' + soTK, 14, 42);
+                    doc.text('Chi nhanh: ' + chiNhanh, 14, 49);
+                    doc.text('So du hien tai: ' + soDu, 14, 56);
+                    doc.text('Tu ngay: ' + formatDate(tuNgay) + ' - Den ngay: ' + formatDate(denNgay), 14, 63);
+
+                    // Bảng giao dịch
+                    const tableData = currentSaoKeData.map((gd, index) => [
+                        index + 1,
+                        formatDateTime(gd.ngay),
+                        gd.loaiGiaoDich,
+                        formatCurrency(gd.soTien),
+                        formatCurrency(gd.soDuDau),
+                        formatCurrency(gd.soDuSau)
+                    ]);
+
+                    doc.autoTable({
+                        startY: 70,
+                        head: [['STT', 'Ngay GD', 'Loai GD', 'So tien', 'So du dau', 'So du sau']],
+                        body: tableData,
+                        styles: { font: 'helvetica', fontSize: 9 },
+                        headStyles: { fillColor: [30, 58, 138] }
+                    });
+
+                    // Lưu file
+                    const fileName = `SaoKe_${soTK}_${tuNgay}_${denNgay}.pdf`;
+                    doc.save(fileName);
+                });
+            }
+        });
     </script>
 </body>
 
