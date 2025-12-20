@@ -276,9 +276,10 @@
         }
     </style>
 
-    <!-- jsPDF Library for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    <!-- pdfmake Library for PDF generation (hỗ trợ tiếng Việt) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+
 </head>
 
 <body>
@@ -737,9 +738,6 @@
                         return;
                     }
 
-                    const { jsPDF } = window.jspdf;
-                    const doc = new jsPDF();
-
                     // Thông tin tài khoản
                     const chuTK = document.getElementById('infoCHUTK').textContent;
                     const soTK = document.getElementById('infoSOTK').textContent;
@@ -748,23 +746,9 @@
                     const tuNgay = document.getElementById('tuNgay').value;
                     const denNgay = document.getElementById('denNgay').value;
 
-                    // Tiêu đề
-                    doc.setFontSize(18);
-                    doc.text('SAO KE TAI KHOAN', 105, 15, { align: 'center' });
-                    doc.setFontSize(12);
-                    doc.text('Ngan Hang Phan Tan', 105, 22, { align: 'center' });
-
-                    // Thông tin
-                    doc.setFontSize(11);
-                    doc.text('Chu tai khoan: ' + chuTK, 14, 35);
-                    doc.text('So tai khoan: ' + soTK, 14, 42);
-                    doc.text('Chi nhanh: ' + chiNhanh, 14, 49);
-                    doc.text('So du hien tai: ' + soDu, 14, 56);
-                    doc.text('Tu ngay: ' + formatDate(tuNgay) + ' - Den ngay: ' + formatDate(denNgay), 14, 63);
-
-                    // Bảng giao dịch
-                    const tableData = currentSaoKeData.map((gd, index) => [
-                        index + 1,
+                    // Chuẩn bị dữ liệu bảng
+                    const tableBody = currentSaoKeData.map((gd, index) => [
+                        (index + 1).toString(),
                         formatDateTime(gd.ngay),
                         gd.loaiGiaoDich,
                         formatCurrency(gd.soTien),
@@ -772,17 +756,104 @@
                         formatCurrency(gd.soDuSau)
                     ]);
 
-                    doc.autoTable({
-                        startY: 70,
-                        head: [['STT', 'Ngay GD', 'Loai GD', 'So tien', 'So du dau', 'So du sau']],
-                        body: tableData,
-                        styles: { font: 'helvetica', fontSize: 9 },
-                        headStyles: { fillColor: [30, 58, 138] }
-                    });
+                    // Ngày giờ in
+                    const now = new Date();
+                    const ngayGioIn = formatDateTime(now);
 
-                    // Lưu file
-                    const fileName = `SaoKe_${soTK}_${tuNgay}_${denNgay}.pdf`;
-                    doc.save(fileName);
+                    // Định nghĩa document PDF với pdfmake
+                    const docDefinition = {
+                        pageSize: 'A4',
+                        pageOrientation: 'portrait',
+                        pageMargins: [40, 60, 40, 60],
+                        content: [
+                            // Tiêu đề
+                            { text: 'SAO KÊ TÀI KHOẢN', style: 'header', alignment: 'center' },
+                            { text: 'NGÂN HÀNG PTIT', style: 'subheader', alignment: 'center' },
+                            { text: ' ', margin: [0, 5] },
+
+                            // Thông tin tài khoản
+                            { text: 'Chủ tài khoản: ' + chuTK, style: 'info' },
+                            { text: 'Số tài khoản: ' + soTK, style: 'info' },
+                            { text: 'Chi nhánh: ' + chiNhanh, style: 'info' },
+                            { text: 'Số dư hiện tại: ' + soDu, style: 'info' },
+
+                            // Khoảng cách lớn
+                            { text: ' ', margin: [0, 10] },
+
+                            // Tiêu đề bảng
+                            { text: 'Thông tin chi tiết giao dịch', style: 'sectionTitle', margin: [0, 0, 0, 5] },
+
+                            // Thời gian sao kê
+                            { text: 'Từ ngày: ' + tuNgay + ' - Đến ngày: ' + denNgay, style: 'info', margin: [0, 0, 0, 8] },
+
+                            // Bảng giao dịch
+                            {
+                                table: {
+                                    headerRows: 1,
+                                    widths: [30, 105, 75, 75, 85, 85],
+                                    body: [
+                                        [
+                                            { text: 'STT', style: 'tableHeader' },
+                                            { text: 'Ngày giao dịch', style: 'tableHeader' },
+                                            { text: 'Loại giao dịch', style: 'tableHeader' },
+                                            { text: 'Số tiền', style: 'tableHeader' },
+                                            { text: 'Số dư đầu', style: 'tableHeader' },
+                                            { text: 'Số dư sau', style: 'tableHeader' }
+                                        ],
+                                        ...tableBody
+                                    ]
+                                },
+                                layout: {
+                                    fillColor: function (rowIndex) {
+                                        return (rowIndex === 0) ? '#1e3a8a' : null;
+                                    }
+                                }
+                            },
+
+                            // Footer - Thông tin in (2 dòng riêng biệt, canh lề với bảng)
+                            { text: ' ', margin: [0, 15] },
+                            { text: 'Người in sao kê: ' + chuTK, style: 'footer' },
+                            { text: 'Ngày giờ in: ' + ngayGioIn, style: 'footer' }
+                        ],
+                        styles: {
+                            header: {
+                                fontSize: 18,
+                                bold: true,
+                                margin: [0, 10, 0, 5]
+                            },
+                            subheader: {
+                                fontSize: 12,
+                                margin: [0, 0, 0, 10]
+                            },
+                            info: {
+                                fontSize: 11,
+                                margin: [0, 2]
+                            },
+                            sectionTitle: {
+                                fontSize: 12,
+                                bold: true,
+                                margin: [0, 8, 0, 5]
+                            },
+                            tableHeader: {
+                                bold: true,
+                                fontSize: 10,
+                                color: 'white',
+                                fillColor: '#1e3a8a'
+                            },
+                            footer: {
+                                fontSize: 10,
+                                italics: true,
+                                margin: [0, 2]
+                            }
+                        },
+                        defaultStyle: {
+                            font: 'Roboto'
+                        }
+                    };
+
+                    // Tạo và download PDF
+                    const fileName = `SaoKe_${soTK}_${tuNgay.replace(/\//g, '')}_${denNgay.replace(/\//g, '')}.pdf`;
+                    pdfMake.createPdf(docDefinition).download(fileName);
                 });
             }
         });
