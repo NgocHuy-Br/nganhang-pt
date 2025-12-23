@@ -10,27 +10,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <!-- Date Range Picker CSS -->
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <!-- Bootstrap Datepicker CSS -->
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css">
 
     <style>
-        /* Chỉ hiển thị 1 calendar */
-        .daterangepicker .drp-calendar.right,
-        .daterangepicker .calendar.right {
-            display: none !important;
-        }
-
-        .daterangepicker .drp-calendar.left,
-        .daterangepicker .calendar.left {
-            margin: 0 !important;
-            float: none !important;
-        }
-
-        .daterangepicker .drp-calendars {
-            display: flex;
-            justify-content: center;
-        }
-
         :root {
             --primary-blue: #1e3a8a;
             --primary-blue-light: #2563eb;
@@ -450,12 +434,15 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row g-3">
-                                        <div class="col-md-8">
-                                            <label class="form-label">Khoảng thời gian</label>
-                                            <input type="text" id="dateRange" class="form-control" readonly
-                                                placeholder="Chọn khoảng thời gian..." style="cursor: pointer;">
-                                            <small id="dateRangeError" class="text-danger"
-                                                style="display: none;"></small>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Từ ngày</label>
+                                            <input type="text" id="tuNgay" class="form-control" readonly
+                                                placeholder="DD/MM/YYYY" style="cursor: pointer;">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Đến ngày</label>
+                                            <input type="text" id="denNgay" class="form-control" readonly
+                                                placeholder="DD/MM/YYYY" style="cursor: pointer;">
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">&nbsp;</label>
@@ -526,12 +513,13 @@
 
     <!-- Bootstrap 5 JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery (required for daterangepicker) -->
+    <!-- jQuery (required for datepicker) -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Moment.js (required for daterangepicker) -->
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.4/moment.min.js"></script>
-    <!-- Date Range Picker -->
-    <script src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <!-- Bootstrap Datepicker -->
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.vi.min.js"></script>
 
     <script th:inline="none">
         // Update current date
@@ -551,6 +539,12 @@
             'account-info': 'Thông tin cá nhân',
             'statement': 'Sao kê tài khoản'
         };
+
+        // Helper function: Convert DD/MM/YYYY to YYYY-MM-DD
+        function convertToApiFormat(dateStr) {
+            const parts = dateStr.split('/');
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
 
         navLinks.forEach(link => {
             link.addEventListener('click', function (e) {
@@ -632,52 +626,25 @@
 
                 // Lấy ngày mở tài khoản
                 const ngayMoTKStr = selectedOption.dataset.ngaymotk;
-                const ngayMoTK = moment(ngayMoTKStr);
 
-                const today = moment();
-                const lastMonth = moment().subtract(30, 'days');
-                const startDate = lastMonth.isBefore(ngayMoTK) ? ngayMoTK : lastMonth;
-
-                // Khởi tạo Date Range Picker
-                $('#dateRange').daterangepicker({
-                    startDate: startDate,
-                    endDate: today,
-                    minDate: ngayMoTK,
-                    maxDate: today,
-                    singleDatePicker: false,
-                    showDropdowns: true,
-                    autoApply: true,
-                    linkedCalendars: false,
-                    locale: {
-                        format: 'DD/MM/YYYY',
-                        separator: ' - ',
-                        applyLabel: 'Áp dụng',
-                        cancelLabel: 'Hủy',
-                        fromLabel: 'Từ',
-                        toLabel: 'Đến',
-                        customRangeLabel: 'Tùy chỉnh',
-                        weekLabel: 'T',
-                        daysOfWeek: ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'],
-                        monthNames: ['Tháng 1', 'Tháng 2', 'Tháng 3', 'Tháng 4', 'Tháng 5', 'Tháng 6',
-                            'Tháng 7', 'Tháng 8', 'Tháng 9', 'Tháng 10', 'Tháng 11', 'Tháng 12'],
-                        firstDay: 1
-                    },
-                    opens: 'center',
-                    autoApply: false,
-                    showDropdowns: true
-                }, function (start, end, label) {
-                    console.log('Date range selected:', start.format('DD/MM/YYYY'), '-', end.format('DD/MM/YYYY'));
+                // Khởi tạo Bootstrap Datepicker cho 2 ô (không có validation để test)
+                $('#tuNgay').datepicker({
+                    format: 'dd/mm/yyyy',
+                    language: 'vi',
+                    autoclose: true,
+                    todayHighlight: true
                 });
 
-                // Lưu ngày mở TK vào data
-                $('#dateRange').data('ngayMoTK', ngayMoTK);
-                $('#dateRange').data('ngayMoTKStr', ngayMoTKStr);
-
-                // Validate và enable nút
-                $('#dateRange').on('apply.daterangepicker', function (ev, picker) {
-                    $('#btnXemSaoKe').prop('disabled', false);
-                    $('#dateRangeError').hide();
+                $('#denNgay').datepicker({
+                    format: 'dd/mm/yyyy',
+                    language: 'vi',
+                    autoclose: true,
+                    todayHighlight: true
                 });
+
+                // Lưu ngày mở TK vào data để dùng sau này
+                $('#tuNgay').data('ngayMoTKStr', ngayMoTKStr);
+                $('#denNgay').data('ngayMoTKStr', ngayMoTKStr);
             } else {
                 document.getElementById('thongTinTK').style.display = 'none';
                 document.getElementById('filterSaoKe').style.display = 'none';
@@ -689,25 +656,21 @@
         // Xem sao ke
         document.getElementById('btnXemSaoKe').addEventListener('click', function () {
             const sotk = document.getElementById('selectTaiKhoan').value;
-            const dateRangeValue = $('#dateRange').val();
+            const tuNgayValue = document.getElementById('tuNgay').value;
+            const denNgayValue = document.getElementById('denNgay').value;
 
             if (!sotk) {
                 alert('Vui lòng chọn tài khoản');
                 return;
             }
-            if (!dateRangeValue) {
-                alert('Vui lòng chọn khoảng thời gian');
+            if (!tuNgayValue || !denNgayValue) {
+                alert('Vui lòng chọn đầy đủ thời gian');
                 return;
             }
 
-            // Lấy start date và end date từ daterangepicker
-            const picker = $('#dateRange').data('daterangepicker');
-            const startDate = picker.startDate;
-            const endDate = picker.endDate;
-
-            // Convert to YYYY-MM-DD for API
-            const tuNgay = startDate.format('YYYY-MM-DD');
-            const denNgay = endDate.format('YYYY-MM-DD');
+            // Convert DD/MM/YYYY to YYYY-MM-DD for API
+            const tuNgay = convertToApiFormat(tuNgayValue);
+            const denNgay = convertToApiFormat(denNgayValue);
 
             console.log('[DEBUG] Xem sao kê - Từ ngày:', tuNgay, '- Đến ngày:', denNgay);
 
@@ -777,9 +740,8 @@
             const soDuCuoi = chronologicalData.length > 0 ? chronologicalData[chronologicalData.length - 1].soDuSau : 0;
 
             // Hiển thị số dư đầu/cuối ngày
-            const picker = $('#dateRange').data('daterangepicker');
-            const tuNgayDisplay = picker.startDate.format('DD/MM/YYYY');
-            const denNgayDisplay = picker.endDate.format('DD/MM/YYYY');
+            const tuNgayDisplay = document.getElementById('tuNgay').value;
+            const denNgayDisplay = document.getElementById('denNgay').value;
             document.getElementById('lblTuNgay').textContent = tuNgayDisplay;
             document.getElementById('lblDenNgay').textContent = denNgayDisplay;
             document.getElementById('soDuDauNgay').textContent = formatCurrency(soDuDau);
