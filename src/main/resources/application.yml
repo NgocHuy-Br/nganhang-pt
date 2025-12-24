@@ -12,7 +12,7 @@ spring:
   # DB chính sẽ tự động truy vấn các phân mảnh thông qua Linked Server
   # Kết nối qua VPN/mạng ảo đến IP 10.241.78.94
   datasource:
-    jdbc-url: jdbc:sqlserver://10.241.78.94;databaseName=NGANHANG;encrypt=true;trustServerCertificate=true
+    jdbc-url: jdbc:sqlserver://10.241.78.94;databaseName=NGANHANG;encrypt=false
     username: HTKN
     password: '123456'
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
@@ -24,8 +24,8 @@ app:
     password: '123456'
     servers:
       - name: 'HCM-LAPT-001\SQLSRV_NH01'
-        url: jdbc:sqlserver://10.241.78.94:1440;databaseName=NGANHANG;encrypt=true;trustServerCertificate=true
+        url: jdbc:sqlserver://10.241.78.94:1440;databaseName=NGANHANG;encrypt=false
       - name: 'HCM-LAPT-001\SQLSRV_NH02'
-        url: jdbc:sqlserver://10.241.78.94:1441;databaseName=NGANHANG;encrypt=true;trustServerCertificate=true
+        url: jdbc:sqlserver://10.241.78.94:1441;databaseName=NGANHANG;encrypt=false
       - name: 'HCM-LAPT-001\SQLSRV_NH03'
-        url: jdbc:sqlserver://10.241.78.94:1443;databaseName=NGANHANG;encrypt=true;trustServerCertificate=true
+        url: jdbc:sqlserver://10.241.78.94:1443;databaseName=NGANHANG;encrypt=false
