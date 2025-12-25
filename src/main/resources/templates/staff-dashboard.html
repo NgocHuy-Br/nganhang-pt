@@ -342,11 +342,180 @@
 
                     <!-- Tab: Employees -->
                     <div id="employees" class="tab-content-item" style="display: none;">
-                        <div class="placeholder-content">
-                            <i class="bi bi-people-fill"></i>
-                            <h3>Quản lý nhân viên</h3>
-                            <p>Chức năng CRUD nhân viên và tạo tài khoản mới</p>
-                            <p class="text-muted">Đang phát triển...</p>
+                        <h3 class="mb-4"><i class="bi bi-people-fill"></i> Quản lý nhân viên</h3>
+
+                        <!-- Toolbar -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <input type="text" id="searchInput" class="form-control"
+                                            placeholder="Tìm kiếm (Mã NV, Họ tên, CMND...)">
+                                    </div>
+                                    <div class="col-md-8 text-end">
+                                        <button class="btn btn-primary" id="btnThem">
+                                            <i class="bi bi-plus-circle"></i> Thêm
+                                        </button>
+                                        <button class="btn btn-warning" id="btnSua" disabled>
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </button>
+                                        <button class="btn btn-danger" id="btnXoa" disabled>
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </button>
+                                        <button class="btn btn-success" id="btnPhucHoi" style="display:none;">
+                                            <i class="bi bi-arrow-counterclockwise"></i> Phục hồi
+                                        </button>
+                                        <button class="btn btn-info" id="btnChuyenCN" disabled>
+                                            <i class="bi bi-building"></i> Chuyển chi nhánh
+                                        </button>
+                                        <button class="btn btn-secondary" id="btnXemDaXoa">
+                                            <i class="bi bi-eye"></i> Xem đã xóa
+                                        </button>
+                                        <button class="btn btn-secondary" id="btnLamMoi">
+                                            <i class="bi bi-arrow-clockwise"></i> Làm mới
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="tableNhanVien">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th width="5%">#</th>
+                                                <th width="10%">Mã NV</th>
+                                                <th width="15%">Họ tên</th>
+                                                <th width="10%">CMND</th>
+                                                <th width="8%">Giới tính</th>
+                                                <th width="12%">Số ĐT</th>
+                                                <th width="20%">Địa chỉ</th>
+                                                <th width="15%">Chi nhánh</th>
+                                                <th width="5%"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tbodyNhanVien">
+                                            <tr>
+                                                <td colspan="9" class="text-center py-4 text-muted">
+                                                    <div class="spinner-border spinner-border-sm me-2" role="status">
+                                                    </div>
+                                                    Đang tải dữ liệu...
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Thêm/Sửa Nhân viên -->
+                    <div class="modal fade" id="modalNhanVien" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalTitle">Thêm nhân viên</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="formNhanVien">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Mã nhân viên <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputMaNV" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">CMND <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputCMND" required
+                                                    maxlength="10">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Họ <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputHo" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Tên <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputTen" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Giới tính <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" id="inputPhai" required>
+                                                    <option value="">-- Chọn --</option>
+                                                    <option value="Nam">Nam</option>
+                                                    <option value="Nữ">Nữ</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Số điện thoại <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputSDT" required
+                                                    maxlength="15">
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label class="form-label">Địa chỉ <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputDiaChi" required>
+                                            </div>
+                                            <div class="col-md-12">
+                                                <label class="form-label">Chi nhánh <span
+                                                        class="text-danger">*</span></label>
+                                                <!-- Select cho chế độ thêm mới -->
+                                                <select class="form-select" id="inputMaCN" required>
+                                                    <option value="">-- Chọn chi nhánh --</option>
+                                                </select>
+                                                <!-- Input readonly cho chế độ sửa -->
+                                                <input type="text" class="form-control" id="inputTenCN" readonly
+                                                    style="display:none; background-color: #e9ecef;">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                        <i class="bi bi-x-circle"></i> Thoát
+                                    </button>
+                                    <button type="button" class="btn btn-primary" id="btnGhi">
+                                        <i class="bi bi-save"></i> Ghi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Chuyển chi nhánh -->
+                    <div class="modal fade" id="modalChuyenCN" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Chuyển nhân viên sang chi nhánh khác</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Nhân viên: <strong id="lblNVChuyen"></strong></p>
+                                    <div class="mb-3">
+                                        <label class="form-label">Chi nhánh mới <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select" id="selectCNMoi" required>
+                                            <option value="">-- Chọn chi nhánh --</option>
+                                        </select>
+                                    </div>
+                                    <div class="alert alert-warning">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        <strong>Lưu ý:</strong> Khi chuyển chi nhánh, mã nhân viên có thể thay đổi.
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="button" class="btn btn-primary" id="btnXacNhanChuyen">Xác
+                                        nhận</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -422,7 +591,366 @@
 
                 // Update page title
                 pageTitle.textContent = tabTitles[tabId];
+
+                // Load data when switching to employees tab
+                if (tabId === 'employees') {
+                    loadNhanVien();
+                    loadChiNhanh();
+                }
             });
+        });
+
+        // ========== QUẢN LÝ NHÂN VIÊN ==========
+        let danhSachNhanVien = [];
+        let danhSachChiNhanh = [];
+        let selectedNV = null;
+        let isEditMode = false;
+        let isViewingDeleted = false;
+
+        // Load danh sách nhân viên
+        function loadNhanVien() {
+            const endpoint = isViewingDeleted ? '/staff/nhan-vien/da-xoa' : '/staff/nhan-vien';
+
+            fetch(endpoint)
+                .then(res => res.json())
+                .then(data => {
+                    danhSachNhanVien = data;
+                    renderNhanVien(data);
+                    console.log('Đã load', data.length, 'nhân viên');
+                })
+                .catch(err => {
+                    console.error('Lỗi load nhân viên:', err);
+                    alert('Không thể tải danh sách nhân viên');
+                });
+        }
+
+        // Load danh sách chi nhánh
+        function loadChiNhanh() {
+            fetch('/staff/chi-nhanh')
+                .then(res => res.json())
+                .then(data => {
+                    danhSachChiNhanh = data;
+                    renderChiNhanhOptions(data);
+                    console.log('Đã load', data.length, 'chi nhánh');
+                })
+                .catch(err => {
+                    console.error('Lỗi load chi nhánh:', err);
+                });
+        }
+
+        // Render chi nhánh options
+        function renderChiNhanhOptions(data) {
+            const selectMaCN = document.getElementById('inputMaCN');
+            const selectCNMoi = document.getElementById('selectCNMoi');
+
+            selectMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            selectCNMoi.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+
+            data.forEach(cn => {
+                selectMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
+                selectCNMoi.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
+            });
+        }
+
+        // Render danh sách nhân viên
+        function renderNhanVien(data) {
+            const tbody = document.getElementById('tbodyNhanVien');
+
+            if (data.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">
+                    Không có nhân viên nào</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = data.map((nv, index) => `
+                <tr class="nv-row" data-manv="${nv.maNV}" style="cursor: pointer;">
+                    <td>${index + 1}</td>
+                    <td><strong>${nv.maNV}</strong></td>
+                    <td>${nv.hoTen}</td>
+                    <td>${nv.cmnd}</td>
+                    <td>${nv.phai}</td>
+                    <td>${nv.soDT}</td>
+                    <td>${nv.diaChi}</td>
+                    <td><span class="badge bg-info">${nv.tenChiNhanh}</span></td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary btn-select" 
+                            data-manv="${nv.maNV}" title="Chọn">
+                            <i class="bi bi-check-circle"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Add click event for rows and select buttons
+            document.querySelectorAll('.nv-row').forEach(row => {
+                row.addEventListener('click', function (e) {
+                    if (!e.target.closest('.btn-select')) {
+                        selectNhanVien(this.dataset.manv);
+                    }
+                });
+            });
+
+            document.querySelectorAll('.btn-select').forEach(btn => {
+                btn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    selectNhanVien(this.dataset.manv);
+                });
+            });
+        }
+
+        // Chọn nhân viên
+        function selectNhanVien(maNV) {
+            // Remove previous selection
+            document.querySelectorAll('.nv-row').forEach(row => {
+                row.classList.remove('table-active');
+            });
+
+            // Add selection to clicked row
+            const row = document.querySelector(`[data-manv="${maNV}"]`);
+            if (row) row.classList.add('table-active');
+
+            // Find selected employee
+            selectedNV = danhSachNhanVien.find(nv => nv.maNV === maNV);
+
+            // Enable/disable buttons
+            if (isViewingDeleted) {
+                document.getElementById('btnSua').disabled = true;
+                document.getElementById('btnXoa').disabled = true;
+                document.getElementById('btnChuyenCN').disabled = true;
+                document.getElementById('btnPhucHoi').disabled = false;
+            } else {
+                document.getElementById('btnSua').disabled = false;
+                document.getElementById('btnXoa').disabled = false;
+                document.getElementById('btnChuyenCN').disabled = false;
+                document.getElementById('btnPhucHoi').disabled = true;
+            }
+        }
+
+        // Tìm kiếm
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            const keyword = e.target.value.toLowerCase();
+            const filtered = danhSachNhanVien.filter(nv =>
+                nv.maNV.toLowerCase().includes(keyword) ||
+                nv.hoTen.toLowerCase().includes(keyword) ||
+                nv.cmnd.toLowerCase().includes(keyword) ||
+                nv.soDT.toLowerCase().includes(keyword)
+            );
+            renderNhanVien(filtered);
+        });
+
+        // Nút Thêm
+        document.getElementById('btnThem').addEventListener('click', function () {
+            isEditMode = false;
+            document.getElementById('modalTitle').textContent = 'Thêm nhân viên mới';
+            document.getElementById('formNhanVien').reset();
+            document.getElementById('inputMaNV').disabled = false;
+            // Hiển thị select, ẩn input readonly
+            document.getElementById('inputMaCN').style.display = 'block';
+            document.getElementById('inputMaCN').disabled = false;
+            document.getElementById('inputTenCN').style.display = 'none';
+            new bootstrap.Modal(document.getElementById('modalNhanVien')).show();
+        });
+
+        // Nút Sửa
+        document.getElementById('btnSua').addEventListener('click', function () {
+            if (!selectedNV) {
+                alert('Vui lòng chọn nhân viên để sửa');
+                return;
+            }
+
+            isEditMode = true;
+            document.getElementById('modalTitle').textContent = 'Sửa thông tin nhân viên';
+            document.getElementById('inputMaNV').value = selectedNV.maNV;
+            document.getElementById('inputHo').value = selectedNV.ho;
+            document.getElementById('inputTen').value = selectedNV.ten;
+            document.getElementById('inputCMND').value = selectedNV.cmnd;
+            document.getElementById('inputPhai').value = selectedNV.phai;
+            document.getElementById('inputSDT').value = selectedNV.soDT;
+            document.getElementById('inputDiaChi').value = selectedNV.diaChi;
+            document.getElementById('inputMaNV').disabled = true;
+
+            // Ẩn select, hiển thị input readonly với tên chi nhánh
+            document.getElementById('inputMaCN').style.display = 'none';
+            document.getElementById('inputMaCN').disabled = true; // Disable để không fail validation
+            document.getElementById('inputTenCN').style.display = 'block';
+            document.getElementById('inputTenCN').value = selectedNV.maCN + ' - ' + selectedNV.tenChiNhanh;
+
+            new bootstrap.Modal(document.getElementById('modalNhanVien')).show();
+        });
+
+        // Nút Ghi
+        document.getElementById('btnGhi').addEventListener('click', function () {
+            const form = document.getElementById('formNhanVien');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const data = {
+                maNV: document.getElementById('inputMaNV').value.trim(),
+                ho: document.getElementById('inputHo').value.trim(),
+                ten: document.getElementById('inputTen').value.trim(),
+                cmnd: document.getElementById('inputCMND').value.trim(),
+                phai: document.getElementById('inputPhai').value,
+                soDT: document.getElementById('inputSDT').value.trim(),
+                diaChi: document.getElementById('inputDiaChi').value.trim(),
+                // Khi sửa, maCN bị disabled nên lấy từ selectedNV, khi thêm thì lấy từ input
+                maCN: isEditMode ? selectedNV.maCN : document.getElementById('inputMaCN').value
+            };
+
+            const url = isEditMode ? `/staff/nhan-vien/${data.maNV}` : '/staff/nhan-vien';
+            const method = isEditMode ? 'PUT' : 'POST';
+
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message);
+                    if (result.result === 1) {
+                        bootstrap.Modal.getInstance(document.getElementById('modalNhanVien')).hide();
+                        loadNhanVien();
+                        selectedNV = null;
+                    }
+                })
+                .catch(err => {
+                    console.error('Lỗi:', err);
+                    alert('Lỗi khi lưu nhân viên');
+                });
+        });
+
+        // Nút Xóa
+        document.getElementById('btnXoa').addEventListener('click', function () {
+            if (!selectedNV) {
+                alert('Vui lòng chọn nhân viên để xóa');
+                return;
+            }
+
+            if (!confirm(`Xác nhận xóa nhân viên ${selectedNV.hoTen}?`)) {
+                return;
+            }
+
+            fetch(`/staff/nhan-vien/${selectedNV.maNV}`, { method: 'DELETE' })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message);
+                    if (result.result === 1) {
+                        loadNhanVien();
+                        selectedNV = null;
+                    }
+                })
+                .catch(err => {
+                    console.error('Lỗi:', err);
+                    alert('Lỗi khi xóa nhân viên');
+                });
+        });
+
+        // Nút Phục hồi
+        document.getElementById('btnPhucHoi').addEventListener('click', function () {
+            if (!selectedNV) {
+                alert('Vui lòng chọn nhân viên để phục hồi');
+                return;
+            }
+
+            if (!confirm(`Xác nhận phục hồi nhân viên ${selectedNV.hoTen}?`)) {
+                return;
+            }
+
+            fetch(`/staff/nhan-vien/${selectedNV.maNV}/phuc-hoi`, { method: 'POST' })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message);
+                    if (result.result === 1) {
+                        loadNhanVien();
+                        selectedNV = null;
+                    }
+                })
+                .catch(err => {
+                    console.error('Lỗi:', err);
+                    alert('Lỗi khi phục hồi nhân viên');
+                });
+        });
+
+        // Nút Xem đã xóa / Quay lại
+        document.getElementById('btnXemDaXoa').addEventListener('click', function () {
+            isViewingDeleted = !isViewingDeleted;
+            this.innerHTML = isViewingDeleted
+                ? '<i class="bi bi-arrow-left"></i> Quay lại'
+                : '<i class="bi bi-eye"></i> Xem đã xóa';
+
+            document.getElementById('btnPhucHoi').style.display = isViewingDeleted ? 'inline-block' : 'none';
+            document.getElementById('btnThem').style.display = isViewingDeleted ? 'none' : 'inline-block';
+
+            selectedNV = null;
+            document.getElementById('btnSua').disabled = true;
+            document.getElementById('btnXoa').disabled = true;
+            document.getElementById('btnChuyenCN').disabled = true;
+
+            loadNhanVien();
+        });
+
+        // Nút Làm mới
+        document.getElementById('btnLamMoi').addEventListener('click', function () {
+            loadNhanVien();
+            selectedNV = null;
+            document.getElementById('btnSua').disabled = true;
+            document.getElementById('btnXoa').disabled = true;
+            document.getElementById('btnChuyenCN').disabled = true;
+            document.getElementById('btnPhucHoi').disabled = true;
+        });
+
+        // Nút Chuyển chi nhánh
+        document.getElementById('btnChuyenCN').addEventListener('click', function () {
+            if (!selectedNV) {
+                alert('Vui lòng chọn nhân viên để chuyển chi nhánh');
+                return;
+            }
+
+            document.getElementById('lblNVChuyen').textContent =
+                `${selectedNV.maNV} - ${selectedNV.hoTen}`;
+            document.getElementById('selectCNMoi').value = '';
+
+            new bootstrap.Modal(document.getElementById('modalChuyenCN')).show();
+        });
+
+        // Xác nhận chuyển chi nhánh
+        document.getElementById('btnXacNhanChuyen').addEventListener('click', function () {
+            const maCNMoi = document.getElementById('selectCNMoi').value;
+
+            if (!maCNMoi) {
+                alert('Vui lòng chọn chi nhánh mới');
+                return;
+            }
+
+            if (maCNMoi === selectedNV.maCN) {
+                alert('Nhân viên đã ở chi nhánh này rồi');
+                return;
+            }
+
+            if (!confirm(`Xác nhận chuyển nhân viên ${selectedNV.hoTen} sang chi nhánh mới?`)) {
+                return;
+            }
+
+            fetch(`/staff/nhan-vien/${selectedNV.maNV}/chuyen-chi-nhanh`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ maCNMoi: maCNMoi })
+            })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message + (result.maNVMoi ? `\nMã nhân viên mới: ${result.maNVMoi}` : ''));
+                    if (result.result === 1) {
+                        bootstrap.Modal.getInstance(document.getElementById('modalChuyenCN')).hide();
+                        loadNhanVien();
+                        selectedNV = null;
+                    }
+                })
+                .catch(err => {
+                    console.error('Lỗi:', err);
+                    alert('Lỗi khi chuyển chi nhánh');
+                });
         });
     </script>
 </body>

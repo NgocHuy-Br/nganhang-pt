@@ -18,6 +18,7 @@ public class NhanVien {
     private String cmnd;
     private String phai; // Giới tính
     private String soDT;
+    private Integer trangThaiXoa; // 0: Còn hoạt động, 1: Đã xóa
 
     public NhanVien() {
     }
@@ -147,5 +148,13 @@ public class NhanVien {
 
     public void setSoDT(String soDT) {
         this.soDT = soDT;
+    }
+
+    public Integer getTrangThaiXoa() {
+        return trangThaiXoa;
+    }
+
+    public void setTrangThaiXoa(Integer trangThaiXoa) {
+        this.trangThaiXoa = trangThaiXoa;
     }
 }
