@@ -371,8 +371,8 @@
                                         <button class="btn btn-secondary" id="btnXemDaXoa">
                                             <i class="bi bi-eye"></i> Xem đã xóa
                                         </button>
-                                        <button class="btn btn-secondary" id="btnLamMoi">
-                                            <i class="bi bi-arrow-clockwise"></i> Làm mới
+                                        <button class="btn btn-dark" id="btnUndo" disabled>
+                                            <i class="bi bi-arrow-counterclockwise"></i> Phục hồi (Undo)
                                         </button>
                                     </div>
                                 </div>
@@ -698,6 +698,24 @@
             });
         }
 
+        // Undo Stack
+        let undoStack = [];
+
+        function enableUndo(action, employeeData) {
+            undoStack.push({
+                action: action, // 'DELETE', 'UPDATE', 'TRANSFER'
+                employee: JSON.parse(JSON.stringify(employeeData)), // Deep copy
+                timestamp: Date.now()
+            });
+            document.getElementById('btnUndo').disabled = false;
+            console.log('[DEBUG] Undo enabled:', action, employeeData);
+        }
+
+        function disableUndo() {
+            undoStack = [];
+            document.getElementById('btnUndo').disabled = true;
+        }
+
         // Chọn nhân viên
         function selectNhanVien(maNV) {
             // Remove previous selection
@@ -718,11 +736,13 @@
                 document.getElementById('btnXoa').disabled = true;
                 document.getElementById('btnChuyenCN').disabled = true;
                 document.getElementById('btnPhucHoi').disabled = false;
+                document.getElementById('btnUndo').disabled = true; // Không cho undo khi đang xem danh sách đã xóa
             } else {
                 document.getElementById('btnSua').disabled = false;
                 document.getElementById('btnXoa').disabled = false;
                 document.getElementById('btnChuyenCN').disabled = false;
                 document.getElementById('btnPhucHoi').disabled = true;
+                // btnUndo giữ nguyên state (tùy thuộc vào stack)
             }
         }
 
@@ -801,6 +821,12 @@
             const url = isEditMode ? `/staff/nhan-vien/${data.maNV}` : '/staff/nhan-vien';
             const method = isEditMode ? 'PUT' : 'POST';
 
+            // Nếu đang edit, lưu state cũ trước khi update
+            let employeeBackup = null;
+            if (isEditMode) {
+                employeeBackup = JSON.parse(JSON.stringify(selectedNV));
+            }
+
             fetch(url, {
                 method: method,
                 headers: { 'Content-Type': 'application/json' },
@@ -810,6 +836,9 @@
                 .then(result => {
                     alert(result.message);
                     if (result.result === 1) {
+                        if (isEditMode && employeeBackup) {
+                            enableUndo('UPDATE', employeeBackup);
+                        }
                         bootstrap.Modal.getInstance(document.getElementById('modalNhanVien')).hide();
                         loadNhanVien();
                         selectedNV = null;
@@ -832,11 +861,15 @@
                 return;
             }
 
+            // Lưu state trước khi xóa
+            const employeeBackup = JSON.parse(JSON.stringify(selectedNV));
+
             fetch(`/staff/nhan-vien/${selectedNV.maNV}`, { method: 'DELETE' })
                 .then(res => res.json())
                 .then(result => {
                     alert(result.message);
                     if (result.result === 1) {
+                        enableUndo('DELETE', employeeBackup);
                         loadNhanVien();
                         selectedNV = null;
                     }
@@ -891,16 +924,6 @@
             loadNhanVien();
         });
 
-        // Nút Làm mới
-        document.getElementById('btnLamMoi').addEventListener('click', function () {
-            loadNhanVien();
-            selectedNV = null;
-            document.getElementById('btnSua').disabled = true;
-            document.getElementById('btnXoa').disabled = true;
-            document.getElementById('btnChuyenCN').disabled = true;
-            document.getElementById('btnPhucHoi').disabled = true;
-        });
-
         // Nút Chuyển chi nhánh
         document.getElementById('btnChuyenCN').addEventListener('click', function () {
             if (!selectedNV) {
@@ -933,6 +956,9 @@
                 return;
             }
 
+            // Lưu state trước khi chuyển chi nhánh
+            const employeeBackup = JSON.parse(JSON.stringify(selectedNV));
+
             fetch(`/staff/nhan-vien/${selectedNV.maNV}/chuyen-chi-nhanh`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -942,6 +968,7 @@
                 .then(result => {
                     alert(result.message + (result.maNVMoi ? `\nMã nhân viên mới: ${result.maNVMoi}` : ''));
                     if (result.result === 1) {
+                        enableUndo('TRANSFER', employeeBackup);
                         bootstrap.Modal.getInstance(document.getElementById('modalChuyenCN')).hide();
                         loadNhanVien();
                         selectedNV = null;
@@ -951,6 +978,87 @@
                     console.error('Lỗi:', err);
                     alert('Lỗi khi chuyển chi nhánh');
                 });
+        });
+
+        // Nút Undo
+        document.getElementById('btnUndo').addEventListener('click', function () {
+            if (undoStack.length === 0) {
+                alert('Không có thao tác nào để hoàn tác');
+                return;
+            }
+
+            const lastAction = undoStack.pop();
+            console.log('[DEBUG] Undo:', lastAction);
+
+            if (lastAction.action === 'DELETE') {
+                // Gọi SP_PhucHoiNhanVien
+                if (!confirm(`Hoàn tác xóa nhân viên ${lastAction.employee.hoTen}?`)) {
+                    undoStack.push(lastAction); // Push back nếu hủy
+                    return;
+                }
+
+                fetch(`/staff/nhan-vien/${lastAction.employee.maNV}/phuc-hoi`, {
+                    method: 'POST'
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        alert(result.message);
+                        if (result.result === 1) {
+                            loadNhanVien();
+                            disableUndo();
+                        } else {
+                            undoStack.push(lastAction); // Push back nếu thất bại
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Lỗi:', err);
+                        alert('Lỗi khi phục hồi nhân viên');
+                        undoStack.push(lastAction); // Push back nếu lỗi
+                    });
+
+            } else if (lastAction.action === 'UPDATE') {
+                // Update lại với dữ liệu cũ
+                if (!confirm(`Hoàn tác cập nhật nhân viên ${lastAction.employee.hoTen}?`)) {
+                    undoStack.push(lastAction); // Push back nếu hủy
+                    return;
+                }
+
+                const data = {
+                    maNV: lastAction.employee.maNV,
+                    ho: lastAction.employee.ho,
+                    ten: lastAction.employee.ten,
+                    cmnd: lastAction.employee.cmnd,
+                    phai: lastAction.employee.phai,
+                    soDT: lastAction.employee.soDT,
+                    diaChi: lastAction.employee.diaChi,
+                    maCN: lastAction.employee.maCN
+                };
+
+                fetch(`/staff/nhan-vien/${data.maNV}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        alert(result.message);
+                        if (result.result === 1) {
+                            loadNhanVien();
+                            disableUndo();
+                        } else {
+                            undoStack.push(lastAction); // Push back nếu thất bại
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Lỗi:', err);
+                        alert('Lỗi khi hoàn tác cập nhật');
+                        undoStack.push(lastAction); // Push back nếu lỗi
+                    });
+
+            } else if (lastAction.action === 'TRANSFER') {
+                alert('Chức năng hoàn tác chuyển chi nhánh sẽ được phát triển sau');
+                undoStack.push(lastAction); // Push back
+            }
         });
     </script>
 </body>
