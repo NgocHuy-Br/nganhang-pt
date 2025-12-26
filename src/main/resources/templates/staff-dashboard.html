@@ -342,15 +342,26 @@
 
                     <!-- Tab: Employees -->
                     <div id="employees" class="tab-content-item" style="display: none;">
-                        <h3 class="mb-4"><i class="bi bi-people-fill"></i> Quản lý nhân viên</h3>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="mb-0"><i class="bi bi-people-fill"></i> Quản lý nhân viên</h3>
+                            <button class="btn btn-secondary" id="btnXemDaXoa">
+                                <i class="bi bi-eye"></i> Xem đã xóa
+                            </button>
+                        </div>
 
                         <!-- Toolbar -->
                         <div class="card mb-3">
                             <div class="card-body">
                                 <div class="row g-3">
                                     <div class="col-md-4">
-                                        <input type="text" id="searchInput" class="form-control"
-                                            placeholder="Tìm kiếm (Mã NV, Họ tên, CMND...)">
+                                        <div class="input-group">
+                                            <input type="text" id="searchInput" class="form-control"
+                                                placeholder="Tìm kiếm (Mã NV, Họ tên, CMND...)">
+                                            <button class="btn btn-outline-secondary" type="button" id="btnClearSearch"
+                                                style="display: none;">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </div>
                                     </div>
                                     <div class="col-md-8 text-end">
                                         <button class="btn btn-primary" id="btnThem">
@@ -362,14 +373,8 @@
                                         <button class="btn btn-danger" id="btnXoa" disabled>
                                             <i class="bi bi-trash"></i> Xóa
                                         </button>
-                                        <button class="btn btn-success" id="btnPhucHoi" style="display:none;">
-                                            <i class="bi bi-arrow-counterclockwise"></i> Phục hồi
-                                        </button>
                                         <button class="btn btn-info" id="btnChuyenCN" disabled>
                                             <i class="bi bi-building"></i> Chuyển chi nhánh
-                                        </button>
-                                        <button class="btn btn-secondary" id="btnXemDaXoa">
-                                            <i class="bi bi-eye"></i> Xem đã xóa
                                         </button>
                                         <button class="btn btn-dark" id="btnUndo" disabled>
                                             <i class="bi bi-arrow-counterclockwise"></i> Phục hồi (Undo)
@@ -730,25 +735,25 @@
             // Find selected employee
             selectedNV = danhSachNhanVien.find(nv => nv.maNV === maNV);
 
-            // Enable/disable buttons
-            if (isViewingDeleted) {
-                document.getElementById('btnSua').disabled = true;
-                document.getElementById('btnXoa').disabled = true;
-                document.getElementById('btnChuyenCN').disabled = true;
-                document.getElementById('btnPhucHoi').disabled = false;
-                document.getElementById('btnUndo').disabled = true; // Không cho undo khi đang xem danh sách đã xóa
-            } else {
+            // Enable/disable buttons (chỉ áp dụng khi KHÔNG xem danh sách đã xóa)
+            if (!isViewingDeleted) {
                 document.getElementById('btnSua').disabled = false;
                 document.getElementById('btnXoa').disabled = false;
                 document.getElementById('btnChuyenCN').disabled = false;
-                document.getElementById('btnPhucHoi').disabled = true;
                 // btnUndo giữ nguyên state (tùy thuộc vào stack)
             }
         }
 
         // Tìm kiếm
-        document.getElementById('searchInput').addEventListener('input', function (e) {
+        const searchInput = document.getElementById('searchInput');
+        const btnClearSearch = document.getElementById('btnClearSearch');
+
+        searchInput.addEventListener('input', function (e) {
             const keyword = e.target.value.toLowerCase();
+
+            // Hiển/ẩn nút X
+            btnClearSearch.style.display = keyword ? 'block' : 'none';
+
             const filtered = danhSachNhanVien.filter(nv =>
                 nv.maNV.toLowerCase().includes(keyword) ||
                 nv.hoTen.toLowerCase().includes(keyword) ||
@@ -756,6 +761,13 @@
                 nv.soDT.toLowerCase().includes(keyword)
             );
             renderNhanVien(filtered);
+        });
+
+        // Nút Clear Search
+        btnClearSearch.addEventListener('click', function () {
+            searchInput.value = '';
+            btnClearSearch.style.display = 'none';
+            renderNhanVien(danhSachNhanVien); // Hiển thị tất cả
         });
 
         // Nút Thêm
@@ -880,41 +892,19 @@
                 });
         });
 
-        // Nút Phục hồi
-        document.getElementById('btnPhucHoi').addEventListener('click', function () {
-            if (!selectedNV) {
-                alert('Vui lòng chọn nhân viên để phục hồi');
-                return;
-            }
-
-            if (!confirm(`Xác nhận phục hồi nhân viên ${selectedNV.hoTen}?`)) {
-                return;
-            }
-
-            fetch(`/staff/nhan-vien/${selectedNV.maNV}/phuc-hoi`, { method: 'POST' })
-                .then(res => res.json())
-                .then(result => {
-                    alert(result.message);
-                    if (result.result === 1) {
-                        loadNhanVien();
-                        selectedNV = null;
-                    }
-                })
-                .catch(err => {
-                    console.error('Lỗi:', err);
-                    alert('Lỗi khi phục hồi nhân viên');
-                });
-        });
-
-        // Nút Xem đã xóa / Quay lại
+        // Nút Xem đã xóa / Xem hiện tại
         document.getElementById('btnXemDaXoa').addEventListener('click', function () {
             isViewingDeleted = !isViewingDeleted;
             this.innerHTML = isViewingDeleted
-                ? '<i class="bi bi-arrow-left"></i> Quay lại'
+                ? '<i class="bi bi-eye"></i> Xem hiện tại'
                 : '<i class="bi bi-eye"></i> Xem đã xóa';
 
-            document.getElementById('btnPhucHoi').style.display = isViewingDeleted ? 'inline-block' : 'none';
+            // Ẩn/hiện các nút khi xem danh sách đã xóa
             document.getElementById('btnThem').style.display = isViewingDeleted ? 'none' : 'inline-block';
+            document.getElementById('btnSua').style.display = isViewingDeleted ? 'none' : 'inline-block';
+            document.getElementById('btnXoa').style.display = isViewingDeleted ? 'none' : 'inline-block';
+            document.getElementById('btnChuyenCN').style.display = isViewingDeleted ? 'none' : 'inline-block';
+            document.getElementById('btnUndo').style.display = isViewingDeleted ? 'none' : 'inline-block';
 
             selectedNV = null;
             document.getElementById('btnSua').disabled = true;

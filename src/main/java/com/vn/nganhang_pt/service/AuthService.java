@@ -446,7 +446,7 @@ public class AuthService {
 
         try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
                 fragmentConfig.getPassword())) {
-            String sql = "{call dbo.SP_XemSaoKeKhachHang(?, ?, ?)}";
+            String sql = "{call dbo.SP_XemSKKHACHHANG(?, ?, ?)}";
 
             try (CallableStatement stmt = conn.prepareCall(sql)) {
                 stmt.setString(1, sotk);
