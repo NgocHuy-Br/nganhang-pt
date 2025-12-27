@@ -61,4 +61,50 @@ public class TaiKhoan {
     public void setSite(String site) {
         this.site = site;
     }
+
+    // Aliases for service layer
+    public String getSoTK() {
+        return sotk;
+    }
+
+    public void setSoTK(String soTK) {
+        this.sotk = soTK;
+    }
+
+    public BigDecimal getSoDu() {
+        return sodu;
+    }
+
+    public void setSoDu(BigDecimal soDu) {
+        this.sodu = soDu;
+    }
+
+    public java.util.Date getNgayMoTK() {
+        if (ngayMotk != null) {
+            return java.sql.Date.valueOf(ngayMotk);
+        }
+        return null;
+    }
+
+    public void setNgayMoTK(java.sql.Date ngayMoTK) {
+        if (ngayMoTK != null) {
+            this.ngayMotk = ngayMoTK.toLocalDate();
+        }
+    }
+
+    public String getMaCN() {
+        return macn;
+    }
+
+    public void setMaCN(String maCN) {
+        this.macn = maCN;
+    }
+
+    public String getTenCN() {
+        return tencn;
+    }
+
+    public void setTenCN(String tenCN) {
+        this.tencn = tenCN;
+    }
 }

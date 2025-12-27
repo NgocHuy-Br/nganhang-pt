@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
@@ -436,21 +436,21 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">CMND <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputCMND" required
+                                                <input type="text" class="form-control" id="inputNVCMND" required
                                                     maxlength="10">
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Họ <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputHo" required>
+                                                <input type="text" class="form-control" id="inputNVHo" required>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Tên <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputTen" required>
+                                                <input type="text" class="form-control" id="inputNVTen" required>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Giới tính <span
                                                         class="text-danger">*</span></label>
-                                                <select class="form-select" id="inputPhai" required>
+                                                <select class="form-select" id="inputNVPhai" required>
                                                     <option value="">-- Chọn --</option>
                                                     <option value="Nam">Nam</option>
                                                     <option value="Nữ">Nữ</option>
@@ -459,19 +459,19 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">Số điện thoại <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputSDT" required
+                                                <input type="text" class="form-control" id="inputNVSDT" required
                                                     maxlength="15">
                                             </div>
                                             <div class="col-md-12">
                                                 <label class="form-label">Địa chỉ <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputDiaChi" required>
+                                                <input type="text" class="form-control" id="inputNVDiaChi" required>
                                             </div>
                                             <div class="col-md-12">
                                                 <label class="form-label">Chi nhánh <span
                                                         class="text-danger">*</span></label>
                                                 <!-- Select cho chế độ thêm mới -->
-                                                <select class="form-select" id="inputMaCN" required>
+                                                <select class="form-select" id="inputNVMaCN" required>
                                                     <option value="">-- Chọn chi nhánh --</option>
                                                 </select>
                                                 <!-- Input readonly cho chế độ sửa -->
@@ -524,13 +524,218 @@
                         </div>
                     </div>
 
+                    <!-- Modal Thêm/Sửa Khách hàng -->
+                    <div class="modal fade" id="modalKhachHang" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalKHTitle">Thêm khách hàng mới</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="formKhachHang">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">CMND <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputCMND" required
+                                                    maxlength="10">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Ngày cấp <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="date" class="form-control" id="inputNgayCap" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Họ <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputKHHo" required
+                                                    maxlength="50">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Tên <span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputKHTen" required
+                                                    maxlength="10">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Giới tính <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" id="inputKHPhai" required>
+                                                    <option value="">-- Chọn --</option>
+                                                    <option value="Nam">Nam</option>
+                                                    <option value="Nữ">Nữ</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Số điện thoại <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputKHSDT" required
+                                                    maxlength="15">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Địa chỉ <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputKHDiaChi" required
+                                                    maxlength="100">
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Chi nhánh <span
+                                                        class="text-danger">*</span></label>
+                                                <select class="form-select" id="inputKHMaCN" required>
+                                                    <option value="">-- Chọn chi nhánh --</option>
+                                                </select>
+                                                <!-- Input readonly cho chế độ sửa -->
+                                                <input type="text" class="form-control" id="inputKHTenCN" readonly
+                                                    style="display:none;">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="button" class="btn btn-primary" id="btnGhiKH">Lưu</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Xem tài khoản -->
+                    <div class="modal fade" id="modalXemTaiKhoan" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Danh sách tài khoản</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Khách hàng: <strong id="lblKHTaiKhoan"></strong></p>
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>Số TK</th>
+                                                    <th>Số dư</th>
+                                                    <th>Ngày mở</th>
+                                                    <th>Chi nhánh</th>
+                                                    <th>Site</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="tableTaiKhoan">
+                                                <tr>
+                                                    <td colspan="5" class="text-center">Đang tải...</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary"
+                                        data-bs-dismiss="modal">Đóng</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Mở tài khoản -->
+                    <div class="modal fade" id="modalMoTaiKhoan" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Mở tài khoản mới</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Khách hàng: <strong id="lblKHMoTK"></strong></p>
+                                    <form id="formMoTaiKhoan">
+                                        <div class="mb-3">
+                                            <label class="form-label">Số tài khoản <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="inputSoTK" required
+                                                maxlength="9" placeholder="Nhập 9 ký tự">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Chi nhánh <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-select" id="inputTKMaCN" required>
+                                                <option value="">-- Chọn chi nhánh --</option>
+                                            </select>
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <i class="bi bi-info-circle"></i> Số dư ban đầu: <strong>100.000.000
+                                                VNĐ</strong>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="button" class="btn btn-primary" id="btnXacNhanMoTK">Xác nhận</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Tab: Customers -->
                     <div id="customers" class="tab-content-item" style="display: none;">
-                        <div class="placeholder-content">
-                            <i class="bi bi-person-badge"></i>
-                            <h3>Quản lý khách hàng</h3>
-                            <p>Chức năng CRUD khách hàng và tạo tài khoản mới</p>
-                            <p class="text-muted">Đang phát triển...</p>
+                        <h3 class="mb-4"><i class="bi bi-person-badge"></i> Quản lý khách hàng</h3>
+
+                        <!-- Toolbar -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <input type="text" id="searchKH" class="form-control"
+                                                placeholder="Tìm kiếm (CMND, Họ tên, SĐT...)">
+                                            <button class="btn btn-outline-secondary" type="button"
+                                                id="btnClearSearchKH" style="display: none;">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8 text-end">
+                                        <button class="btn btn-primary" id="btnThemKH">
+                                            <i class="bi bi-plus-circle"></i> Thêm
+                                        </button>
+                                        <button class="btn btn-warning" id="btnSuaKH" disabled>
+                                            <i class="bi bi-pencil-square"></i> Sửa
+                                        </button>
+                                        <button class="btn btn-danger" id="btnXoaKH" disabled>
+                                            <i class="bi bi-trash"></i> Xóa
+                                        </button>
+                                        <button class="btn btn-info" id="btnXemTaiKhoan" disabled>
+                                            <i class="bi bi-wallet2"></i> Xem tài khoản
+                                        </button>
+                                        <button class="btn btn-success" id="btnMoTaiKhoan" disabled>
+                                            <i class="bi bi-plus-square"></i> Mở tài khoản
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Table -->
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>CMND</th>
+                                                <th>Họ tên</th>
+                                                <th>Giới tính</th>
+                                                <th>Số ĐT</th>
+                                                <th>Địa chỉ</th>
+                                                <th>Chi nhánh</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableKH">
+                                            <tr>
+                                                <td colspan="7" class="text-center">Đang tải dữ liệu...</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -559,7 +764,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script th:inline="javascript">
+        // Thông tin nhân viên đăng nhập
+        const currentNhanVien = {
+            maCN: /*[[${nhanVien.maCN}]]*/ 'CN01',
+            tenChiNhanh: /*[[${nhanVien.tenChiNhanh}]]*/ 'Chi nhánh Bến Thành'
+        };
+
         // Display current date
         const dateElement = document.getElementById('current-date');
         const today = new Date();
@@ -601,6 +812,8 @@
                 if (tabId === 'employees') {
                     loadNhanVien();
                     loadChiNhanh();
+                } else if (tabId === 'customers') {
+                    loadKhachHang();
                 }
             });
         });
@@ -647,13 +860,19 @@
         function renderChiNhanhOptions(data) {
             const selectMaCN = document.getElementById('inputMaCN');
             const selectCNMoi = document.getElementById('selectCNMoi');
+            const selectKHMaCN = document.getElementById('inputKHMaCN');
+            const selectTKMaCN = document.getElementById('inputTKMaCN');
 
             selectMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
             selectCNMoi.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            selectKHMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            selectTKMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
 
             data.forEach(cn => {
                 selectMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
                 selectCNMoi.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
+                selectKHMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
+                selectTKMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
             });
         }
 
@@ -777,8 +996,8 @@
             document.getElementById('formNhanVien').reset();
             document.getElementById('inputMaNV').disabled = false;
             // Hiển thị select, ẩn input readonly
-            document.getElementById('inputMaCN').style.display = 'block';
-            document.getElementById('inputMaCN').disabled = false;
+            document.getElementById('inputNVMaCN').style.display = 'block';
+            document.getElementById('inputNVMaCN').disabled = false;
             document.getElementById('inputTenCN').style.display = 'none';
             new bootstrap.Modal(document.getElementById('modalNhanVien')).show();
         });
@@ -793,17 +1012,17 @@
             isEditMode = true;
             document.getElementById('modalTitle').textContent = 'Sửa thông tin nhân viên';
             document.getElementById('inputMaNV').value = selectedNV.maNV;
-            document.getElementById('inputHo').value = selectedNV.ho;
-            document.getElementById('inputTen').value = selectedNV.ten;
-            document.getElementById('inputCMND').value = selectedNV.cmnd;
-            document.getElementById('inputPhai').value = selectedNV.phai;
-            document.getElementById('inputSDT').value = selectedNV.soDT;
-            document.getElementById('inputDiaChi').value = selectedNV.diaChi;
+            document.getElementById('inputNVHo').value = selectedNV.ho;
+            document.getElementById('inputNVTen').value = selectedNV.ten;
+            document.getElementById('inputNVCMND').value = selectedNV.cmnd;
+            document.getElementById('inputNVPhai').value = selectedNV.phai;
+            document.getElementById('inputNVSDT').value = selectedNV.soDT;
+            document.getElementById('inputNVDiaChi').value = selectedNV.diaChi;
             document.getElementById('inputMaNV').disabled = true;
 
             // Ẩn select, hiển thị input readonly với tên chi nhánh
-            document.getElementById('inputMaCN').style.display = 'none';
-            document.getElementById('inputMaCN').disabled = true; // Disable để không fail validation
+            document.getElementById('inputNVMaCN').style.display = 'none';
+            document.getElementById('inputNVMaCN').disabled = true; // Disable để không fail validation
             document.getElementById('inputTenCN').style.display = 'block';
             document.getElementById('inputTenCN').value = selectedNV.maCN + ' - ' + selectedNV.tenChiNhanh;
 
@@ -820,14 +1039,14 @@
 
             const data = {
                 maNV: document.getElementById('inputMaNV').value.trim(),
-                ho: document.getElementById('inputHo').value.trim(),
-                ten: document.getElementById('inputTen').value.trim(),
-                cmnd: document.getElementById('inputCMND').value.trim(),
-                phai: document.getElementById('inputPhai').value,
-                soDT: document.getElementById('inputSDT').value.trim(),
-                diaChi: document.getElementById('inputDiaChi').value.trim(),
+                ho: document.getElementById('inputNVHo').value.trim(),
+                ten: document.getElementById('inputNVTen').value.trim(),
+                cmnd: document.getElementById('inputNVCMND').value.trim(),
+                phai: document.getElementById('inputNVPhai').value,
+                soDT: document.getElementById('inputNVSDT').value.trim(),
+                diaChi: document.getElementById('inputNVDiaChi').value.trim(),
                 // Khi sửa, maCN bị disabled nên lấy từ selectedNV, khi thêm thì lấy từ input
-                maCN: isEditMode ? selectedNV.maCN : document.getElementById('inputMaCN').value
+                maCN: isEditMode ? selectedNV.maCN : document.getElementById('inputNVMaCN').value
             };
 
             const url = isEditMode ? `/staff/nhan-vien/${data.maNV}` : '/staff/nhan-vien';
@@ -1049,6 +1268,287 @@
                 alert('Chức năng hoàn tác chuyển chi nhánh sẽ được phát triển sau');
                 undoStack.push(lastAction); // Push back
             }
+        });
+
+        // ==================== QUẢN LÝ KHÁCH HÀNG ====================
+        let selectedKH = null;
+        let allKhachHang = [];
+
+        // Load danh sách khách hàng
+        function loadKhachHang() {
+            fetch('/staff/khach-hang')
+                .then(res => res.json())
+                .then(data => {
+                    allKhachHang = data;
+                    renderKhachHang(data);
+                })
+                .catch(err => {
+                    console.error('Lỗi:', err);
+                    alert('Lỗi khi tải danh sách khách hàng');
+                });
+        }
+
+        // Hiển thị khách hàng ra table
+        function renderKhachHang(data) {
+            const tbody = document.getElementById('tableKH');
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không có dữ liệu</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = data.map((kh, index) => `
+                <tr onclick="selectKhachHang('${kh.cmnd ? kh.cmnd.trim() : ''}')">
+                    <td>${index + 1}</td>
+                    <td>${kh.cmnd ? kh.cmnd.trim() : ''}</td>
+                    <td>${kh.hoten}</td>
+                    <td>${kh.phai}</td>
+                    <td>${kh.soDT || ''}</td>
+                    <td>${kh.diaChi || ''}</td>
+                    <td>${kh.tenChiNhanh || ''}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Chọn khách hàng
+        function selectKhachHang(cmnd) {
+            selectedKH = allKhachHang.find(kh => kh.cmnd && kh.cmnd.trim() === cmnd);
+
+            // Highlight row
+            document.querySelectorAll('#tableKH tr').forEach(tr => {
+                tr.classList.remove('table-active');
+            });
+            event.target.closest('tr').classList.add('table-active');
+
+            // Enable buttons
+            document.getElementById('btnSuaKH').disabled = false;
+            document.getElementById('btnXoaKH').disabled = false;
+            document.getElementById('btnXemTaiKhoan').disabled = false;
+            document.getElementById('btnMoTaiKhoan').disabled = false;
+        }
+
+        // Tìm kiếm khách hàng
+        document.getElementById('searchKH').addEventListener('input', function () {
+            const keyword = this.value.toLowerCase();
+            const filtered = allKhachHang.filter(kh =>
+                kh.cmnd.toLowerCase().includes(keyword) ||
+                kh.hoten.toLowerCase().includes(keyword) ||
+                (kh.soDT && kh.soDT.toLowerCase().includes(keyword))
+            );
+            renderKhachHang(filtered);
+
+            // Show/hide clear button
+            document.getElementById('btnClearSearchKH').style.display = keyword ? 'inline-block' : 'none';
+        });
+
+        // Nút Clear search
+        document.getElementById('btnClearSearchKH').addEventListener('click', function () {
+            document.getElementById('searchKH').value = '';
+            this.style.display = 'none';
+            renderKhachHang(allKhachHang);
+        });
+
+        // Nút Thêm khách hàng
+        document.getElementById('btnThemKH').addEventListener('click', function () {
+            document.getElementById('modalKHTitle').textContent = 'Thêm khách hàng mới';
+            document.getElementById('formKhachHang').reset();
+            document.getElementById('inputCMND').disabled = false;
+            document.getElementById('inputKHPhai').disabled = false;
+
+            // Ẩn select, hiển thị input readonly với chi nhánh của nhân viên
+            document.getElementById('inputKHMaCN').style.display = 'none';
+            document.getElementById('inputKHMaCN').disabled = true;
+            document.getElementById('inputKHTenCN').style.display = 'block';
+            document.getElementById('inputKHTenCN').value = currentNhanVien.maCN + ' - ' + currentNhanVien.tenChiNhanh;
+
+            new bootstrap.Modal(document.getElementById('modalKhachHang')).show();
+        });
+
+        // Nút Sửa khách hàng
+        document.getElementById('btnSuaKH').addEventListener('click', function () {
+            if (!selectedKH) {
+                alert('Vui lòng chọn khách hàng để sửa');
+                return;
+            }
+
+            document.getElementById('modalKHTitle').textContent = 'Cập nhật thông tin khách hàng';
+
+            // CMND: enable → set value → disable
+            const inputCMND = document.getElementById('inputCMND');
+            inputCMND.disabled = false;
+            inputCMND.value = selectedKH.cmnd ? selectedKH.cmnd.trim() : '';
+            inputCMND.disabled = true;
+
+            document.getElementById('inputKHHo').value = selectedKH.ho || '';
+            document.getElementById('inputKHTen').value = selectedKH.ten || '';
+            document.getElementById('inputKHDiaChi').value = selectedKH.diaChi || '';
+            document.getElementById('inputNgayCap').value = selectedKH.ngayCap || '';
+            document.getElementById('inputKHSDT').value = selectedKH.soDT || '';
+
+            // Phai: enable → set value → disable
+            const inputPhai = document.getElementById('inputKHPhai');
+            inputPhai.disabled = false;
+            inputPhai.value = selectedKH.phai || '';
+            inputPhai.disabled = true;
+
+            // Chi nhánh: Ẩn select, hiển thị input readonly với tên chi nhánh
+            document.getElementById('inputKHMaCN').style.display = 'none';
+            document.getElementById('inputKHMaCN').disabled = true;
+            document.getElementById('inputKHTenCN').style.display = 'block';
+            document.getElementById('inputKHTenCN').value = (selectedKH.macn || 'CN01') + ' - ' + (selectedKH.tenChiNhanh || 'Chi nhánh Bến Thành');
+
+            new bootstrap.Modal(document.getElementById('modalKhachHang')).show();
+        });
+
+        // Nút Lưu khách hàng
+        document.getElementById('btnGhiKH').addEventListener('click', function () {
+            const isEdit = document.getElementById('inputCMND').disabled;
+
+            const cmnd = document.getElementById('inputCMND').value.trim();
+            const ho = document.getElementById('inputKHHo').value.trim();
+            const ten = document.getElementById('inputKHTen').value.trim();
+            const diaChi = document.getElementById('inputKHDiaChi').value.trim();
+            const ngayCap = document.getElementById('inputNgayCap').value;
+            const soDT = document.getElementById('inputKHSDT').value.trim();
+
+            // Lấy giá trị từ selectedKH khi edit, từ currentNhanVien khi thêm mới (vì input bị disabled)
+            const phai = isEdit ? selectedKH.phai : document.getElementById('inputKHPhai').value;
+            const maCN = isEdit ? selectedKH.macn : currentNhanVien.maCN;
+
+            if (!cmnd || !ho || !ten || !ngayCap || !soDT || !phai || !maCN) {
+                alert('Vui lòng điền đầy đủ thông tin');
+                return;
+            }
+
+            if (isEdit) {
+                // Cập nhật
+                fetch(`/staff/khach-hang/${cmnd}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ ho, ten, diaChi, soDT })
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        alert(result.message);
+                        if (result.result === 1) {
+                            bootstrap.Modal.getInstance(document.getElementById('modalKhachHang')).hide();
+                            loadKhachHang();
+                            selectedKH = null;
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Lỗi:', err);
+                        alert('Lỗi khi cập nhật khách hàng');
+                    });
+            } else {
+                // Thêm mới
+                fetch('/staff/khach-hang', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ cmnd, ho, ten, diaChi, ngayCap, soDT, phai, maCN })
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        alert(result.message);
+                        if (result.result === 1) {
+                            bootstrap.Modal.getInstance(document.getElementById('modalKhachHang')).hide();
+                            loadKhachHang();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Lỗi:', err);
+                        alert('Lỗi khi thêm khách hàng');
+                    });
+            }
+        });
+
+        // Nút Xóa khách hàng
+        document.getElementById('btnXoaKH').addEventListener('click', function () {
+            alert('Chức năng đang phát triển');
+        });
+
+        // Nút Xem tài khoản
+        document.getElementById('btnXemTaiKhoan').addEventListener('click', function () {
+            if (!selectedKH) {
+                alert('Vui lòng chọn khách hàng để xem tài khoản');
+                return;
+            }
+
+            document.getElementById('lblKHTaiKhoan').textContent = `${selectedKH.cmnd} - ${selectedKH.hoten}`;
+            document.getElementById('tableTaiKhoan').innerHTML = '<tr><td colspan="5" class="text-center">Đang tải...</td></tr>';
+
+            fetch(`/staff/khach-hang/${selectedKH.cmnd}/tai-khoan`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById('tableTaiKhoan').innerHTML = '<tr><td colspan="5" class="text-center">Chưa có tài khoản</td></tr>';
+                    } else {
+                        document.getElementById('tableTaiKhoan').innerHTML = data.map(tk => `
+                            <tr>
+                                <td>${tk.soTK}</td>
+                                <td>${new Intl.NumberFormat('vi-VN').format(tk.soDu)} VNĐ</td>
+                                <td>${tk.ngayMoTK ? new Date(tk.ngayMoTK).toLocaleDateString('vi-VN') : ''}</td>
+                                <td>${tk.tenCN || ''}</td>
+                                <td>${tk.site || ''}</td>
+                            </tr>
+                        `).join('');
+                    }
+                })
+                .catch(err => {
+                    console.error('Lỗi:', err);
+                    document.getElementById('tableTaiKhoan').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+                });
+
+            new bootstrap.Modal(document.getElementById('modalXemTaiKhoan')).show();
+        });
+
+        // Nút Mở tài khoản
+        document.getElementById('btnMoTaiKhoan').addEventListener('click', function () {
+            if (!selectedKH) {
+                alert('Vui lòng chọn khách hàng để mở tài khoản');
+                return;
+            }
+
+            document.getElementById('lblKHMoTK').textContent = `${selectedKH.cmnd} - ${selectedKH.hoten}`;
+            document.getElementById('formMoTaiKhoan').reset();
+
+            new bootstrap.Modal(document.getElementById('modalMoTaiKhoan')).show();
+        });
+
+        // Xác nhận mở tài khoản
+        document.getElementById('btnXacNhanMoTK').addEventListener('click', function () {
+            const soTK = document.getElementById('inputSoTK').value.trim();
+            const maCN = document.getElementById('inputTKMaCN').value;
+
+            if (!soTK || !maCN) {
+                alert('Vui lòng điền đầy đủ thông tin');
+                return;
+            }
+
+            if (soTK.length !== 9) {
+                alert('Số tài khoản phải có 9 ký tự');
+                return;
+            }
+
+            if (!confirm(`Xác nhận mở tài khoản ${soTK} với số dư ban đầu 100.000.000 VNĐ?`)) {
+                return;
+            }
+
+            fetch(`/staff/khach-hang/${selectedKH.cmnd}/mo-tai-khoan`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ soTK, maCN })
+            })
+                .then(res => res.json())
+                .then(result => {
+                    alert(result.message);
+                    if (result.result === 1) {
+                        bootstrap.Modal.getInstance(document.getElementById('modalMoTaiKhoan')).hide();
+                    }
+                })
+                .catch(err => {
+                    console.error('Lỗi:', err);
+                    alert('Lỗi khi mở tài khoản');
+                });
         });
     </script>
 </body>

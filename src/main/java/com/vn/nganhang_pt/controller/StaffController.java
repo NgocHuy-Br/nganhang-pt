@@ -1,13 +1,17 @@
 package com.vn.nganhang_pt.controller;
 
 import com.vn.nganhang_pt.model.ChiNhanh;
+import com.vn.nganhang_pt.model.KhachHang;
 import com.vn.nganhang_pt.model.NhanVien;
+import com.vn.nganhang_pt.model.TaiKhoan;
+import com.vn.nganhang_pt.service.KhachHangService;
 import com.vn.nganhang_pt.service.NhanVienService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +22,9 @@ public class StaffController {
 
     @Autowired
     private NhanVienService nhanVienService;
+
+    @Autowired
+    private KhachHangService khachHangService;
 
     /**
      * Lấy danh sách nhân viên
@@ -210,5 +217,114 @@ public class StaffController {
             default:
                 return "Lỗi không xác định";
         }
+    }
+
+    /* ==================== KHÁCH HÀNG APIs ==================== */
+
+    /**
+     * Lấy danh sách khách hàng
+     */
+    @GetMapping("/khach-hang")
+    @ResponseBody
+    public List<KhachHang> layDanhSachKhachHang(HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String role = nhanVien.getRole();
+
+        // Role NGANHANG: Xem tất cả chi nhánh
+        if ("NGANHANG".equals(role)) {
+            System.out.println("[DEBUG] Role NGANHANG - Lấy KH tất cả chi nhánh");
+            return khachHangService.layDanhSachKhachHangTatCaCN(tenServer);
+        } else {
+            // Role CHINHANH: Chỉ xem chi nhánh hiện tại
+            System.out.println("[DEBUG] Role CHINHANH - Lấy KH chi nhánh hiện tại");
+            return khachHangService.layDanhSachKhachHang(tenServer);
+        }
+    }
+
+    /**
+     * Thêm khách hàng mới
+     */
+    @PostMapping("/khach-hang")
+    @ResponseBody
+    public Map<String, Object> themKhachHang(@RequestBody Map<String, String> data, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String cmnd = data.get("cmnd");
+        String ho = data.get("ho");
+        String ten = data.get("ten");
+        String diaChi = data.get("diaChi");
+        Date ngayCap = Date.valueOf(data.get("ngayCap"));
+        String soDT = data.get("soDT");
+        String phai = data.get("phai");
+        String maCN = data.get("maCN");
+
+        return khachHangService.themKhachHang(tenServer, cmnd, ho, ten, diaChi, ngayCap, soDT, phai, maCN);
+    }
+
+    /**
+     * Cập nhật thông tin khách hàng
+     */
+    @PutMapping("/khach-hang/{cmnd}")
+    @ResponseBody
+    public Map<String, Object> capNhatKhachHang(@PathVariable String cmnd,
+            @RequestBody Map<String, String> data,
+            HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String ho = data.get("ho");
+        String ten = data.get("ten");
+        String diaChi = data.get("diaChi");
+        String soDT = data.get("soDT");
+
+        return khachHangService.capNhatKhachHang(tenServer, cmnd, ho, ten, diaChi, soDT);
+    }
+
+    /**
+     * Lấy danh sách tài khoản của khách hàng
+     */
+    @GetMapping("/khach-hang/{cmnd}/tai-khoan")
+    @ResponseBody
+    public List<TaiKhoan> layDanhSachTaiKhoanKH(@PathVariable String cmnd, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        return khachHangService.layDanhSachTaiKhoanKH(tenServer, cmnd);
+    }
+
+    /**
+     * Mở tài khoản cho khách hàng
+     */
+    @PostMapping("/khach-hang/{cmnd}/mo-tai-khoan")
+    @ResponseBody
+    public Map<String, Object> moTaiKhoan(@PathVariable String cmnd,
+            @RequestBody Map<String, String> data,
+            HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String soTK = data.get("soTK");
+        String maCN = data.get("maCN");
+        String maNV = nhanVien.getMaNV(); // Lấy mã NV từ session
+
+        return khachHangService.moTaiKhoan(tenServer, soTK, cmnd, maCN, maNV);
     }
 }

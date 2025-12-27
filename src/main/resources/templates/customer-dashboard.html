@@ -626,23 +626,40 @@
 
                 // Lấy ngày mở tài khoản
                 const ngayMoTKStr = selectedOption.dataset.ngaymotk;
+                let ngayMoTK = null;
+                if (ngayMoTKStr) {
+                    ngayMoTK = new Date(ngayMoTKStr);
+                }
 
-                // Khởi tạo Bootstrap Datepicker cho 2 ô (không có validation để test)
+                const today = new Date();
+                today.setHours(0, 0, 0, 0); // Reset giờ để so sánh chính xác
+
+                // Khởi tạo Bootstrap Datepicker cho Từ ngày
+                $('#tuNgay').datepicker('destroy'); // Xóa instance cũ nếu có
                 $('#tuNgay').datepicker({
                     format: 'dd/mm/yyyy',
                     language: 'vi',
                     autoclose: true,
-                    todayHighlight: true
+                    todayHighlight: true,
+                    startDate: ngayMoTK, // Không chọn trước ngày mở TK
+                    endDate: today // Không chọn sau ngày hôm nay
+                }).on('changeDate', function (e) {
+                    // Cập nhật startDate cho Đến ngày
+                    $('#denNgay').datepicker('setStartDate', e.date);
                 });
 
+                // Khởi tạo Bootstrap Datepicker cho Đến ngày
+                $('#denNgay').datepicker('destroy');
                 $('#denNgay').datepicker({
                     format: 'dd/mm/yyyy',
                     language: 'vi',
                     autoclose: true,
-                    todayHighlight: true
+                    todayHighlight: true,
+                    startDate: ngayMoTK, // Không chọn trước ngày mở TK
+                    endDate: today // Không chọn sau ngày hôm nay
                 });
 
-                // Lưu ngày mở TK vào data để dùng sau này
+                // Lưu ngày mở TK vào data đễ dùng sau này
                 $('#tuNgay').data('ngayMoTKStr', ngayMoTKStr);
                 $('#denNgay').data('ngayMoTKStr', ngayMoTKStr);
             } else {
@@ -784,13 +801,17 @@
                     const chiNhanh = document.getElementById('infoTENCN').textContent;
                     const soDu = document.getElementById('infoSODU').textContent;
 
-                    // Lấy ngày từ daterangepicker
-                    const picker = $('#dateRange').data('daterangepicker');
-                    const tuNgay = picker.startDate.format('DD/MM/YYYY');
-                    const denNgay = picker.endDate.format('DD/MM/YYYY');
+                    // Lấy ngày từ 2 ô input
+                    const tuNgay = document.getElementById('tuNgay').value;
+                    const denNgay = document.getElementById('denNgay').value;
+
+                    // Sắp xếp dữ liệu theo ngày giờ gần nhất đầu tiên
+                    const sortedData = [...currentSaoKeData].sort((a, b) => {
+                        return new Date(b.ngay) - new Date(a.ngay);
+                    });
 
                     // Chuẩn bị dữ liệu bảng
-                    const tableBody = currentSaoKeData.map((gd, index) => [
+                    const tableBody = sortedData.map((gd, index) => [
                         (index + 1).toString(),
                         formatDateTime(gd.ngay),
                         gd.loaiGiaoDich,

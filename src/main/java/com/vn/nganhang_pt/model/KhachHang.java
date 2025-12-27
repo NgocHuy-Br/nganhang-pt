@@ -16,6 +16,7 @@ public class KhachHang {
     private String diaChi;
     private String phai;
     private String soDT;
+    private java.util.Date ngayCap;
     private String tenChiNhanh;
     private String tenServer;
 
@@ -133,6 +134,19 @@ public class KhachHang {
 
     public void setSoDT(String soDT) {
         this.soDT = soDT;
+    }
+
+    public java.util.Date getNgayCap() {
+        return ngayCap;
+    }
+
+    public void setNgayCap(java.util.Date ngayCap) {
+        this.ngayCap = ngayCap;
+    }
+
+    // Alias for service layer
+    public void setMaCN(String maCN) {
+        this.macn = maCN;
     }
 
     public String getTenChiNhanh() {
