@@ -102,7 +102,9 @@ public class AuthController {
                     NhanVien thongTinDayDu = authService.layThongTinDayDuNhanVien(
                             nhanVien.getMaNV(),
                             nhanVien.getRole(),
-                            tenServer);
+                            tenServer,
+                            username,
+                            password);
 
                     if (thongTinDayDu != null) {
                         System.out.println("[DEBUG] Nhận được thông tin đầy đủ: ho=" + thongTinDayDu.getHo() + ", ten="
@@ -175,6 +177,7 @@ public class AuthController {
             }
 
             session.setAttribute("username", username);
+            session.setAttribute("password", password); // Lưu password để dùng cho các thao tác quản trị
             session.setAttribute("tenServer", tenServer);
             session.setAttribute("tenChiNhanh", tenChiNhanh);
 

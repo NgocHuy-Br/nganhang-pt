@@ -376,6 +376,9 @@
                                         <button class="btn btn-info" id="btnChuyenCN" disabled>
                                             <i class="bi bi-building"></i> Chuyển chi nhánh
                                         </button>
+                                        <button class="btn btn-success" id="btnTaoLogin" disabled>
+                                            <i class="bi bi-key"></i> Tạo tài khoản
+                                        </button>
                                         <button class="btn btn-dark" id="btnUndo" disabled>
                                             <i class="bi bi-arrow-counterclockwise"></i> Phục hồi (Undo)
                                         </button>
@@ -487,6 +490,63 @@
                                     </button>
                                     <button type="button" class="btn btn-primary" id="btnGhi">
                                         <i class="bi bi-save"></i> Ghi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal Tạo tài khoản đăng nhập -->
+                    <div class="modal fade" id="modalTaoLogin" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-success text-white">
+                                    <h5 class="modal-title"><i class="bi bi-key"></i> Tạo tài khoản đăng nhập</h5>
+                                    <button type="button" class="btn-close btn-close-white"
+                                        data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="formTaoLogin">
+                                        <div class="mb-3">
+                                            <label class="form-label">Tên nhân viên</label>
+                                            <input type="text" class="form-control" id="inputTenNV" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Mã nhân viên (UserName trong database)</label>
+                                            <input type="text" class="form-control" id="inputUserName" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Tên đăng nhập <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="inputLoginName" required
+                                                placeholder="Nhập tên đăng nhập">
+                                            <small class="text-muted">Tên đăng nhập để truy cập hệ thống SQL
+                                                Server</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Mật khẩu đăng nhập <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="password" class="form-control" id="inputPassword" required
+                                                placeholder="Nhập mật khẩu">
+                                            <small class="text-muted">Mật khẩu cho tài khoản đăng nhập</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Vai trò</label>
+                                            <input type="text" class="form-control" id="inputRole" readonly>
+                                            <small class="text-muted">Vai trò được gán bằng với tài khoản đang đăng
+                                                nhập</small>
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <i class="bi bi-info-circle"></i>
+                                            <strong>Lưu ý:</strong> Tài khoản sẽ được tạo trên server SQL hiện tại.
+                                            Đảm bảo tên đăng nhập chưa tồn tại.
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="button" class="btn btn-success" id="btnXacNhanTaoLogin">
+                                        <i class="bi bi-check-circle"></i> Tạo tài khoản
                                     </button>
                                 </div>
                             </div>
@@ -653,11 +713,11 @@
                                                 maxlength="9" placeholder="Nhập 9 ký tự">
                                         </div>
                                         <div class="mb-3">
-                                            <label class="form-label">Chi nhánh <span
-                                                    class="text-danger">*</span></label>
-                                            <select class="form-select" id="inputTKMaCN" required>
-                                                <option value="">-- Chọn chi nhánh --</option>
-                                            </select>
+                                            <label class="form-label">Chi nhánh</label>
+                                            <input type="text" class="form-control" id="inputTKTenCN" readonly>
+                                            <input type="hidden" id="inputTKMaCN">
+                                            <small class="text-muted">Chi nhánh được gán theo nhân viên đang đăng
+                                                nhập</small>
                                         </div>
                                         <div class="alert alert-info">
                                             <i class="bi bi-info-circle"></i> Số dư ban đầu: <strong>100.000.000
@@ -768,7 +828,8 @@
         // Thông tin nhân viên đăng nhập
         const currentNhanVien = {
             maCN: /*[[${nhanVien.maCN}]]*/ 'CN01',
-            tenChiNhanh: /*[[${nhanVien.tenChiNhanh}]]*/ 'Chi nhánh Bến Thành'
+            tenChiNhanh: /*[[${nhanVien.tenChiNhanh}]]*/ 'Chi nhánh Bến Thành',
+            role: /*[[${nhanVien.role}]]*/ 'CHINHANH'
         };
 
         // Display current date
@@ -959,6 +1020,7 @@
                 document.getElementById('btnSua').disabled = false;
                 document.getElementById('btnXoa').disabled = false;
                 document.getElementById('btnChuyenCN').disabled = false;
+                document.getElementById('btnTaoLogin').disabled = false;
                 // btnUndo giữ nguyên state (tùy thuộc vào stack)
             }
         }
@@ -1123,12 +1185,14 @@
             document.getElementById('btnSua').style.display = isViewingDeleted ? 'none' : 'inline-block';
             document.getElementById('btnXoa').style.display = isViewingDeleted ? 'none' : 'inline-block';
             document.getElementById('btnChuyenCN').style.display = isViewingDeleted ? 'none' : 'inline-block';
+            document.getElementById('btnTaoLogin').style.display = isViewingDeleted ? 'none' : 'inline-block';
             document.getElementById('btnUndo').style.display = isViewingDeleted ? 'none' : 'inline-block';
 
             selectedNV = null;
             document.getElementById('btnSua').disabled = true;
             document.getElementById('btnXoa').disabled = true;
             document.getElementById('btnChuyenCN').disabled = true;
+            document.getElementById('btnTaoLogin').disabled = true;
 
             loadNhanVien();
         });
@@ -1145,6 +1209,62 @@
             document.getElementById('selectCNMoi').value = '';
 
             new bootstrap.Modal(document.getElementById('modalChuyenCN')).show();
+        });
+
+        // Tạo tài khoản đăng nhập
+        document.getElementById('btnTaoLogin').addEventListener('click', function () {
+            if (!selectedNV) {
+                alert('Vui lòng chọn nhân viên để tạo tài khoản');
+                return;
+            }
+
+            // Điền thông tin vào form
+            document.getElementById('inputTenNV').value = selectedNV.hoTen; // Tên nhân viên (readonly)
+            document.getElementById('inputUserName').value = selectedNV.maNV; // Mã NV = UserName (readonly)
+            document.getElementById('inputLoginName').value = ''; // Để trống cho user tự đặt
+            document.getElementById('inputPassword').value = ''; // Để trống
+            document.getElementById('inputRole').value = currentNhanVien.role; // Gán role của user đang đăng nhập (readonly)
+
+            new bootstrap.Modal(document.getElementById('modalTaoLogin')).show();
+        });
+
+        // Xác nhận tạo tài khoản
+        document.getElementById('btnXacNhanTaoLogin').addEventListener('click', function () {
+            const loginName = document.getElementById('inputLoginName').value.trim();
+            const password = document.getElementById('inputPassword').value;
+            const userName = document.getElementById('inputUserName').value.trim(); // Mã NV (readonly)
+            const role = document.getElementById('inputRole').value.trim(); // Role (readonly)
+
+            if (!loginName || !password) {
+                alert('Vui lòng điền đầy đủ thông tin (Tên đăng nhập và Mật khẩu)');
+                return;
+            }
+
+            if (!confirm(`Xác nhận tạo tài khoản đăng nhập "${loginName}" cho nhân viên ${userName} với vai trò ${role}?`)) {
+                return;
+            }
+
+            fetch('/staff/tao-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ loginName, password, userName, role })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result === 1) {
+                        alert('✅ ' + data.message);
+                        bootstrap.Modal.getInstance(document.getElementById('modalTaoLogin')).hide();
+                    } else if (data.result === -1) {
+                        alert('⚠️ Login đã tồn tại!\n' + data.message);
+                    } else if (data.result === -2) {
+                        alert('⚠️ Role không hợp lệ!\n' + data.message);
+                    } else {
+                        alert('❌ Lỗi hệ thống:\n' + data.message);
+                    }
+                })
+                .catch(error => {
+                    alert('❌ Lỗi kết nối: ' + error.message);
+                });
         });
 
         // Xác nhận chuyển chi nhánh
@@ -1510,6 +1630,10 @@
 
             document.getElementById('lblKHMoTK').textContent = `${selectedKH.cmnd} - ${selectedKH.hoten}`;
             document.getElementById('formMoTaiKhoan').reset();
+
+            // Tự động gán chi nhánh từ nhân viên đang đăng nhập
+            document.getElementById('inputTKMaCN').value = currentNhanVien.maCN;
+            document.getElementById('inputTKTenCN').value = currentNhanVien.tenChiNhanh;
 
             new bootstrap.Modal(document.getElementById('modalMoTaiKhoan')).show();
         });

@@ -38,8 +38,10 @@ public class StaffController {
         }
 
         String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
         System.out.println("[DEBUG StaffController] Lấy DS nhân viên từ server=" + tenServer);
-        return nhanVienService.layDanhSachNhanVien(tenServer);
+        return nhanVienService.layDanhSachNhanVien(tenServer, username, password);
     }
 
     /**
@@ -54,8 +56,10 @@ public class StaffController {
         }
 
         String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
         System.out.println("[DEBUG StaffController] Lấy DS nhân viên đã xóa từ server=" + tenServer);
-        return nhanVienService.layDanhSachNhanVienDaXoa(tenServer);
+        return nhanVienService.layDanhSachNhanVienDaXoa(tenServer, username, password);
     }
 
     /**
@@ -70,8 +74,10 @@ public class StaffController {
         }
 
         String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
         System.out.println("[DEBUG StaffController] Lấy DS chi nhánh từ server=" + tenServer);
-        return nhanVienService.layDanhSachChiNhanh(tenServer);
+        return nhanVienService.layDanhSachChiNhanh(tenServer, username, password);
     }
 
     /**
@@ -86,9 +92,11 @@ public class StaffController {
         }
 
         String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
         System.out.println("[DEBUG StaffController] Thêm nhân viên mới: " + nv.getMaNV());
 
-        int result = nhanVienService.themNhanVien(nv, tenServer);
+        int result = nhanVienService.themNhanVien(nv, tenServer, username, password);
         Map<String, Object> response = new HashMap<>();
         response.put("result", result);
         response.put("message", getMessageByCode(result, "thêm"));
@@ -108,10 +116,12 @@ public class StaffController {
         }
 
         String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
         nv.setMaNV(maNV); // Đảm bảo mã NV đúng
         System.out.println("[DEBUG StaffController] Sửa nhân viên: " + maNV);
 
-        int result = nhanVienService.suaNhanVien(nv, tenServer);
+        int result = nhanVienService.suaNhanVien(nv, tenServer, username, password);
         Map<String, Object> response = new HashMap<>();
         response.put("result", result);
         response.put("message", getMessageByCode(result, "sửa"));
@@ -130,9 +140,11 @@ public class StaffController {
         }
 
         String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
         System.out.println("[DEBUG StaffController] Xóa nhân viên: " + maNV);
 
-        int result = nhanVienService.xoaNhanVien(maNV, tenServer);
+        int result = nhanVienService.xoaNhanVien(maNV, tenServer, username, password);
         Map<String, Object> response = new HashMap<>();
         response.put("result", result);
         response.put("message", getMessageByCode(result, "xóa"));
@@ -151,9 +163,11 @@ public class StaffController {
         }
 
         String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
         System.out.println("[DEBUG StaffController] Phục hồi nhân viên: " + maNV);
 
-        int result = nhanVienService.phucHoiNhanVien(maNV, tenServer);
+        int result = nhanVienService.phucHoiNhanVien(maNV, tenServer, username, password);
         Map<String, Object> response = new HashMap<>();
         response.put("result", result);
         response.put("message", getMessageByCode(result, "phục hồi"));
@@ -173,10 +187,12 @@ public class StaffController {
         }
 
         String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
         String maCNMoi = payload.get("maCNMoi");
         System.out.println("[DEBUG StaffController] Chuyển nhân viên " + maNV + " sang chi nhánh " + maCNMoi);
 
-        Map<String, Object> result = nhanVienService.chuyenChiNhanh(maNV, maCNMoi, tenServer);
+        Map<String, Object> result = nhanVienService.chuyenChiNhanh(maNV, maCNMoi, tenServer, username, password);
         return result;
     }
 
@@ -326,5 +342,33 @@ public class StaffController {
         String maNV = nhanVien.getMaNV(); // Lấy mã NV từ session
 
         return khachHangService.moTaiKhoan(tenServer, soTK, cmnd, maCN, maNV);
+    }
+
+    /**
+     * Tạo tài khoản đăng nhập
+     */
+    @PostMapping("/tao-login")
+    @ResponseBody
+    public Map<String, Object> taoTaiKhoanDangNhap(@RequestBody Map<String, String> data, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String loginName = data.get("loginName");
+        String password = data.get("password");
+        String userName = data.get("userName");
+        String role = data.get("role");
+
+        // Lấy credentials của user hiện tại từ session
+        String currentUsername = (String) session.getAttribute("username");
+        String currentPassword = (String) session.getAttribute("password");
+
+        System.out.println("[DEBUG StaffController] Tạo login - currentUsername=" + currentUsername
+                + ", currentPassword=" + (currentPassword != null ? "***" : "NULL"));
+
+        return nhanVienService.taoTaiKhoanDangNhap(tenServer, loginName, password, userName, role,
+                currentUsername, currentPassword);
     }
 }

@@ -21,7 +21,7 @@ public class NhanVienService {
     /**
      * Lấy danh sách nhân viên
      */
-    public List<NhanVien> layDanhSachNhanVien(String tenServer) {
+    public List<NhanVien> layDanhSachNhanVien(String tenServer, String username, String password) {
         List<NhanVien> danhSach = new ArrayList<>();
         String connectionString = fragmentConfig.getConnectionString(tenServer);
 
@@ -30,8 +30,7 @@ public class NhanVienService {
             return danhSach;
         }
 
-        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
-                fragmentConfig.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
             String sql = "{call dbo.SP_Lay_DS_NhanVien}";
 
             try (CallableStatement stmt = conn.prepareCall(sql);
@@ -64,7 +63,7 @@ public class NhanVienService {
     /**
      * Lấy danh sách nhân viên đã xóa
      */
-    public List<NhanVien> layDanhSachNhanVienDaXoa(String tenServer) {
+    public List<NhanVien> layDanhSachNhanVienDaXoa(String tenServer, String username, String password) {
         List<NhanVien> danhSach = new ArrayList<>();
         String connectionString = fragmentConfig.getConnectionString(tenServer);
 
@@ -73,8 +72,7 @@ public class NhanVienService {
             return danhSach;
         }
 
-        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
-                fragmentConfig.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
             String sql = "{call dbo.SP_Lay_DS_NhanVien_DaXoa}";
 
             try (CallableStatement stmt = conn.prepareCall(sql);
@@ -107,7 +105,7 @@ public class NhanVienService {
     /**
      * Lấy danh sách chi nhánh
      */
-    public List<ChiNhanh> layDanhSachChiNhanh(String tenServer) {
+    public List<ChiNhanh> layDanhSachChiNhanh(String tenServer, String username, String password) {
         List<ChiNhanh> danhSach = new ArrayList<>();
         String connectionString = fragmentConfig.getConnectionString(tenServer);
 
@@ -116,8 +114,7 @@ public class NhanVienService {
             return danhSach;
         }
 
-        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
-                fragmentConfig.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
             String sql = "SELECT MACN, TENCN FROM CHINHANH ORDER BY MACN";
 
             try (Statement stmt = conn.createStatement();
@@ -141,15 +138,14 @@ public class NhanVienService {
     /**
      * Thêm nhân viên mới
      */
-    public int themNhanVien(NhanVien nv, String tenServer) {
+    public int themNhanVien(NhanVien nv, String tenServer, String username, String password) {
         String connectionString = fragmentConfig.getConnectionString(tenServer);
         if (connectionString == null) {
             System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
             return -99;
         }
 
-        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
-                fragmentConfig.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
             String sql = "{call dbo.sp_ThemNhanVien(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
             try (CallableStatement stmt = conn.prepareCall(sql)) {
@@ -178,15 +174,14 @@ public class NhanVienService {
     /**
      * Sửa thông tin nhân viên
      */
-    public int suaNhanVien(NhanVien nv, String tenServer) {
+    public int suaNhanVien(NhanVien nv, String tenServer, String username, String password) {
         String connectionString = fragmentConfig.getConnectionString(tenServer);
         if (connectionString == null) {
             System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
             return -99;
         }
 
-        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
-                fragmentConfig.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
             String sql = "{call dbo.SP_SuaNhanVien(?, ?, ?, ?, ?, ?, ?, ?, ?)}";
 
             try (CallableStatement stmt = conn.prepareCall(sql)) {
@@ -215,15 +210,14 @@ public class NhanVienService {
     /**
      * Xóa nhân viên (soft delete)
      */
-    public int xoaNhanVien(String maNV, String tenServer) {
+    public int xoaNhanVien(String maNV, String tenServer, String username, String password) {
         String connectionString = fragmentConfig.getConnectionString(tenServer);
         if (connectionString == null) {
             System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
             return -99;
         }
 
-        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
-                fragmentConfig.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
             String sql = "{call dbo.sp_XoaNhanVien(?, ?)}";
 
             try (CallableStatement stmt = conn.prepareCall(sql)) {
@@ -245,15 +239,14 @@ public class NhanVienService {
     /**
      * Phục hồi nhân viên đã xóa
      */
-    public int phucHoiNhanVien(String maNV, String tenServer) {
+    public int phucHoiNhanVien(String maNV, String tenServer, String username, String password) {
         String connectionString = fragmentConfig.getConnectionString(tenServer);
         if (connectionString == null) {
             System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
             return -99;
         }
 
-        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
-                fragmentConfig.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
             String sql = "{call dbo.SP_PhucHoiNhanVien(?, ?)}";
 
             try (CallableStatement stmt = conn.prepareCall(sql)) {
@@ -275,7 +268,8 @@ public class NhanVienService {
     /**
      * Chuyển nhân viên sang chi nhánh khác
      */
-    public Map<String, Object> chuyenChiNhanh(String maNV, String maCNMoi, String tenServer) {
+    public Map<String, Object> chuyenChiNhanh(String maNV, String maCNMoi, String tenServer, String username,
+            String password) {
         Map<String, Object> response = new HashMap<>();
         String connectionString = fragmentConfig.getConnectionString(tenServer);
 
@@ -286,8 +280,7 @@ public class NhanVienService {
             return response;
         }
 
-        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
-                fragmentConfig.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
             String sql = "{call dbo.sp_ChuyenNhanVien(?, ?, ?)}";
 
             try (CallableStatement stmt = conn.prepareCall(sql)) {
@@ -317,5 +310,56 @@ public class NhanVienService {
             response.put("message", "Lỗi hệ thống: " + e.getMessage());
         }
         return response;
+    }
+
+    /**
+     * Tạo tài khoản đăng nhập cho nhân viên
+     */
+    public Map<String, Object> taoTaiKhoanDangNhap(String tenServer, String loginName, String password,
+            String userName, String role, String currentUsername, String currentPassword) {
+        Map<String, Object> result = new HashMap<>();
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
+
+        System.out.println("[DEBUG NhanVienService] Tạo login với credentials: username=" + currentUsername
+                + ", password=" + (currentPassword != null ? "***" : "NULL"));
+
+        try (Connection conn = DriverManager.getConnection(connectionString, currentUsername, currentPassword)) {
+            String sql = "{call dbo.sp_TaoLogin(?, ?, ?, ?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                stmt.setString(1, loginName);
+                stmt.setString(2, password);
+                stmt.setString(3, userName);
+                stmt.setString(4, role);
+
+                stmt.execute();
+
+                result.put("result", 1);
+                result.put("message", "Tạo tài khoản đăng nhập thành công");
+                System.out.println("[DEBUG] Đã tạo login: " + loginName + " với role: " + role);
+
+            }
+        } catch (SQLException e) {
+            String errorMsg = e.getMessage();
+            System.err.println("[ERROR] Lỗi khi tạo login: " + errorMsg);
+
+            // Kiểm tra lỗi login đã tồn tại
+            if (errorMsg.contains("đã tồn tại")) {
+                result.put("result", -1);
+                result.put("message", errorMsg);
+            } else if (errorMsg.contains("không hợp lệ")) {
+                result.put("result", -2);
+                result.put("message", errorMsg);
+            } else {
+                result.put("result", -99);
+                result.put("message", "Lỗi khi tạo tài khoản: " + errorMsg);
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi hệ thống: " + e.getMessage());
+            e.printStackTrace();
+            result.put("result", -99);
+            result.put("message", "Lỗi hệ thống: " + e.getMessage());
+        }
+        return result;
     }
 }

@@ -261,7 +261,8 @@ public class AuthService {
      * @param tenServer Tên server phân mảnh
      * @return NhanVien với đầy đủ thông tin
      */
-    public NhanVien layThongTinDayDuNhanVien(String loginID, String role, String tenServer) {
+    public NhanVien layThongTinDayDuNhanVien(String loginID, String role, String tenServer, String username,
+            String password) {
         System.out.println("[DEBUG AuthService] Bắt đầu lấy thông tin đầy đủ cho loginID=" + loginID + ", role=" + role
                 + ", server=" + tenServer);
 
@@ -274,10 +275,9 @@ public class AuthService {
 
         System.out.println("[DEBUG] Connection string: "
                 + connectionString.substring(0, Math.min(80, connectionString.length())) + "...");
-        System.out.println("[DEBUG] Username: " + fragmentConfig.getUsername());
+        System.out.println("[DEBUG] Username: " + username);
 
-        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
-                fragmentConfig.getPassword())) {
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
             System.out.println("[DEBUG] Kết nối thành công, đang gọi SP...");
             String sql = "{call dbo.SP_ThongTinDangNhapHienTai(?, ?)}";
 
