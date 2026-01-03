@@ -45,22 +45,13 @@ public class GiaoDichService {
                     result.put("tenKH", rs.getString("HOTEN"));
                     result.put("tenChiNhanh", rs.getString("TENCN"));
                     result.put("cmnd", rs.getString("CMND"));
+
+                    // TODO: Cần cập nhật SP để trả về SODU và NGAYMOTK
+                    // Hiện tại SP chỉ trả về HOTEN, TENCN, CMND
                 } else {
                     result.put("success", false);
                     result.put("message", "Tài khoản không tồn tại");
                     return result;
-                }
-            }
-
-            // Lấy số dư từ bảng TAIKHOAN
-            String sqlSoDu = "SELECT SODU FROM TAIKHOAN WHERE SOTK = ?";
-            try (PreparedStatement stmtSoDu = conn.prepareStatement(sqlSoDu)) {
-                stmtSoDu.setString(1, soTK);
-                ResultSet rsSoDu = stmtSoDu.executeQuery();
-                if (rsSoDu.next()) {
-                    result.put("soDu", rsSoDu.getBigDecimal("SODU"));
-                } else {
-                    result.put("soDu", BigDecimal.ZERO);
                 }
             }
 

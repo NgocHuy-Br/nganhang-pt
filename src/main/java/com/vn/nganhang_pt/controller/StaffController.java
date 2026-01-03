@@ -1,19 +1,26 @@
 package com.vn.nganhang_pt.controller;
 
 import com.vn.nganhang_pt.model.ChiNhanh;
+import com.vn.nganhang_pt.model.GiaoDich;
 import com.vn.nganhang_pt.model.KhachHang;
 import com.vn.nganhang_pt.model.NhanVien;
 import com.vn.nganhang_pt.model.TaiKhoan;
+import com.vn.nganhang_pt.service.BaoCaoService;
 import com.vn.nganhang_pt.service.GiaoDichService;
 import com.vn.nganhang_pt.service.KhachHangService;
 import com.vn.nganhang_pt.service.NhanVienService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +37,9 @@ public class StaffController {
 
     @Autowired
     private GiaoDichService giaoDichService;
+
+    @Autowired
+    private BaoCaoService baoCaoService;
 
     /**
      * Lấy danh sách nhân viên
@@ -460,5 +470,161 @@ public class StaffController {
         String password = (String) session.getAttribute("password");
 
         return giaoDichService.chuyenTien(soTKGui, soTKNhan, soTien, maNV, tenServer, username, password);
+    }
+
+    /**
+     * Sao kê giao dịch
+     */
+    @PostMapping("/bao-cao/sao-ke")
+    @ResponseBody
+    public Map<String, Object> saoKeGiaoDich(@RequestBody Map<String, String> data, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+            if (nhanVien == null) {
+                response.put("success", false);
+                response.put("message", "Chưa đăng nhập");
+                return response;
+            }
+
+            String soTK = data.get("soTK");
+            LocalDate tuNgay = LocalDate.parse(data.get("tuNgay"));
+            LocalDate denNgay = LocalDate.parse(data.get("denNgay"));
+
+            String tenServer = nhanVien.getTenServer();
+            String username = (String) session.getAttribute("username");
+            String password = (String) session.getAttribute("password");
+
+            List<GiaoDich> transactions = baoCaoService.saoKeGiaoDich(soTK, tuNgay, denNgay, tenServer, username,
+                    password);
+
+            response.put("success", true);
+            response.put("transactions", transactions);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        }
+
+        return response;
+    }
+
+    /**
+     * Xuất PDF sao kê giao dịch
+     */
+    @PostMapping("/bao-cao/sao-ke/pdf")
+    public ResponseEntity<byte[]> xuatPDFSaoKe(@RequestBody Map<String, String> data, HttpSession session) {
+        try {
+            NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+            if (nhanVien == null) {
+                return ResponseEntity.status(401).body(null);
+            }
+
+            String soTK = data.get("soTK");
+            LocalDate tuNgay = LocalDate.parse(data.get("tuNgay"));
+            LocalDate denNgay = LocalDate.parse(data.get("denNgay"));
+
+            String tenServer = nhanVien.getTenServer();
+            String username = (String) session.getAttribute("username");
+            String password = (String) session.getAttribute("password");
+
+            // Lấy thông tin tài khoản
+            String chuTK = data.get("chuTK");
+            String chiNhanh = data.get("chiNhanh");
+            String nguoiXuat = nhanVien.getHo() + " " + nhanVien.getTen();
+
+            byte[] pdfBytes = baoCaoService.xuatPDFSaoKe(soTK, tuNgay, denNgay, tenServer, username, password, chuTK,
+                    chiNhanh, nguoiXuat);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename("SaoKeTaiKhoan_" + soTK + "_" + tuNgay + "_" + denNgay + ".pdf")
+                    .build());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    /**
+     * Liệt kê tài khoản mở mới
+     */
+    @PostMapping("/bao-cao/tai-khoan-moi")
+    @ResponseBody
+    public Map<String, Object> lietKeTaiKhoanMoi(@RequestBody Map<String, String> data, HttpSession session) {
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+            if (nhanVien == null) {
+                response.put("success", false);
+                response.put("message", "Chưa đăng nhập");
+                return response;
+            }
+
+            LocalDate tuNgay = LocalDate.parse(data.get("tuNgay"));
+            LocalDate denNgay = LocalDate.parse(data.get("denNgay"));
+
+            String tenServer = nhanVien.getTenServer();
+            String role = nhanVien.getRole();
+            String maCN = nhanVien.getMaCN();
+            String username = (String) session.getAttribute("username");
+            String password = (String) session.getAttribute("password");
+
+            List<Map<String, Object>> accounts = baoCaoService.lietKeTaiKhoanMoi(tuNgay, denNgay, role, maCN, tenServer,
+                    username, password);
+
+            response.put("success", true);
+            response.put("accounts", accounts);
+        } catch (Exception e) {
+            response.put("success", false);
+            response.put("message", e.getMessage());
+        }
+
+        return response;
+    }
+
+    /**
+     * Xuất PDF danh sách tài khoản mở mới
+     */
+    @PostMapping("/bao-cao/tai-khoan-moi/pdf")
+    public ResponseEntity<byte[]> xuatPDFTaiKhoanMoi(@RequestBody Map<String, String> data, HttpSession session) {
+        try {
+            NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+            if (nhanVien == null) {
+                return ResponseEntity.status(401).body(null);
+            }
+
+            LocalDate tuNgay = LocalDate.parse(data.get("tuNgay"));
+            LocalDate denNgay = LocalDate.parse(data.get("denNgay"));
+
+            String tenServer = nhanVien.getTenServer();
+            String role = nhanVien.getRole();
+            String maCN = nhanVien.getMaCN();
+            String username = (String) session.getAttribute("username");
+            String password = (String) session.getAttribute("password");
+
+            // Lấy tên người xuất
+            String nguoiXuat = nhanVien.getHo() + " " + nhanVien.getTen();
+
+            byte[] pdfBytes = baoCaoService.xuatPDFTaiKhoanMoi(tuNgay, denNgay, role, maCN, tenServer, username,
+                    password, nguoiXuat);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDisposition(ContentDisposition.builder("attachment")
+                    .filename("DanhSachTaiKhoanMoi_" + tuNgay + "_" + denNgay + ".pdf")
+                    .build());
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(pdfBytes);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(null);
+        }
     }
 }

@@ -1110,11 +1110,170 @@
 
                     <!-- Tab: Statistics -->
                     <div id="statistics" class="tab-content-item" style="display: none;">
-                        <div class="placeholder-content">
-                            <i class="bi bi-graph-up"></i>
-                            <h3>Thống kê & Báo cáo</h3>
-                            <p>Sao kê giao dịch, Thống kê tài khoản mở theo ngày</p>
-                            <p class="text-muted">Đang phát triển...</p>
+                        <h3 class="mb-4"><i class="bi bi-graph-up"></i> Thống kê & Báo cáo</h3>
+
+                        <!-- Chọn loại báo cáo -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Chọn loại báo cáo</label>
+                                        <select class="form-select" id="selectBaoCao">
+                                            <option value="">-- Chọn báo cáo --</option>
+                                            <option value="sao-ke">Sao kê giao dịch</option>
+                                            <option value="tai-khoan-moi">Tài khoản mở mới</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Sao kê -->
+                        <div id="formSaoKe" style="display: none;">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="bi bi-file-earmark-text"></i> Sao kê giao dịch</h6>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Xác nhận tài khoản -->
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-8">
+                                            <label class="form-label">Số tài khoản</label>
+                                            <input type="text" id="saoKeSoTK" class="form-control"
+                                                placeholder="Nhập số TK" maxlength="9">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">&nbsp;</label>
+                                            <button id="btnXacNhanTKSaoKe" class="btn btn-info w-100">
+                                                <i class="bi bi-search"></i> Xác nhận TK
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Thông tin tài khoản -->
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label text-muted small">Tên khách hàng</label>
+                                            <input type="text" id="saoKeTenKH" class="form-control" readonly>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label text-muted small">Chi nhánh</label>
+                                            <input type="text" id="saoKeChiNhanh" class="form-control" readonly>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label text-muted small">Ngày mở TK</label>
+                                            <input type="text" id="saoKeNgayMo" class="form-control" readonly>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <!-- Chọn ngày -->
+                                    <div class="row g-3">
+                                        <div class="col-md-5">
+                                            <label class="form-label">Từ ngày</label>
+                                            <input type="date" id="saoKeTuNgay" class="form-control">
+                                        </div>
+                                        <div class="col-md-5">
+                                            <label class="form-label">Đến ngày</label>
+                                            <input type="date" id="saoKeDenNgay" class="form-control">
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">&nbsp;</label>
+                                            <button id="btnXemSaoKe" class="btn btn-primary w-100">
+                                                <i class="bi bi-search"></i> Xem
+                                            </button>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <label class="form-label">&nbsp;</label>
+                                            <button id="btnXuatPDFSaoKe" class="btn btn-success w-100" disabled>
+                                                <i class="bi bi-file-pdf"></i> Xuất PDF
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bảng kết quả sao kê -->
+                            <div id="resultSaoKe" style="display: none;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>STT</th>
+                                                <th>Ngày GD</th>
+                                                <th>Loại GD</th>
+                                                <th class="text-end">Số tiền</th>
+                                                <th class="text-end">Số dư đầu</th>
+                                                <th class="text-end">Số dư sau</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableSaoKe"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Tài khoản mới -->
+                        <div id="formTKMoi" style="display: none;">
+                            <div class="card mb-3">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0"><i class="bi bi-person-plus"></i> Tài khoản mở mới</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label class="form-label">Từ ngày</label>
+                                            <input type="date" id="tkMoiTuNgay" class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">Đến ngày</label>
+                                            <input type="date" id="tkMoiDenNgay" class="form-control">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">&nbsp;</label>
+                                            <button id="btnXemTKMoi" class="btn btn-primary w-100">
+                                                <i class="bi bi-search"></i> Xem danh sách
+                                            </button>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label">&nbsp;</label>
+                                            <button id="btnXuatPDFTKMoi" class="btn btn-success w-100" disabled>
+                                                <i class="bi bi-file-pdf"></i> Xuất PDF
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Bảng kết quả TK mới -->
+                            <div id="resultTKMoi" style="display: none;">
+                                <div class="table-responsive">
+                                    <table class="table table-hover table-bordered">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>STT</th>
+                                                <th>Số TK</th>
+                                                <th>CMND</th>
+                                                <th>Họ tên KH</th>
+                                                <th class="text-end">Số dư</th>
+                                                <th>Ngày mở</th>
+                                                <th>Chi nhánh</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tableTKMoi"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Placeholder -->
+                        <div id="placeholderBaoCao">
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-graph-up" style="font-size: 4rem;"></i>
+                                <h5 class="mt-3">Chọn loại báo cáo</h5>
+                                <p>Vui lòng chọn loại báo cáo ở trên để xem thông tin</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -2297,6 +2456,283 @@
                 .catch(error => {
                     console.error('Error:', error);
                     alert('❌ Lỗi khi thực hiện giao dịch: ' + error.message);
+                });
+        });
+
+        // ===== BÁO CÁO =====
+
+        // Format functions
+        function formatDateTime(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Biến lưu thông tin TK đã xác nhận
+        let saoKeTKInfo = null;
+
+        // Chọn loại báo cáo
+        document.getElementById('selectBaoCao').addEventListener('change', function () {
+            const loai = this.value;
+            document.getElementById('formSaoKe').style.display = 'none';
+            document.getElementById('formTKMoi').style.display = 'none';
+            document.getElementById('placeholderBaoCao').style.display = 'none';
+            document.getElementById('resultSaoKe').style.display = 'none';
+            document.getElementById('resultTKMoi').style.display = 'none';
+
+            // Reset form sao kê
+            if (loai !== 'sao-ke') {
+                saoKeTKInfo = null;
+                document.getElementById('saoKeSoTK').value = '';
+                document.getElementById('saoKeTenKH').value = '';
+                document.getElementById('saoKeChiNhanh').value = '';
+                document.getElementById('saoKeNgayMo').value = '';
+                document.getElementById('saoKeTuNgay').value = '';
+                document.getElementById('saoKeDenNgay').value = '';
+            }
+
+            if (loai === 'sao-ke') {
+                document.getElementById('formSaoKe').style.display = 'block';
+            } else if (loai === 'tai-khoan-moi') {
+                document.getElementById('formTKMoi').style.display = 'block';
+            } else {
+                document.getElementById('placeholderBaoCao').style.display = 'block';
+            }
+        });
+
+        // Xác nhận tài khoản sao kê
+        document.getElementById('btnXacNhanTKSaoKe').addEventListener('click', function () {
+            const soTK = document.getElementById('saoKeSoTK').value.trim();
+
+            if (!soTK) {
+                alert('Vui lòng nhập số tài khoản');
+                return;
+            }
+
+            fetch(`/staff/giao-dich/thong-tin-tai-khoan/${soTK}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        saoKeTKInfo = data;
+                        document.getElementById('saoKeTenKH').value = data.tenKH || '';
+                        document.getElementById('saoKeChiNhanh').value = data.tenChiNhanh || '';
+                        // Hiển thị placeholder nếu SP chưa trả về field này
+                        document.getElementById('saoKeNgayMo').value = data.ngayMoTK ? formatDate(data.ngayMoTK) : 'Cần cập nhật SP để hiển thị';
+                    } else {
+                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                        saoKeTKInfo = null;
+                        document.getElementById('saoKeTenKH').value = '';
+                        document.getElementById('saoKeChiNhanh').value = '';
+                        document.getElementById('saoKeNgayMo').value = '';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi kiểm tra tài khoản');
+                });
+        });
+
+        // Xem sao kê
+        document.getElementById('btnXemSaoKe').addEventListener('click', function () {
+            if (!saoKeTKInfo) {
+                alert('Vui lòng xác nhận tài khoản trước');
+                return;
+            }
+
+            const soTK = document.getElementById('saoKeSoTK').value.trim();
+            const tuNgay = document.getElementById('saoKeTuNgay').value;
+            const denNgay = document.getElementById('saoKeDenNgay').value;
+
+            if (!tuNgay || !denNgay) {
+                alert('Vui lòng chọn đầy đủ thời gian');
+                return;
+            }
+
+            fetch('/staff/bao-cao/sao-ke', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ soTK, tuNgay, denNgay })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.getElementById('tableSaoKe');
+                        tbody.innerHTML = '';
+
+                        if (data.transactions.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted py-4">Không có giao dịch trong khoảng thời gian này</td></tr>';
+                        } else {
+                            data.transactions.forEach((gd, idx) => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                <td>${idx + 1}</td>
+                                <td>${formatDateTime(gd.ngay)}</td>
+                                <td>${gd.loaiGiaoDich}</td>
+                                <td class="text-end">${new Intl.NumberFormat('vi-VN').format(gd.soTien)} VNĐ</td>
+                                <td class="text-end">${new Intl.NumberFormat('vi-VN').format(gd.soDuDau)} VNĐ</td>
+                                <td class="text-end">${new Intl.NumberFormat('vi-VN').format(gd.soDuSau)} VNĐ</td>
+                            `;
+                                tbody.appendChild(row);
+                            });
+                        }
+
+                        document.getElementById('resultSaoKe').style.display = 'block';
+                        document.getElementById('btnXuatPDFSaoKe').disabled = false;
+                    } else {
+                        alert('⚠️ ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi lấy sao kê');
+                });
+        });
+
+        // Xuất PDF sao kê
+        document.getElementById('btnXuatPDFSaoKe').addEventListener('click', function () {
+            if (!saoKeTKInfo) {
+                alert('Vui lòng xác nhận tài khoản trước');
+                return;
+            }
+
+            const soTK = document.getElementById('saoKeSoTK').value.trim();
+            const tuNgay = document.getElementById('saoKeTuNgay').value;
+            const denNgay = document.getElementById('saoKeDenNgay').value;
+
+            if (!tuNgay || !denNgay) {
+                alert('Vui lòng chọn đầy đủ thời gian');
+                return;
+            }
+
+            const chuTK = document.getElementById('saoKeTenKH').value;
+            const chiNhanh = document.getElementById('saoKeChiNhanh').value;
+
+            fetch('/staff/bao-cao/sao-ke/pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ soTK, tuNgay, denNgay, chuTK, chiNhanh })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    throw new Error('Không thể xuất PDF');
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `SaoKeTaiKhoan_${soTK}_${tuNgay}_${denNgay}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi xuất PDF');
+                });
+        });
+
+        // Xem tài khoản mới
+        document.getElementById('btnXemTKMoi').addEventListener('click', function () {
+            const tuNgay = document.getElementById('tkMoiTuNgay').value;
+            const denNgay = document.getElementById('tkMoiDenNgay').value;
+
+            if (!tuNgay || !denNgay) {
+                alert('Vui lòng nhập đầy đủ thông tin');
+                return;
+            }
+
+            fetch('/staff/bao-cao/tai-khoan-moi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tuNgay, denNgay })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        const tbody = document.getElementById('tableTKMoi');
+                        tbody.innerHTML = '';
+
+                        if (data.accounts.length === 0) {
+                            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không có tài khoản mới</td></tr>';
+                        } else {
+                            data.accounts.forEach((tk, idx) => {
+                                const row = document.createElement('tr');
+                                row.innerHTML = `
+                                <td>${idx + 1}</td>
+                                <td>${tk.SOTK}</td>
+                                <td>${tk.CMND}</td>
+                                <td>${tk.HOTENKH}</td>
+                                <td class="text-end">${new Intl.NumberFormat('vi-VN').format(tk.SODU)} VNĐ</td>
+                                <td>${new Date(tk.NGAYDK).toLocaleDateString('vi-VN')}</td>
+                                <td>${tk.TENCHINHANH}</td>
+                            `;
+                                tbody.appendChild(row);
+                            });
+                        }
+
+                        document.getElementById('resultTKMoi').style.display = 'block';
+                        document.getElementById('btnXuatPDFTKMoi').disabled = false;
+                    } else {
+                        alert('⚠️ ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi lấy danh sách tài khoản');
+                });
+        });
+
+        // Xuất PDF tài khoản mới
+        document.getElementById('btnXuatPDFTKMoi').addEventListener('click', function () {
+            const tuNgay = document.getElementById('tkMoiTuNgay').value;
+            const denNgay = document.getElementById('tkMoiDenNgay').value;
+
+            if (!tuNgay || !denNgay) {
+                alert('Vui lòng nhập đầy đủ thông tin');
+                return;
+            }
+
+            fetch('/staff/bao-cao/tai-khoan-moi/pdf', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tuNgay, denNgay })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    throw new Error('Không thể xuất PDF');
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `DanhSachTaiKhoanMoi_${tuNgay}_${denNgay}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi xuất PDF');
                 });
         });
     </script>
