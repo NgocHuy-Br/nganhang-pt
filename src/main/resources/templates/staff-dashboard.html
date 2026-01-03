@@ -733,6 +733,65 @@
                         </div>
                     </div>
 
+                    <!-- Modal Tạo tài khoản đăng nhập cho khách hàng -->
+                    <div class="modal fade" id="modalTaoLoginKH" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header bg-primary text-white">
+                                    <h5 class="modal-title"><i class="bi bi-key"></i> Tạo tài khoản đăng nhập cho khách
+                                        hàng</h5>
+                                    <button type="button" class="btn-close btn-close-white"
+                                        data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form id="formTaoLoginKH">
+                                        <div class="mb-3">
+                                            <label class="form-label">Tên khách hàng</label>
+                                            <input type="text" class="form-control" id="inputTenKH" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">CMND (UserName trong database)</label>
+                                            <input type="text" class="form-control" id="inputKHUserName" readonly>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Tên đăng nhập <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="inputKHLoginName" required
+                                                placeholder="Nhập tên đăng nhập">
+                                            <small class="text-muted">Tên đăng nhập để truy cập hệ thống SQL
+                                                Server</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Mật khẩu đăng nhập <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="password" class="form-control" id="inputKHPassword" required
+                                                placeholder="Nhập mật khẩu">
+                                            <small class="text-muted">Mật khẩu cho tài khoản đăng nhập</small>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Vai trò</label>
+                                            <input type="text" class="form-control" id="inputKHRole" readonly
+                                                value="KHACHHANG">
+                                            <small class="text-muted">Vai trò khách hàng (khách hàng chỉ truy cập chi
+                                                nhánh của mình)</small>
+                                        </div>
+                                        <div class="alert alert-info">
+                                            <i class="bi bi-info-circle"></i>
+                                            <strong>Lưu ý:</strong> Tài khoản sẽ được tạo trên server SQL hiện tại.
+                                            Đảm bảo tên đăng nhập chưa tồn tại.
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="button" class="btn btn-primary" id="btnXacNhanTaoLoginKH">
+                                        <i class="bi bi-check-circle"></i> Tạo tài khoản
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Tab: Customers -->
                     <div id="customers" class="tab-content-item" style="display: none;">
                         <h3 class="mb-4"><i class="bi bi-person-badge"></i> Quản lý khách hàng</h3>
@@ -801,11 +860,251 @@
 
                     <!-- Tab: Transactions -->
                     <div id="transactions" class="tab-content-item" style="display: none;">
-                        <div class="placeholder-content">
-                            <i class="bi bi-arrow-left-right"></i>
-                            <h3>Giao dịch</h3>
-                            <p>Nhập giao dịch: Rút tiền, Nộp tiền, Chuyển tiền</p>
-                            <p class="text-muted">Đang phát triển...</p>
+                        <h3 class="mb-4"><i class="bi bi-arrow-left-right"></i> Giao dịch</h3>
+
+                        <div class="card">
+                            <div class="card-body">
+                                <!-- Chọn loại giao dịch -->
+                                <div class="row mb-4">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Chọn loại giao dịch <span
+                                                class="text-danger">*</span></label>
+                                        <select class="form-select form-select-lg" id="selectLoaiGiaoDich">
+                                            <option value="">-- Chọn loại giao dịch --</option>
+                                            <option value="rut-tien">💵 Rút tiền</option>
+                                            <option value="goi-tien">💰 Gửi tiền</option>
+                                            <option value="chuyen-tien">💸 Chuyển tiền</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <!-- Form Rút tiền -->
+                                <div id="formRutTienContainer" style="display: none;">
+                                    <h5 class="mb-3"><i class="bi bi-cash-coin text-primary"></i> Rút tiền</h5>
+
+                                    <form id="formRutTien">
+                                        <div class="row mb-3">
+                                            <div class="col-md-8">
+                                                <label class="form-label">Số tài khoản <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputRutTienSoTKCheck"
+                                                    placeholder="Nhập số tài khoản" maxlength="9" required>
+                                            </div>
+                                            <div class="col-md-4 d-flex align-items-end">
+                                                <button type="button" class="btn btn-info w-100"
+                                                    id="btnXacNhanTKRutTien">
+                                                    <i class="bi bi-search"></i> Xác nhận TK
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Tên khách hàng</label>
+                                                <input type="text" class="form-control" id="rutTienInfoTenKH" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Chi nhánh</label>
+                                                <input type="text" class="form-control" id="rutTienInfoChiNhanh"
+                                                    readonly>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Số dư hiện tại</label>
+                                            <input type="text" class="form-control text-primary fw-bold"
+                                                id="rutTienInfoSoDu" readonly>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Số tiền rút (VNĐ) <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="inputRutTienSoTien"
+                                                placeholder="Nhập số tiền" min="100000" step="1000" required>
+                                            <small class="text-muted">Tối thiểu 100,000 VNĐ</small>
+                                        </div>
+
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-check-circle"></i> Thực hiện giao dịch
+                                            </button>
+                                            <button type="button" class="btn btn-secondary" onclick="resetGiaoDich()">
+                                                <i class="bi bi-x-circle"></i> Hủy
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Form Gửi tiền -->
+                                <div id="formGoiTienContainer" style="display: none;">
+                                    <h5 class="mb-3"><i class="bi bi-piggy-bank text-success"></i> Gửi tiền</h5>
+
+                                    <form id="formGoiTien">
+                                        <div class="row mb-3">
+                                            <div class="col-md-8">
+                                                <label class="form-label">Số tài khoản <span
+                                                        class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" id="inputGoiTienSoTKCheck"
+                                                    placeholder="Nhập số tài khoản" maxlength="9" required>
+                                            </div>
+                                            <div class="col-md-4 d-flex align-items-end">
+                                                <button type="button" class="btn btn-info w-100"
+                                                    id="btnXacNhanTKGoiTien">
+                                                    <i class="bi bi-search"></i> Xác nhận TK
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label">Tên khách hàng</label>
+                                                <input type="text" class="form-control" id="goiTienInfoTenKH" readonly>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Chi nhánh</label>
+                                                <input type="text" class="form-control" id="goiTienInfoChiNhanh"
+                                                    readonly>
+                                            </div>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Số dư hiện tại</label>
+                                            <input type="text" class="form-control text-primary fw-bold"
+                                                id="goiTienInfoSoDu" readonly>
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <label class="form-label">Số tiền gửi (VNĐ) <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="inputGoiTienSoTien"
+                                                placeholder="Nhập số tiền" min="100000" step="1000" required>
+                                            <small class="text-muted">Tối thiểu 100,000 VNĐ</small>
+                                        </div>
+
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-check-circle"></i> Thực hiện giao dịch
+                                            </button>
+                                            <button type="button" class="btn btn-secondary" onclick="resetGiaoDich()">
+                                                <i class="bi bi-x-circle"></i> Hủy
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Form Chuyển tiền -->
+                                <div id="formChuyenTienContainer" style="display: none;">
+                                    <h5 class="mb-3"><i class="bi bi-arrow-left-right text-warning"></i> Chuyển tiền
+                                    </h5>
+
+                                    <form id="formChuyenTien">
+                                        <!-- Tài khoản gửi -->
+                                        <div class="card mb-3 border-success">
+                                            <div class="card-header bg-success text-white">
+                                                <h6 class="mb-0"><i class="bi bi-person-fill"></i> Tài khoản gửi</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-8">
+                                                        <label class="form-label">Số tài khoản <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                            id="inputChuyenTienSoTKGuiCheck"
+                                                            placeholder="Nhập số tài khoản" maxlength="9" required>
+                                                    </div>
+                                                    <div class="col-md-4 d-flex align-items-end">
+                                                        <button type="button" class="btn btn-info w-100"
+                                                            id="btnXacNhanTKGui">
+                                                            <i class="bi bi-search"></i> Xác nhận
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-3">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Tên khách hàng</label>
+                                                        <input type="text" class="form-control"
+                                                            id="chuyenTienInfoTenKHGui" readonly>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Chi nhánh</label>
+                                                        <input type="text" class="form-control"
+                                                            id="chuyenTienInfoChiNhanhGui" readonly>
+                                                    </div>
+                                                </div>
+                                                <div class="mb-0">
+                                                    <label class="form-label">Số dư</label>
+                                                    <input type="text" class="form-control text-primary fw-bold"
+                                                        id="chuyenTienInfoSoDuGui" readonly>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Tài khoản nhận -->
+                                        <div class="card mb-3 border-info">
+                                            <div class="card-header bg-info text-white">
+                                                <h6 class="mb-0"><i class="bi bi-person-fill"></i> Tài khoản nhận</h6>
+                                            </div>
+                                            <div class="card-body">
+                                                <div class="row mb-3">
+                                                    <div class="col-md-8">
+                                                        <label class="form-label">Số tài khoản <span
+                                                                class="text-danger">*</span></label>
+                                                        <input type="text" class="form-control"
+                                                            id="inputChuyenTienSoTKNhanCheck"
+                                                            placeholder="Nhập số tài khoản" maxlength="9" required>
+                                                    </div>
+                                                    <div class="col-md-4 d-flex align-items-end">
+                                                        <button type="button" class="btn btn-info w-100"
+                                                            id="btnXacNhanTKNhan">
+                                                            <i class="bi bi-search"></i> Xác nhận
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                                <div class="row mb-0">
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Tên khách hàng</label>
+                                                        <input type="text" class="form-control"
+                                                            id="chuyenTienInfoTenKHNhan" readonly>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label class="form-label">Chi nhánh</label>
+                                                        <input type="text" class="form-control"
+                                                            id="chuyenTienInfoChiNhanhNhan" readonly>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Số tiền -->
+                                        <div class="mb-3">
+                                            <label class="form-label">Số tiền chuyển (VNĐ) <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="number" class="form-control" id="inputChuyenTienSoTien"
+                                                placeholder="Nhập số tiền" min="1" step="1" required>
+                                        </div>
+
+                                        <div class="d-flex gap-2">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i class="bi bi-check-circle"></i> Thực hiện giao dịch
+                                            </button>
+                                            <button type="button" class="btn btn-secondary" onclick="resetGiaoDich()">
+                                                <i class="bi bi-x-circle"></i> Hủy
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <!-- Placeholder khi chưa chọn loại giao dịch -->
+                                <div id="placeholderGiaoDich">
+                                    <div class="text-center py-5 text-muted">
+                                        <i class="bi bi-arrow-left-right" style="font-size: 4rem;"></i>
+                                        <h5 class="mt-3">Vui lòng chọn loại giao dịch ở trên</h5>
+                                        <p>Chọn Rút tiền, Gửi tiền hoặc Chuyển tiền để bắt đầu giao dịch</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1672,6 +1971,332 @@
                 .catch(err => {
                     console.error('Lỗi:', err);
                     alert('Lỗi khi mở tài khoản');
+                });
+        });
+
+        // ===== GIAO DỊCH =====
+
+        // Biến lưu thông tin tài khoản
+        let rutTienTK = null;
+        let goiTienTK = null;
+        let chuyenTienTKGui = null;
+        let chuyenTienTKNhan = null;
+
+        // Hiển thị/ẩn form giao dịch theo loại
+        document.getElementById('selectLoaiGiaoDich').addEventListener('change', function () {
+            const loaiGD = this.value;
+
+            // Reset tất cả
+            resetGiaoDichInternal();
+
+            // Ẩn tất cả form
+            document.getElementById('formRutTienContainer').style.display = 'none';
+            document.getElementById('formGoiTienContainer').style.display = 'none';
+            document.getElementById('formChuyenTienContainer').style.display = 'none';
+            document.getElementById('placeholderGiaoDich').style.display = 'none';
+
+            // Hiển thị form tương ứng
+            if (loaiGD === 'rut-tien') {
+                document.getElementById('formRutTienContainer').style.display = 'block';
+            } else if (loaiGD === 'goi-tien') {
+                document.getElementById('formGoiTienContainer').style.display = 'block';
+            } else if (loaiGD === 'chuyen-tien') {
+                document.getElementById('formChuyenTienContainer').style.display = 'block';
+            } else {
+                document.getElementById('placeholderGiaoDich').style.display = 'block';
+            }
+        });
+
+        // Hàm reset form giao dịch (gọi từ nút Hủy)
+        function resetGiaoDich() {
+            document.getElementById('selectLoaiGiaoDich').value = '';
+            resetGiaoDichInternal();
+
+            // Ẩn tất cả form
+            document.getElementById('formRutTienContainer').style.display = 'none';
+            document.getElementById('formGoiTienContainer').style.display = 'none';
+            document.getElementById('formChuyenTienContainer').style.display = 'none';
+            document.getElementById('placeholderGiaoDich').style.display = 'block';
+        }
+
+        // Hàm reset internal (không reset dropdown)
+        function resetGiaoDichInternal() {
+            // Reset biến
+            rutTienTK = null;
+            goiTienTK = null;
+            chuyenTienTKGui = null;
+            chuyenTienTKNhan = null;
+
+            // Reset form rút tiền
+            document.getElementById('formRutTien').reset();
+            document.getElementById('rutTienInfoTenKH').value = '';
+            document.getElementById('rutTienInfoChiNhanh').value = '';
+            document.getElementById('rutTienInfoSoDu').value = '';
+
+            // Reset form gửi tiền
+            document.getElementById('formGoiTien').reset();
+            document.getElementById('goiTienInfoTenKH').value = '';
+            document.getElementById('goiTienInfoChiNhanh').value = '';
+            document.getElementById('goiTienInfoSoDu').value = '';
+
+            // Reset form chuyển tiền
+            document.getElementById('formChuyenTien').reset();
+            document.getElementById('chuyenTienInfoTenKHGui').value = '';
+            document.getElementById('chuyenTienInfoChiNhanhGui').value = '';
+            document.getElementById('chuyenTienInfoSoDuGui').value = '';
+            document.getElementById('chuyenTienInfoTenKHNhan').value = '';
+            document.getElementById('chuyenTienInfoChiNhanhNhan').value = '';
+        }
+
+        // ===== RÚT TIỀN =====
+
+        // Xác nhận tài khoản rút tiền
+        document.getElementById('btnXacNhanTKRutTien').addEventListener('click', function () {
+            const soTK = document.getElementById('inputRutTienSoTKCheck').value.trim();
+
+            if (!soTK) {
+                alert('Vui lòng nhập số tài khoản');
+                return;
+            }
+
+            fetch(`/staff/giao-dich/thong-tin-tai-khoan/${soTK}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        rutTienTK = { soTK, ...data };
+                        document.getElementById('rutTienInfoTenKH').value = data.tenKH || '';
+                        document.getElementById('rutTienInfoChiNhanh').value = data.tenChiNhanh || '';
+                        document.getElementById('rutTienInfoSoDu').value = data.soDu ? new Intl.NumberFormat('vi-VN').format(data.soDu) + ' VNĐ' : '';
+                    } else {
+                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi kiểm tra tài khoản: ' + error.message);
+                });
+        });
+
+        // Submit form rút tiền
+        document.getElementById('formRutTien').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const soTien = document.getElementById('inputRutTienSoTien').value;
+
+            if (!rutTienTK) {
+                alert('Vui lòng xác nhận tài khoản trước');
+                return;
+            }
+
+            if (parseFloat(soTien) < 100000) {
+                alert('Số tiền tối thiểu là 100,000 VNĐ');
+                return;
+            }
+
+            if (parseFloat(soTien) > rutTienTK.soDu) {
+                alert('❌ Số dư không đủ! Số dư hiện tại: ' + new Intl.NumberFormat('vi-VN').format(rutTienTK.soDu) + ' VNĐ');
+                return;
+            }
+
+            if (!confirm(`Xác nhận rút ${new Intl.NumberFormat('vi-VN').format(soTien)} VNĐ từ tài khoản ${rutTienTK.soTK} (${rutTienTK.tenKH})?`)) {
+                return;
+            }
+
+            fetch('/staff/giao-dich/rut-tien', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ soTK: rutTienTK.soTK, soTien })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result === 1) {
+                        alert('✅ ' + data.message);
+                        resetGiaoDich();
+                    } else {
+                        alert('❌ ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi thực hiện giao dịch: ' + error.message);
+                });
+        });
+
+        // ===== GỬI TIỀN =====
+
+        // Xác nhận tài khoản gửi tiền
+        document.getElementById('btnXacNhanTKGoiTien').addEventListener('click', function () {
+            const soTK = document.getElementById('inputGoiTienSoTKCheck').value.trim();
+
+            if (!soTK) {
+                alert('Vui lòng nhập số tài khoản');
+                return;
+            }
+
+            fetch(`/staff/giao-dich/thong-tin-tai-khoan/${soTK}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        goiTienTK = { soTK, ...data };
+                        document.getElementById('goiTienInfoTenKH').value = data.tenKH || '';
+                        document.getElementById('goiTienInfoChiNhanh').value = data.tenChiNhanh || '';
+                        document.getElementById('goiTienInfoSoDu').value = data.soDu ? new Intl.NumberFormat('vi-VN').format(data.soDu) + ' VNĐ' : '';
+                    } else {
+                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi kiểm tra tài khoản: ' + error.message);
+                });
+        });
+
+        // Submit form gửi tiền
+        document.getElementById('formGoiTien').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const soTien = document.getElementById('inputGoiTienSoTien').value;
+
+            if (!goiTienTK) {
+                alert('Vui lòng xác nhận tài khoản trước');
+                return;
+            }
+
+            if (parseFloat(soTien) < 100000) {
+                alert('Số tiền tối thiểu là 100,000 VNĐ');
+                return;
+            }
+
+            if (!confirm(`Xác nhận gửi ${new Intl.NumberFormat('vi-VN').format(soTien)} VNĐ vào tài khoản ${goiTienTK.soTK} (${goiTienTK.tenKH})?`)) {
+                return;
+            }
+
+            fetch('/staff/giao-dich/goi-tien', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ soTK: goiTienTK.soTK, soTien })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result === 1) {
+                        alert('✅ ' + data.message);
+                        resetGiaoDich();
+                    } else {
+                        alert('❌ ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi thực hiện giao dịch: ' + error.message);
+                });
+        });
+
+        // ===== CHUYỂN TIỀN =====
+
+        // Xác nhận TK gửi
+        document.getElementById('btnXacNhanTKGui').addEventListener('click', function () {
+            const soTK = document.getElementById('inputChuyenTienSoTKGuiCheck').value.trim();
+
+            if (!soTK) {
+                alert('Vui lòng nhập số tài khoản gửi');
+                return;
+            }
+
+            fetch(`/staff/giao-dich/thong-tin-tai-khoan/${soTK}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        chuyenTienTKGui = { soTK, ...data };
+                        document.getElementById('chuyenTienInfoTenKHGui').value = data.tenKH || '';
+                        document.getElementById('chuyenTienInfoChiNhanhGui').value = data.tenChiNhanh || '';
+                        document.getElementById('chuyenTienInfoSoDuGui').value = data.soDu ? new Intl.NumberFormat('vi-VN').format(data.soDu) + ' VNĐ' : '';
+                    } else {
+                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi kiểm tra tài khoản: ' + error.message);
+                });
+        });
+
+        // Xác nhận TK nhận
+        document.getElementById('btnXacNhanTKNhan').addEventListener('click', function () {
+            const soTK = document.getElementById('inputChuyenTienSoTKNhanCheck').value.trim();
+
+            if (!soTK) {
+                alert('Vui lòng nhập số tài khoản nhận');
+                return;
+            }
+
+            if (chuyenTienTKGui && soTK === chuyenTienTKGui.soTK) {
+                alert('❌ Tài khoản gửi và nhận không được trùng nhau');
+                return;
+            }
+
+            fetch(`/staff/giao-dich/thong-tin-tai-khoan/${soTK}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        chuyenTienTKNhan = { soTK, ...data };
+                        document.getElementById('chuyenTienInfoTenKHNhan').value = data.tenKH || '';
+                        document.getElementById('chuyenTienInfoChiNhanhNhan').value = data.tenChiNhanh || '';
+                    } else {
+                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi kiểm tra tài khoản: ' + error.message);
+                });
+        });
+
+        // Submit form chuyển tiền
+        document.getElementById('formChuyenTien').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const soTien = document.getElementById('inputChuyenTienSoTien').value;
+
+            if (!chuyenTienTKGui || !chuyenTienTKNhan) {
+                alert('Vui lòng xác nhận cả 2 tài khoản trước');
+                return;
+            }
+
+            if (parseFloat(soTien) <= 0) {
+                alert('Số tiền phải lớn hơn 0');
+                return;
+            }
+
+            if (parseFloat(soTien) > chuyenTienTKGui.soDu) {
+                alert('❌ Số dư không đủ! Số dư TK gửi: ' + new Intl.NumberFormat('vi-VN').format(chuyenTienTKGui.soDu) + ' VNĐ');
+                return;
+            }
+
+            if (!confirm(`Xác nhận chuyển ${new Intl.NumberFormat('vi-VN').format(soTien)} VNĐ\nTừ: ${chuyenTienTKGui.soTK} (${chuyenTienTKGui.tenKH})\nĐến: ${chuyenTienTKNhan.soTK} (${chuyenTienTKNhan.tenKH})?`)) {
+                return;
+            }
+
+            fetch('/staff/giao-dich/chuyen-tien', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    soTKGui: chuyenTienTKGui.soTK,
+                    soTKNhan: chuyenTienTKNhan.soTK,
+                    soTien
+                })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.result === 1) {
+                        alert('✅ ' + data.message);
+                        resetGiaoDich();
+                    } else {
+                        alert('❌ ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi thực hiện giao dịch: ' + error.message);
                 });
         });
     </script>

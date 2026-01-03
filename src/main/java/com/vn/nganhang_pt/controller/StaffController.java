@@ -4,6 +4,7 @@ import com.vn.nganhang_pt.model.ChiNhanh;
 import com.vn.nganhang_pt.model.KhachHang;
 import com.vn.nganhang_pt.model.NhanVien;
 import com.vn.nganhang_pt.model.TaiKhoan;
+import com.vn.nganhang_pt.service.GiaoDichService;
 import com.vn.nganhang_pt.service.KhachHangService;
 import com.vn.nganhang_pt.service.NhanVienService;
 import jakarta.servlet.http.HttpSession;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -25,6 +27,9 @@ public class StaffController {
 
     @Autowired
     private KhachHangService khachHangService;
+
+    @Autowired
+    private GiaoDichService giaoDichService;
 
     /**
      * Lấy danh sách nhân viên
@@ -370,5 +375,90 @@ public class StaffController {
 
         return nhanVienService.taoTaiKhoanDangNhap(tenServer, loginName, password, userName, role,
                 currentUsername, currentPassword);
+    }
+
+    /**
+     * Lấy thông tin tài khoản
+     */
+    @GetMapping("/giao-dich/thong-tin-tai-khoan/{soTK}")
+    @ResponseBody
+    public Map<String, Object> layThongTinTaiKhoan(@PathVariable String soTK, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
+
+        return giaoDichService.layThongTinTaiKhoan(soTK, tenServer, username, password);
+    }
+
+    /**
+     * Rút tiền
+     */
+    @PostMapping("/giao-dich/rut-tien")
+    @ResponseBody
+    public Map<String, Object> rutTien(@RequestBody Map<String, String> data, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String soTK = data.get("soTK");
+        BigDecimal soTien = new BigDecimal(data.get("soTien"));
+        String maNV = nhanVien.getMaNV();
+
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
+
+        return giaoDichService.rutTien(soTK, soTien, maNV, tenServer, username, password);
+    }
+
+    /**
+     * Gửi tiền
+     */
+    @PostMapping("/giao-dich/goi-tien")
+    @ResponseBody
+    public Map<String, Object> goiTien(@RequestBody Map<String, String> data, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String soTK = data.get("soTK");
+        BigDecimal soTien = new BigDecimal(data.get("soTien"));
+        String maNV = nhanVien.getMaNV();
+
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
+
+        return giaoDichService.goiTien(soTK, soTien, maNV, tenServer, username, password);
+    }
+
+    /**
+     * Chuyển tiền
+     */
+    @PostMapping("/giao-dich/chuyen-tien")
+    @ResponseBody
+    public Map<String, Object> chuyenTien(@RequestBody Map<String, String> data, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String soTKGui = data.get("soTKGui");
+        String soTKNhan = data.get("soTKNhan");
+        BigDecimal soTien = new BigDecimal(data.get("soTien"));
+        String maNV = nhanVien.getMaNV();
+
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
+
+        return giaoDichService.chuyenTien(soTKGui, soTKNhan, soTien, maNV, tenServer, username, password);
     }
 }
