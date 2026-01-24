@@ -364,22 +364,22 @@
                                         </div>
                                     </div>
                                     <div class="col-md-8 text-end">
-                                        <button class="btn btn-primary" id="btnThem">
+                                        <button class="btn btn-primary btn-edit-action" id="btnThem">
                                             <i class="bi bi-plus-circle"></i> Thêm
                                         </button>
-                                        <button class="btn btn-warning" id="btnSua" disabled>
+                                        <button class="btn btn-warning btn-edit-action" id="btnSua" disabled>
                                             <i class="bi bi-pencil-square"></i> Sửa
                                         </button>
-                                        <button class="btn btn-danger" id="btnXoa" disabled>
+                                        <button class="btn btn-danger btn-edit-action" id="btnXoa" disabled>
                                             <i class="bi bi-trash"></i> Xóa
                                         </button>
-                                        <button class="btn btn-info" id="btnChuyenCN" disabled>
+                                        <button class="btn btn-info btn-edit-action" id="btnChuyenCN" disabled>
                                             <i class="bi bi-building"></i> Chuyển chi nhánh
                                         </button>
                                         <button class="btn btn-success" id="btnTaoLogin" disabled>
                                             <i class="bi bi-key"></i> Tạo tài khoản
                                         </button>
-                                        <button class="btn btn-dark" id="btnUndo" disabled>
+                                        <button class="btn btn-dark btn-edit-action" id="btnUndo" disabled>
                                             <i class="bi bi-arrow-counterclockwise"></i> Phục hồi (Undo)
                                         </button>
                                     </div>
@@ -473,13 +473,11 @@
                                             <div class="col-md-12">
                                                 <label class="form-label">Chi nhánh <span
                                                         class="text-danger">*</span></label>
-                                                <!-- Select cho chế độ thêm mới -->
-                                                <select class="form-select" id="inputNVMaCN" required>
-                                                    <option value="">-- Chọn chi nhánh --</option>
-                                                </select>
-                                                <!-- Input readonly cho chế độ sửa -->
-                                                <input type="text" class="form-control" id="inputTenCN" readonly
-                                                    style="display:none; background-color: #e9ecef;">
+                                                <!-- Input readonly cho chế độ thêm mới (tự động gán) -->
+                                                <input type="text" class="form-control" id="inputNVTenCN" readonly
+                                                    style="background-color: #e9ecef;">
+                                                <!-- Hidden field chứa mã chi nhánh -->
+                                                <input type="hidden" id="inputNVMaCN" required>
                                             </div>
                                         </div>
                                     </form>
@@ -811,20 +809,23 @@
                                         </div>
                                     </div>
                                     <div class="col-md-8 text-end">
-                                        <button class="btn btn-primary" id="btnThemKH">
+                                        <button class="btn btn-primary btn-edit-action" id="btnThemKH">
                                             <i class="bi bi-plus-circle"></i> Thêm
                                         </button>
-                                        <button class="btn btn-warning" id="btnSuaKH" disabled>
+                                        <button class="btn btn-warning btn-edit-action" id="btnSuaKH" disabled>
                                             <i class="bi bi-pencil-square"></i> Sửa
                                         </button>
-                                        <button class="btn btn-danger" id="btnXoaKH" disabled>
+                                        <button class="btn btn-danger btn-edit-action" id="btnXoaKH" disabled>
                                             <i class="bi bi-trash"></i> Xóa
                                         </button>
                                         <button class="btn btn-info" id="btnXemTaiKhoan" disabled>
                                             <i class="bi bi-wallet2"></i> Xem tài khoản
                                         </button>
-                                        <button class="btn btn-success" id="btnMoTaiKhoan" disabled>
+                                        <button class="btn btn-success btn-edit-action" id="btnMoTaiKhoan" disabled>
                                             <i class="bi bi-plus-square"></i> Mở tài khoản
+                                        </button>
+                                        <button class="btn btn-primary" id="btnTaoLoginKH" disabled style="display: none;">
+                                            <i class="bi bi-key"></i> Tạo login
                                         </button>
                                     </div>
                                 </div>
@@ -869,7 +870,7 @@
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Chọn loại giao dịch <span
                                                 class="text-danger">*</span></label>
-                                        <select class="form-select form-select-lg" id="selectLoaiGiaoDich">
+                                        <select class="form-select form-select-lg transaction-action" id="selectLoaiGiaoDich">
                                             <option value="">-- Chọn loại giao dịch --</option>
                                             <option value="rut-tien">💵 Rút tiền</option>
                                             <option value="goi-tien">💰 Gửi tiền</option>
@@ -1290,6 +1291,23 @@
             role: /*[[${nhanVien.role}]]*/ 'CHINHANH'
         };
 
+        // Ẩn các chức năng chỉnh sửa nếu role là NGANHANG
+        if (currentNhanVien.role === 'NGANHANG') {
+            document.addEventListener('DOMContentLoaded', function() {
+                // Ẩn tất cả nút có class btn-edit-action
+                document.querySelectorAll('.btn-edit-action').forEach(btn => {
+                    btn.style.display = 'none';
+                });
+                
+                // Ẩn select loại giao dịch (NGANHANG chỉ xem, không giao dịch)
+                document.querySelectorAll('.transaction-action').forEach(element => {
+                    element.disabled = true;
+                    element.closest('.row')?.insertAdjacentHTML('beforeend', 
+                        '<div class="col-12 mt-2"><small class="text-muted">⚠️ Tài khoản NGÂN HÀNG chỉ có quyền xem, không thể thực hiện giao dịch</small></div>');
+                });
+            });
+        }
+
         // Display current date
         const dateElement = document.getElementById('current-date');
         const today = new Date();
@@ -1333,6 +1351,14 @@
                     loadChiNhanh();
                 } else if (tabId === 'customers') {
                     loadKhachHang();
+                    
+                    // Hiển thị nút "Tạo login" chỉ khi role là CHINHANH
+                    const btnTaoLoginKH = document.getElementById('btnTaoLoginKH');
+                    if (currentNhanVien.role === 'CHINHANH') {
+                        btnTaoLoginKH.style.display = 'inline-block';
+                    } else {
+                        btnTaoLoginKH.style.display = 'none';
+                    }
                 }
             });
         });
@@ -1378,17 +1404,20 @@
         // Render chi nhánh options
         function renderChiNhanhOptions(data) {
             const selectMaCN = document.getElementById('inputMaCN');
+            const selectNVMaCN = document.getElementById('inputNVMaCN');
             const selectCNMoi = document.getElementById('selectCNMoi');
             const selectKHMaCN = document.getElementById('inputKHMaCN');
             const selectTKMaCN = document.getElementById('inputTKMaCN');
 
             selectMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            selectNVMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
             selectCNMoi.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
             selectKHMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
             selectTKMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
 
             data.forEach(cn => {
                 selectMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
+                selectNVMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
                 selectCNMoi.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
                 selectKHMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
                 selectTKMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
@@ -1515,10 +1544,11 @@
             document.getElementById('modalTitle').textContent = 'Thêm nhân viên mới';
             document.getElementById('formNhanVien').reset();
             document.getElementById('inputMaNV').disabled = false;
-            // Hiển thị select, ẩn input readonly
-            document.getElementById('inputNVMaCN').style.display = 'block';
-            document.getElementById('inputNVMaCN').disabled = false;
-            document.getElementById('inputTenCN').style.display = 'none';
+
+            // Tự động gán chi nhánh của nhân viên đang đăng nhập
+            document.getElementById('inputNVMaCN').value = currentNhanVien.maCN;
+            document.getElementById('inputNVTenCN').value = currentNhanVien.tenChiNhanh;
+
             new bootstrap.Modal(document.getElementById('modalNhanVien')).show();
         });
 
@@ -1540,11 +1570,9 @@
             document.getElementById('inputNVDiaChi').value = selectedNV.diaChi;
             document.getElementById('inputMaNV').disabled = true;
 
-            // Ẩn select, hiển thị input readonly với tên chi nhánh
-            document.getElementById('inputNVMaCN').style.display = 'none';
-            document.getElementById('inputNVMaCN').disabled = true; // Disable để không fail validation
-            document.getElementById('inputTenCN').style.display = 'block';
-            document.getElementById('inputTenCN').value = selectedNV.maCN + ' - ' + selectedNV.tenChiNhanh;
+            // Hiển thị chi nhánh (readonly - không cho sửa)
+            document.getElementById('inputNVMaCN').value = selectedNV.maCN;
+            document.getElementById('inputNVTenCN').value = selectedNV.tenChiNhanh;
 
             new bootstrap.Modal(document.getElementById('modalNhanVien')).show();
         });
@@ -1902,6 +1930,12 @@
             document.getElementById('btnXoaKH').disabled = false;
             document.getElementById('btnXemTaiKhoan').disabled = false;
             document.getElementById('btnMoTaiKhoan').disabled = false;
+            
+            // Enable Tạo login button (chỉ khi role CHINHANH)
+            const btnTaoLoginKH = document.getElementById('btnTaoLoginKH');
+            if (currentNhanVien.role === 'CHINHANH') {
+                btnTaoLoginKH.disabled = false;
+            }
         }
 
         // Tìm kiếm khách hàng
@@ -2077,6 +2111,67 @@
                 });
 
             new bootstrap.Modal(document.getElementById('modalXemTaiKhoan')).show();
+        });
+
+        // Tạo tài khoản đăng nhập cho khách hàng
+        document.getElementById('btnTaoLoginKH').addEventListener('click', function () {
+            if (!selectedKH) {
+                alert('Vui lòng chọn khách hàng để tạo tài khoản');
+                return;
+            }
+
+            // Kiểm tra quyền: chỉ CHINHANH mới được tạo login cho khách hàng
+            if (currentNhanVien.role !== 'CHINHANH') {
+                alert('⚠️ Chỉ nhân viên chi nhánh mới có quyền tạo tài khoản đăng nhập cho khách hàng!');
+                return;
+            }
+
+            // Điền thông tin vào form
+            document.getElementById('inputTenKH').value = selectedKH.hoten;
+            document.getElementById('inputKHUserName').value = selectedKH.cmnd;
+            document.getElementById('inputKHLoginName').value = '';
+            document.getElementById('inputKHPassword').value = '';
+            document.getElementById('inputKHRole').value = 'KHACHHANG';
+
+            new bootstrap.Modal(document.getElementById('modalTaoLoginKH')).show();
+        });
+
+        // Xác nhận tạo tài khoản đăng nhập cho khách hàng
+        document.getElementById('btnXacNhanTaoLoginKH').addEventListener('click', function () {
+            const loginName = document.getElementById('inputKHLoginName').value.trim();
+            const password = document.getElementById('inputKHPassword').value;
+            const userName = document.getElementById('inputKHUserName').value.trim();
+            const role = document.getElementById('inputKHRole').value.trim();
+
+            if (!loginName || !password) {
+                alert('Vui lòng điền đầy đủ thông tin (Tên đăng nhập và Mật khẩu)');
+                return;
+            }
+
+            if (!confirm(`Xác nhận tạo tài khoản đăng nhập "${loginName}" cho khách hàng ${selectedKH.hoten} (CMND: ${userName}) với vai trò ${role}?`)) {
+                return;
+            }
+
+            fetch('/staff/tao-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ loginName, password, userName, role })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.result === 1) {
+                        alert('✅ ' + data.message);
+                        bootstrap.Modal.getInstance(document.getElementById('modalTaoLoginKH')).hide();
+                    } else if (data.result === -1) {
+                        alert('⚠️ ' + data.message);
+                    } else {
+                        alert('❌ ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi gọi API: ' + error.message);
+                });
         });
 
         // Nút Mở tài khoản
