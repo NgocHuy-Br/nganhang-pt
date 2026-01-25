@@ -824,7 +824,8 @@
                                         <button class="btn btn-success btn-edit-action" id="btnMoTaiKhoan" disabled>
                                             <i class="bi bi-plus-square"></i> Mở tài khoản
                                         </button>
-                                        <button class="btn btn-primary" id="btnTaoLoginKH" disabled style="display: none;">
+                                        <button class="btn btn-primary" id="btnTaoLoginKH" disabled
+                                            style="display: none;">
                                             <i class="bi bi-key"></i> Tạo login
                                         </button>
                                     </div>
@@ -870,7 +871,8 @@
                                     <div class="col-md-6">
                                         <label class="form-label fw-bold">Chọn loại giao dịch <span
                                                 class="text-danger">*</span></label>
-                                        <select class="form-select form-select-lg transaction-action" id="selectLoaiGiaoDich">
+                                        <select class="form-select form-select-lg transaction-action"
+                                            id="selectLoaiGiaoDich">
                                             <option value="">-- Chọn loại giao dịch --</option>
                                             <option value="rut-tien">💵 Rút tiền</option>
                                             <option value="goi-tien">💰 Gửi tiền</option>
@@ -1293,16 +1295,16 @@
 
         // Ẩn các chức năng chỉnh sửa nếu role là NGANHANG
         if (currentNhanVien.role === 'NGANHANG') {
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 // Ẩn tất cả nút có class btn-edit-action
                 document.querySelectorAll('.btn-edit-action').forEach(btn => {
                     btn.style.display = 'none';
                 });
-                
+
                 // Ẩn select loại giao dịch (NGANHANG chỉ xem, không giao dịch)
                 document.querySelectorAll('.transaction-action').forEach(element => {
                     element.disabled = true;
-                    element.closest('.row')?.insertAdjacentHTML('beforeend', 
+                    element.closest('.row')?.insertAdjacentHTML('beforeend',
                         '<div class="col-12 mt-2"><small class="text-muted">⚠️ Tài khoản NGÂN HÀNG chỉ có quyền xem, không thể thực hiện giao dịch</small></div>');
                 });
             });
@@ -1351,7 +1353,7 @@
                     loadChiNhanh();
                 } else if (tabId === 'customers') {
                     loadKhachHang();
-                    
+
                     // Hiển thị nút "Tạo login" chỉ khi role là CHINHANH
                     const btnTaoLoginKH = document.getElementById('btnTaoLoginKH');
                     if (currentNhanVien.role === 'CHINHANH') {
@@ -1930,7 +1932,7 @@
             document.getElementById('btnXoaKH').disabled = false;
             document.getElementById('btnXemTaiKhoan').disabled = false;
             document.getElementById('btnMoTaiKhoan').disabled = false;
-            
+
             // Enable Tạo login button (chỉ khi role CHINHANH)
             const btnTaoLoginKH = document.getElementById('btnTaoLoginKH');
             if (currentNhanVien.role === 'CHINHANH') {
