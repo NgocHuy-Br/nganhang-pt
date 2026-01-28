@@ -205,9 +205,13 @@ public class StaffController {
         String username = (String) session.getAttribute("username");
         String password = (String) session.getAttribute("password");
         String maCNMoi = payload.get("maCNMoi");
-        System.out.println("[DEBUG StaffController] Chuyển nhân viên " + maNV + " sang chi nhánh " + maCNMoi);
+        String maNVMoi = payload.get("maNVMoi");
 
-        Map<String, Object> result = nhanVienService.chuyenChiNhanh(maNV, maCNMoi, tenServer, username, password);
+        System.out.println("[DEBUG StaffController] Chuyển nhân viên " + maNV + " sang chi nhánh " + maCNMoi
+                + " với mã mới: " + maNVMoi);
+
+        Map<String, Object> result = nhanVienService.chuyenChiNhanh(maNV, maCNMoi, maNVMoi, tenServer, username,
+                password);
         return result;
     }
 
@@ -336,6 +340,21 @@ public class StaffController {
 
         String tenServer = nhanVien.getTenServer();
         return khachHangService.layDanhSachTaiKhoanKH(tenServer, cmnd);
+    }
+
+    /**
+     * Tìm khách hàng theo CMND
+     */
+    @GetMapping("/khach-hang/tim-theo-cmnd/{cmnd}")
+    @ResponseBody
+    public Map<String, Object> timKhachHangTheoCMND(@PathVariable String cmnd, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        return khachHangService.timKhachHangTheoCMND(tenServer, cmnd);
     }
 
     /**

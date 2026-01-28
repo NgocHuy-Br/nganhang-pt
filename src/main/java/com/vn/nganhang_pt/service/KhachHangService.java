@@ -230,6 +230,52 @@ public class KhachHangService {
     }
 
     /**
+     * Tìm khách hàng theo CMND trên tất cả các site
+     */
+    public Map<String, Object> timKhachHangTheoCMND(String tenServer, String cmnd) {
+        Map<String, Object> result = new HashMap<>();
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
+
+        try (Connection conn = DriverManager.getConnection(connectionString, fragmentConfig.getUsername(),
+                fragmentConfig.getPassword())) {
+            String sql = "{call dbo.sp_TimKhachHangTheoCMND(?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                stmt.setString(1, cmnd);
+
+                ResultSet rs = stmt.executeQuery();
+
+                if (rs.next()) {
+                    String cmndResult = rs.getString("CMND");
+                    if (cmndResult != null && !cmndResult.trim().isEmpty()) {
+                        result.put("found", true);
+                        result.put("cmnd", cmndResult.trim());
+                        result.put("ho", rs.getString("HO") != null ? rs.getString("HO").trim() : "");
+                        result.put("ten", rs.getString("TEN") != null ? rs.getString("TEN").trim() : "");
+                        result.put("hoten", rs.getString("HOTEN") != null ? rs.getString("HOTEN").trim() : "");
+                        result.put("maCN", rs.getString("MACN") != null ? rs.getString("MACN").trim() : "");
+                        result.put("tenChiNhanh",
+                                rs.getString("TENCHINHANH") != null ? rs.getString("TENCHINHANH").trim() : "");
+                        result.put("message", "Tìm thấy khách hàng");
+                    } else {
+                        result.put("found", false);
+                        result.put("message", "Không tìm thấy khách hàng với CMND: " + cmnd);
+                    }
+                } else {
+                    result.put("found", false);
+                    result.put("message", "Không tìm thấy khách hàng với CMND: " + cmnd);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi khi tìm khách hàng: " + e.getMessage());
+            e.printStackTrace();
+            result.put("found", false);
+            result.put("message", "Lỗi: " + e.getMessage());
+        }
+        return result;
+    }
+
+    /**
      * Mở tài khoản cho khách hàng
      */
     public Map<String, Object> moTaiKhoan(String tenServer, String soTK, String cmnd,

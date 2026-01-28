@@ -555,28 +555,51 @@
                     <div class="modal fade" id="modalChuyenCN" tabindex="-1">
                         <div class="modal-dialog">
                             <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Chuyển nhân viên sang chi nhánh khác</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                <div class="modal-header bg-info text-white">
+                                    <h5 class="modal-title"><i class="bi bi-arrow-left-right"></i> Chuyển nhân viên sang
+                                        chi nhánh khác</h5>
+                                    <button type="button" class="btn-close btn-close-white"
+                                        data-bs-dismiss="modal"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Nhân viên: <strong id="lblNVChuyen"></strong></p>
-                                    <div class="mb-3">
-                                        <label class="form-label">Chi nhánh mới <span
-                                                class="text-danger">*</span></label>
-                                        <select class="form-select" id="selectCNMoi" required>
-                                            <option value="">-- Chọn chi nhánh --</option>
-                                        </select>
-                                    </div>
-                                    <div class="alert alert-warning">
-                                        <i class="bi bi-exclamation-triangle"></i>
-                                        <strong>Lưu ý:</strong> Khi chuyển chi nhánh, mã nhân viên có thể thay đổi.
-                                    </div>
+                                    <form id="formChuyenCN">
+                                        <div class="mb-3">
+                                            <label class="form-label">Nhân viên cần chuyển</label>
+                                            <input type="text" class="form-control" id="lblNVChuyen" readonly>
+                                            <input type="hidden" id="hiddenMaNVCu">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Chi nhánh mới <span
+                                                    class="text-danger">*</span></label>
+                                            <select class="form-select" id="selectCNMoi" required>
+                                                <option value="">-- Chọn chi nhánh --</option>
+                                            </select>
+                                        </div>
+                                        <div class="mb-3">
+                                            <label class="form-label">Mã nhân viên mới <span
+                                                    class="text-danger">*</span></label>
+                                            <input type="text" class="form-control" id="inputMaNVMoi" required
+                                                placeholder="Nhập mã nhân viên mới tại chi nhánh đích">
+                                            <small class="text-muted">Mã nhân viên tại chi nhánh đích (có thể khác mã
+                                                cũ)</small>
+                                        </div>
+                                        <div class="alert alert-warning">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                            <strong>Lưu ý:</strong>
+                                            <ul class="mb-0 mt-2">
+                                                <li>Nhân viên sẽ được <strong>soft delete</strong> ở chi nhánh hiện tại
+                                                </li>
+                                                <li>Tài khoản đăng nhập (nếu có) sẽ bị <strong>xóa</strong></li>
+                                                <li>Nhân viên mới sẽ được tạo ở chi nhánh đích với mã mới</li>
+                                            </ul>
+                                        </div>
+                                    </form>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                    <button type="button" class="btn btn-primary" id="btnXacNhanChuyen">Xác
-                                        nhận</button>
+                                    <button type="button" class="btn btn-primary" id="btnXacNhanChuyen">
+                                        <i class="bi bi-check-circle"></i> Xác nhận chuyển
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -702,21 +725,46 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <p>Khách hàng: <strong id="lblKHMoTK"></strong></p>
                                     <form id="formMoTaiKhoan">
+                                        <!-- CMND khách hàng -->
+                                        <div class="mb-3">
+                                            <label class="form-label">CMND khách hàng <span
+                                                    class="text-danger">*</span></label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control" id="inputMoTKCMND" required
+                                                    maxlength="10" placeholder="Nhập CMND">
+                                                <button type="button" class="btn btn-info" id="btnKiemTraCMND"
+                                                    style="display: inline-block;">
+                                                    <i class="bi bi-search"></i> Kiểm tra
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Thông tin khách hàng -->
+                                        <div class="mb-3" id="thongTinKHContainer" style="display: none;">
+                                            <div class="alert alert-success">
+                                                <strong>Tên khách hàng:</strong> <span id="lblTenKHMoTK"></span><br>
+                                                <strong>Chi nhánh gốc:</strong> <span id="lblCNGocKH"></span>
+                                            </div>
+                                        </div>
+
+                                        <!-- Số tài khoản -->
                                         <div class="mb-3">
                                             <label class="form-label">Số tài khoản <span
                                                     class="text-danger">*</span></label>
                                             <input type="text" class="form-control" id="inputSoTK" required
                                                 maxlength="9" placeholder="Nhập 9 ký tự">
                                         </div>
+
+                                        <!-- Chi nhánh mở tài khoản -->
                                         <div class="mb-3">
-                                            <label class="form-label">Chi nhánh</label>
+                                            <label class="form-label">Chi nhánh mở tài khoản</label>
                                             <input type="text" class="form-control" id="inputTKTenCN" readonly>
                                             <input type="hidden" id="inputTKMaCN">
                                             <small class="text-muted">Chi nhánh được gán theo nhân viên đang đăng
                                                 nhập</small>
                                         </div>
+
                                         <div class="alert alert-info">
                                             <i class="bi bi-info-circle"></i> Số dư ban đầu: <strong>100.000.000
                                                 VNĐ</strong>
@@ -725,7 +773,8 @@
                                 </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                    <button type="button" class="btn btn-primary" id="btnXacNhanMoTK">Xác nhận</button>
+                                    <button type="button" class="btn btn-primary" id="btnXacNhanMoTK" disabled>Xác
+                                        nhận</button>
                                 </div>
                             </div>
                         </div>
@@ -821,7 +870,7 @@
                                         <button class="btn btn-info" id="btnXemTaiKhoan" disabled>
                                             <i class="bi bi-wallet2"></i> Xem tài khoản
                                         </button>
-                                        <button class="btn btn-success btn-edit-action" id="btnMoTaiKhoan" disabled>
+                                        <button class="btn btn-success btn-edit-action" id="btnMoTaiKhoan">
                                             <i class="bi bi-plus-square"></i> Mở tài khoản
                                         </button>
                                         <button class="btn btn-primary" id="btnTaoLoginKH" disabled
@@ -1353,6 +1402,7 @@
                     loadChiNhanh();
                 } else if (tabId === 'customers') {
                     loadKhachHang();
+                    selectedKH = null; // Reset khách hàng đã chọn khi chuyển tab
 
                     // Hiển thị nút "Tạo login" chỉ khi role là CHINHANH
                     const btnTaoLoginKH = document.getElementById('btnTaoLoginKH');
@@ -1400,6 +1450,34 @@
                 })
                 .catch(err => {
                     console.error('Lỗi load chi nhánh:', err);
+                });
+        }
+
+        // Load chi nhánh cho modal chuyển nhân viên (lọc chi nhánh hiện tại)
+        function loadChiNhanhForTransfer(currentMaCN) {
+            fetch('/staff/chi-nhanh')
+                .then(res => res.json())
+                .then(data => {
+                    const selectCNMoi = document.getElementById('selectCNMoi');
+                    selectCNMoi.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+
+                    // Lọc bỏ chi nhánh hiện tại
+                    const filteredData = data.filter(cn => cn.maCN.trim() !== currentMaCN.trim());
+
+                    if (filteredData.length === 0) {
+                        selectCNMoi.innerHTML += '<option value="" disabled>Không có chi nhánh khác</option>';
+                        return;
+                    }
+
+                    filteredData.forEach(cn => {
+                        selectCNMoi.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
+                    });
+
+                    console.log(`Loaded ${filteredData.length} chi nhánh (đã lọc bỏ ${currentMaCN})`);
+                })
+                .catch(err => {
+                    console.error('Lỗi load chi nhánh:', err);
+                    alert('❌ Lỗi khi tải danh sách chi nhánh: ' + err.message);
                 });
         }
 
@@ -1692,9 +1770,14 @@
                 return;
             }
 
-            document.getElementById('lblNVChuyen').textContent =
-                `${selectedNV.maNV} - ${selectedNV.hoTen}`;
+            // Pre-fill thông tin
+            document.getElementById('lblNVChuyen').value = `${selectedNV.maNV} - ${selectedNV.hoTen}`;
+            document.getElementById('hiddenMaNVCu').value = selectedNV.maNV;
             document.getElementById('selectCNMoi').value = '';
+            document.getElementById('inputMaNVMoi').value = '';
+
+            // Load danh sách chi nhánh (lọc bỏ chi nhánh hiện tại)
+            loadChiNhanhForTransfer(selectedNV.maCN);
 
             new bootstrap.Modal(document.getElementById('modalChuyenCN')).show();
         });
@@ -1757,10 +1840,17 @@
 
         // Xác nhận chuyển chi nhánh
         document.getElementById('btnXacNhanChuyen').addEventListener('click', function () {
+            const maNVCu = document.getElementById('hiddenMaNVCu').value;
             const maCNMoi = document.getElementById('selectCNMoi').value;
+            const maNVMoi = document.getElementById('inputMaNVMoi').value.trim();
 
             if (!maCNMoi) {
                 alert('Vui lòng chọn chi nhánh mới');
+                return;
+            }
+
+            if (!maNVMoi) {
+                alert('Vui lòng nhập mã nhân viên mới');
                 return;
             }
 
@@ -1769,31 +1859,32 @@
                 return;
             }
 
-            if (!confirm(`Xác nhận chuyển nhân viên ${selectedNV.hoTen} sang chi nhánh mới?`)) {
+            if (!confirm(`Xác nhận chuyển nhân viên ${selectedNV.hoTen} sang chi nhánh mới?\n\nMã NV cũ: ${maNVCu}\nMã NV mới: ${maNVMoi}\n\n⚠️ Lưu ý: Tài khoản đăng nhập (nếu có) sẽ bị xóa!`)) {
                 return;
             }
 
-            // Lưu state trước khi chuyển chi nhánh
-            const employeeBackup = JSON.parse(JSON.stringify(selectedNV));
-
-            fetch(`/staff/nhan-vien/${selectedNV.maNV}/chuyen-chi-nhanh`, {
+            fetch(`/staff/nhan-vien/${maNVCu}/chuyen-chi-nhanh`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ maCNMoi: maCNMoi })
+                body: JSON.stringify({
+                    maCNMoi: maCNMoi,
+                    maNVMoi: maNVMoi
+                })
             })
                 .then(res => res.json())
                 .then(result => {
-                    alert(result.message + (result.maNVMoi ? `\nMã nhân viên mới: ${result.maNVMoi}` : ''));
                     if (result.result === 1) {
-                        enableUndo('TRANSFER', employeeBackup);
+                        alert('✅ ' + result.message);
                         bootstrap.Modal.getInstance(document.getElementById('modalChuyenCN')).hide();
-                        loadNhanVien();
+                        loadNhanVien(); // Reload danh sách
                         selectedNV = null;
+                    } else {
+                        alert('❌ ' + result.message);
                     }
                 })
-                .catch(err => {
-                    console.error('Lỗi:', err);
-                    alert('Lỗi khi chuyển chi nhánh');
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi chuyển chi nhánh: ' + error.message);
                 });
         });
 
@@ -1884,6 +1975,8 @@
 
         // Load danh sách khách hàng
         function loadKhachHang() {
+            selectedKH = null; // Reset khách hàng đã chọn khi load lại danh sách
+
             fetch('/staff/khach-hang')
                 .then(res => res.json())
                 .then(data => {
@@ -2178,27 +2271,70 @@
 
         // Nút Mở tài khoản
         document.getElementById('btnMoTaiKhoan').addEventListener('click', function () {
-            if (!selectedKH) {
-                alert('Vui lòng chọn khách hàng để mở tài khoản');
-                return;
-            }
-
-            document.getElementById('lblKHMoTK').textContent = `${selectedKH.cmnd} - ${selectedKH.hoten}`;
+            // Reset form
             document.getElementById('formMoTaiKhoan').reset();
+            document.getElementById('thongTinKHContainer').style.display = 'none';
+            document.getElementById('btnXacNhanMoTK').disabled = true;
 
             // Tự động gán chi nhánh từ nhân viên đang đăng nhập
             document.getElementById('inputTKMaCN').value = currentNhanVien.maCN;
             document.getElementById('inputTKTenCN').value = currentNhanVien.tenChiNhanh;
 
+            // Nếu đã chọn khách hàng → tự động điền CMND (nhưng vẫn cho phép sửa)
+            if (selectedKH && selectedKH.cmnd) {
+                document.getElementById('inputMoTKCMND').value = selectedKH.cmnd;
+            } else {
+                document.getElementById('inputMoTKCMND').value = '';
+            }
+
+            // Luôn cho phép nhập/sửa CMND và hiển thị nút Kiểm tra
+            document.getElementById('inputMoTKCMND').readOnly = false;
+            document.getElementById('btnKiemTraCMND').style.display = 'inline-block';
+
             new bootstrap.Modal(document.getElementById('modalMoTaiKhoan')).show();
+        });
+
+        // Nút Kiểm tra CMND
+        document.getElementById('btnKiemTraCMND').addEventListener('click', function () {
+            const cmnd = document.getElementById('inputMoTKCMND').value.trim();
+
+            if (!cmnd) {
+                alert('Vui lòng nhập CMND');
+                return;
+            }
+
+            // Gọi API tìm khách hàng
+            fetch(`/staff/khach-hang/tim-theo-cmnd/${cmnd}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.found) {
+                        // Tìm thấy khách hàng
+                        document.getElementById('lblTenKHMoTK').textContent = data.hoten;
+                        document.getElementById('lblCNGocKH').textContent = data.tenChiNhanh || 'N/A';
+                        document.getElementById('thongTinKHContainer').style.display = 'block';
+                        document.getElementById('btnXacNhanMoTK').disabled = false;
+
+                        alert('✅ ' + data.message);
+                    } else {
+                        // Không tìm thấy
+                        document.getElementById('thongTinKHContainer').style.display = 'none';
+                        document.getElementById('btnXacNhanMoTK').disabled = true;
+                        alert('⚠️ ' + data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('❌ Lỗi khi tìm kiếm: ' + error.message);
+                });
         });
 
         // Xác nhận mở tài khoản
         document.getElementById('btnXacNhanMoTK').addEventListener('click', function () {
+            const cmnd = document.getElementById('inputMoTKCMND').value.trim();
             const soTK = document.getElementById('inputSoTK').value.trim();
             const maCN = document.getElementById('inputTKMaCN').value;
 
-            if (!soTK || !maCN) {
+            if (!cmnd || !soTK || !maCN) {
                 alert('Vui lòng điền đầy đủ thông tin');
                 return;
             }
@@ -2212,7 +2348,7 @@
                 return;
             }
 
-            fetch(`/staff/khach-hang/${selectedKH.cmnd}/mo-tai-khoan`, {
+            fetch(`/staff/khach-hang/${cmnd}/mo-tai-khoan`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ soTK, maCN })

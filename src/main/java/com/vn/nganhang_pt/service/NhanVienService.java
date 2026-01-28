@@ -115,10 +115,10 @@ public class NhanVienService {
         }
 
         try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
-            String sql = "SELECT MACN, TENCN FROM CHINHANH ORDER BY MACN";
+            String sql = "{call dbo.sp_LoadDanhSachChiNhanh}";
 
-            try (Statement stmt = conn.createStatement();
-                    ResultSet rs = stmt.executeQuery(sql)) {
+            try (CallableStatement stmt = conn.prepareCall(sql);
+                    ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {
                     ChiNhanh cn = new ChiNhanh();
@@ -268,8 +268,8 @@ public class NhanVienService {
     /**
      * Chuyển nhân viên sang chi nhánh khác
      */
-    public Map<String, Object> chuyenChiNhanh(String maNV, String maCNMoi, String tenServer, String username,
-            String password) {
+    public Map<String, Object> chuyenChiNhanh(String maNVCu, String maCNMoi, String maNVMoi, String tenServer,
+            String username, String password) {
         Map<String, Object> response = new HashMap<>();
         String connectionString = fragmentConfig.getConnectionString(tenServer);
 
@@ -281,30 +281,36 @@ public class NhanVienService {
         }
 
         try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
-            String sql = "{call dbo.sp_ChuyenNhanVien(?, ?, ?)}";
+            String sql = "{call dbo.sp_ChuyenChiNhanhNhanVien(?, ?, ?)}";
 
             try (CallableStatement stmt = conn.prepareCall(sql)) {
-                stmt.setString(1, maNV);
+                stmt.setString(1, maNVCu);
                 stmt.setString(2, maCNMoi);
-                stmt.registerOutParameter(3, Types.NCHAR);
+                stmt.setString(3, maNVMoi);
 
-                int result = stmt.executeUpdate();
-                String maNVMoi = stmt.getString(3);
+                stmt.execute();
 
-                System.out.println("[DEBUG] Kết quả chuyển chi nhánh: " + result);
-                System.out.println("[DEBUG] Mã NV mới: " + maNVMoi);
+                response.put("result", 1);
+                response.put("message", "Chuyển chi nhánh thành công! Mã nhân viên mới: " + maNVMoi);
+                response.put("maNVMoi", maNVMoi);
 
-                if (result == 0) {
-                    response.put("result", 1);
-                    response.put("message", "Chuyển chi nhánh thành công");
-                    response.put("maNVMoi", maNVMoi);
-                } else {
-                    response.put("result", -1);
-                    response.put("message", "Có lỗi xảy ra khi chuyển chi nhánh");
-                }
+            }
+        } catch (SQLException e) {
+            String errorMsg = e.getMessage();
+            System.err.println("[ERROR] Lỗi khi chuyển chi nhánh: " + errorMsg);
+
+            if (errorMsg.contains("không tồn tại") || errorMsg.contains("đã bị xóa")) {
+                response.put("result", -1);
+                response.put("message", errorMsg);
+            } else if (errorMsg.contains("đã ở chi nhánh này")) {
+                response.put("result", -2);
+                response.put("message", errorMsg);
+            } else {
+                response.put("result", -99);
+                response.put("message", "Lỗi: " + errorMsg);
             }
         } catch (Exception e) {
-            System.err.println("[ERROR] Lỗi khi chuyển chi nhánh: " + e.getMessage());
+            System.err.println("[ERROR] Lỗi hệ thống: " + e.getMessage());
             e.printStackTrace();
             response.put("result", -99);
             response.put("message", "Lỗi hệ thống: " + e.getMessage());
