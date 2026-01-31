@@ -6,6 +6,8 @@ import com.vn.nganhang_pt.model.NhanVien;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.sql.DataSource;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +19,9 @@ public class NhanVienService {
 
     @Autowired
     private FragmentConfig fragmentConfig;
+
+    @Autowired
+    private DataSource dataSource;
 
     /**
      * Lấy danh sách nhân viên
@@ -55,6 +60,52 @@ public class NhanVienService {
             }
         } catch (Exception e) {
             System.err.println("[ERROR] Lỗi khi lấy danh sách nhân viên: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return danhSach;
+    }
+
+    /**
+     * Lấy danh sách nhân viên theo chi nhánh (cho role NGANHANG)
+     * Sử dụng SP_Lay_DS_NhanVien_Theo_ChiNhanh để lấy từ 2 site
+     */
+    public List<NhanVien> layDanhSachNhanVienTheoChiNhanh(String tenServer, String maCN, String username,
+            String password) {
+        List<NhanVien> danhSach = new ArrayList<>();
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
+
+        if (connectionString == null) {
+            System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
+            return danhSach;
+        }
+
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
+            String sql = "{call dbo.SP_Lay_DS_NhanVien_Theo_ChiNhanh(?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                stmt.setString(1, maCN);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        NhanVien nv = new NhanVien();
+                        nv.setMaNV(rs.getString("MANV"));
+                        nv.setHo(rs.getString("HO"));
+                        nv.setTen(rs.getString("TEN"));
+                        nv.setHoTen(rs.getString("HOTEN"));
+                        nv.setDiaChi(rs.getString("DIACHI"));
+                        nv.setCmnd(rs.getString("CMND"));
+                        nv.setPhai(rs.getString("PHAI"));
+                        nv.setSoDT(rs.getString("SODT"));
+                        nv.setMaCN(rs.getString("MACN"));
+                        nv.setTenChiNhanh(rs.getString("TENCN"));
+                        nv.setTrangThaiXoa(rs.getInt("TrangThaiXoa"));
+                        danhSach.add(nv);
+                    }
+                    System.out.println("[DEBUG] Tìm thấy " + danhSach.size() + " nhân viên cho chi nhánh " + maCN);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi khi lấy danh sách nhân viên theo chi nhánh: " + e.getMessage());
             e.printStackTrace();
         }
         return danhSach;
@@ -103,6 +154,53 @@ public class NhanVienService {
     }
 
     /**
+     * Lấy danh sách nhân viên đã xóa theo chi nhánh (cho role NGANHANG)
+     * Sử dụng SP_Lay_DS_NhanVien_DaXoa_TheoChiNhanh để lấy từ 2 site
+     */
+    public List<NhanVien> layDanhSachNhanVienDaXoaTheoChiNhanh(String tenServer, String maCN, String username,
+            String password) {
+        List<NhanVien> danhSach = new ArrayList<>();
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
+
+        if (connectionString == null) {
+            System.err.println("[ERROR] Không tìm thấy connection string cho server: " + tenServer);
+            return danhSach;
+        }
+
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
+            String sql = "{call dbo.SP_Lay_DS_NhanVien_DaXoa_TheoChiNhanh(?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                stmt.setString(1, maCN);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        NhanVien nv = new NhanVien();
+                        nv.setMaNV(rs.getString("MANV"));
+                        nv.setHo(rs.getString("HO"));
+                        nv.setTen(rs.getString("TEN"));
+                        nv.setHoTen(rs.getString("HOTEN"));
+                        nv.setDiaChi(rs.getString("DIACHI"));
+                        nv.setCmnd(rs.getString("CMND"));
+                        nv.setPhai(rs.getString("PHAI"));
+                        nv.setSoDT(rs.getString("SODT"));
+                        nv.setMaCN(rs.getString("MACN"));
+                        nv.setTenChiNhanh(rs.getString("TENCN"));
+                        nv.setTrangThaiXoa(rs.getInt("TrangThaiXoa"));
+                        danhSach.add(nv);
+                    }
+                    System.out
+                            .println("[DEBUG] Tìm thấy " + danhSach.size() + " nhân viên đã xóa cho chi nhánh " + maCN);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi khi lấy danh sách nhân viên đã xóa theo chi nhánh: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return danhSach;
+    }
+
+    /**
      * Lấy danh sách chi nhánh
      */
     public List<ChiNhanh> layDanhSachChiNhanh(String tenServer, String username, String password) {
@@ -132,6 +230,35 @@ public class NhanVienService {
             System.err.println("[ERROR] Lỗi khi lấy danh sách chi nhánh: " + e.getMessage());
             e.printStackTrace();
         }
+        return danhSach;
+    }
+
+    /**
+     * Lấy danh sách chi nhánh từ DataSource (Trụ sở/HTKN)
+     * Dùng cho role NGANHANG để đảm bảo lấy được toàn bộ chi nhánh
+     */
+    public List<ChiNhanh> layDanhSachChiNhanhTuTruSo() {
+        List<ChiNhanh> danhSach = new ArrayList<>();
+
+        try (Connection conn = dataSource.getConnection()) {
+            String sql = "{call dbo.sp_LoadDanhSachChiNhanh}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql);
+                    ResultSet rs = stmt.executeQuery()) {
+
+                while (rs.next()) {
+                    ChiNhanh cn = new ChiNhanh();
+                    cn.setMaCN(rs.getString("MACN"));
+                    cn.setTenCN(rs.getString("TENCN"));
+                    danhSach.add(cn);
+                }
+                System.out.println("[DEBUG] Trụ sở: tìm thấy " + danhSach.size() + " chi nhánh");
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi khi lấy danh sách chi nhánh từ trụ sở: " + e.getMessage());
+            e.printStackTrace();
+        }
+
         return danhSach;
     }
 

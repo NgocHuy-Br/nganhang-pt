@@ -349,6 +349,27 @@
                             </button>
                         </div>
 
+                        <!-- Dropdown chọn chi nhánh (chỉ hiển thị cho role NGANHANG) -->
+                        <div class="card mb-3" id="filterChiNhanhNV" style="display: none;">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold mb-0">
+                                            <i class="bi bi-building"></i> Lọc theo chi nhánh:
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select class="form-select" id="selectChiNhanhNV">
+                                            <option value="">-- Chọn chi nhánh --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        <span class="badge bg-info" id="badgeCountNV">0 nhân viên</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Toolbar -->
                         <div class="card mb-3">
                             <div class="card-body">
@@ -842,6 +863,27 @@
                     <!-- Tab: Customers -->
                     <div id="customers" class="tab-content-item" style="display: none;">
                         <h3 class="mb-4"><i class="bi bi-person-badge"></i> Quản lý khách hàng</h3>
+
+                        <!-- Dropdown chọn chi nhánh (chỉ hiển thị cho role NGANHANG) -->
+                        <div class="card mb-3" id="filterChiNhanhKH" style="display: none;">
+                            <div class="card-body">
+                                <div class="row align-items-center">
+                                    <div class="col-md-3">
+                                        <label class="form-label fw-bold mb-0">
+                                            <i class="bi bi-building"></i> Lọc theo chi nhánh:
+                                        </label>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <select class="form-select" id="selectChiNhanhKH">
+                                            <option value="">-- Chọn chi nhánh --</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3 text-end">
+                                        <span class="badge bg-success" id="badgeCountKH">0 khách hàng</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
                         <!-- Toolbar -->
                         <div class="card mb-3">
@@ -1398,11 +1440,92 @@
 
                 // Load data when switching to employees tab
                 if (tabId === 'employees') {
-                    loadNhanVien();
-                    loadChiNhanh();
+                    console.log('[DEBUG] Switching to employees tab, role:', currentNhanVien.role);
+
+                    // Hiển thị/ẩn dropdown lọc chi nhánh theo role
+                    if (currentNhanVien.role === 'NGANHANG') {
+                        document.getElementById('filterChiNhanhNV').style.display = 'block';
+                        console.log('[DEBUG] Role NGANHANG detected, loading branches...');
+
+                        // Load chi nhánh trước, sau đó set giá trị mặc định và load dữ liệu
+                        loadChiNhanh()
+                            .then(() => {
+                                console.log('[DEBUG] Chi nhánh loaded, setting default value:', currentNhanVien.maCN);
+                                if (currentNhanVien.maCN) {
+                                    selectedMaCNNV = currentNhanVien.maCN;
+                                    const dropdown = document.getElementById('selectChiNhanhNV');
+                                    dropdown.value = currentNhanVien.maCN;
+                                    console.log('[DEBUG] Dropdown set to:', dropdown.value);
+                                    loadNhanVienTheoChiNhanh(selectedMaCNNV);
+                                }
+                            })
+                            .catch(err => {
+                                console.error('[ERROR] Failed to load employees for NGANHANG:', err);
+                                alert('❌ Lỗi: ' + err.message);
+                            });
+
+                        // Ẩn các nút chỉnh sửa
+                        document.getElementById('btnThem').style.display = 'none';
+                        document.getElementById('btnSua').style.display = 'none';
+                        document.getElementById('btnXoa').style.display = 'none';
+                        document.getElementById('btnChuyenCN').style.display = 'none';
+                        document.getElementById('btnUndo').style.display = 'none';
+                        document.getElementById('btnTaoLogin').style.display = 'inline-block';
+                    } else {
+                        // Role CHINHANH: ẩn dropdown, load bình thường
+                        console.log('[DEBUG] Role CHINHANH, loading normally...');
+                        document.getElementById('filterChiNhanhNV').style.display = 'none';
+                        loadChiNhanh()
+                            .then(() => {
+                                loadNhanVien();
+                            })
+                            .catch(err => {
+                                console.error('[ERROR] Failed to load branches for CHINHANH:', err);
+                            });
+                    }
                 } else if (tabId === 'customers') {
-                    loadKhachHang();
-                    selectedKH = null; // Reset khách hàng đã chọn khi chuyển tab
+                    console.log('[DEBUG] Switching to customers tab, role:', currentNhanVien.role);
+                    selectedKH = null;
+
+                    // Hiển thị/ẩn dropdown lọc chi nhánh theo role
+                    if (currentNhanVien.role === 'NGANHANG') {
+                        document.getElementById('filterChiNhanhKH').style.display = 'block';
+                        console.log('[DEBUG] Role NGANHANG detected, loading customer branches...');
+
+                        loadChiNhanh()
+                            .then(() => {
+                                console.log('[DEBUG] Chi nhánh loaded, setting default value for KH:', currentNhanVien.maCN);
+                                if (currentNhanVien.maCN) {
+                                    selectedMaCNKH = currentNhanVien.maCN;
+                                    const dropdown = document.getElementById('selectChiNhanhKH');
+                                    dropdown.value = currentNhanVien.maCN;
+                                    console.log('[DEBUG] KH Dropdown set to:', dropdown.value);
+                                    loadKhachHangTheoChiNhanh(selectedMaCNKH);
+                                }
+                            })
+                            .catch(err => {
+                                console.error('[ERROR] Failed to load customers for NGANHANG:', err);
+                                alert('❌ Lỗi: ' + err.message);
+                            });
+                    } else {
+                        // Role CHINHANH: ẩn dropdown, load bình thường
+                        console.log('[DEBUG] Role CHINHANH, loading customers normally...');
+                        document.getElementById('filterChiNhanhKH').style.display = 'none';
+                        loadChiNhanh()
+                            .then(() => {
+                                loadKhachHang();
+                            })
+                            .catch(err => {
+                                console.error('[ERROR] Failed to load branches for customers:', err);
+                            });
+                    }
+
+                    // Ẩn các nút chỉnh sửa nếu role NGANHANG
+                    if (currentNhanVien.role === 'NGANHANG') {
+                        document.querySelectorAll('.btn-edit-action').forEach(btn => {
+                            btn.style.display = 'none';
+                        });
+                    }
 
                     // Hiển thị nút "Tạo login" chỉ khi role là CHINHANH
                     const btnTaoLoginKH = document.getElementById('btnTaoLoginKH');
@@ -1421,6 +1544,8 @@
         let selectedNV = null;
         let isEditMode = false;
         let isViewingDeleted = false;
+        let selectedMaCNNV = ''; // Mã chi nhánh được chọn cho nhân viên
+        let selectedMaCNKH = ''; // Mã chi nhánh được chọn cho khách hàng
 
         // Load danh sách nhân viên
         function loadNhanVien() {
@@ -1431,7 +1556,19 @@
                 .then(data => {
                     danhSachNhanVien = data;
                     renderNhanVien(data);
+                    updateBadgeCount('NV', data.length);
                     console.log('Đã load', data.length, 'nhân viên');
+
+                    // Sau khi load xong, đảm bảo ẩn các nút nếu role NGANHANG
+                    if (currentNhanVien.role === 'NGANHANG' && !isViewingDeleted) {
+                        document.getElementById('btnThem').style.display = 'none';
+                        document.getElementById('btnSua').style.display = 'none';
+                        document.getElementById('btnXoa').style.display = 'none';
+                        document.getElementById('btnChuyenCN').style.display = 'none';
+                        document.getElementById('btnUndo').style.display = 'none';
+                        // Nút Tạo Login vẫn hiện
+                        document.getElementById('btnTaoLogin').style.display = 'inline-block';
+                    }
                 })
                 .catch(err => {
                     console.error('Lỗi load nhân viên:', err);
@@ -1439,17 +1576,54 @@
                 });
         }
 
-        // Load danh sách chi nhánh
-        function loadChiNhanh() {
-            fetch('/staff/chi-nhanh')
+        // Load danh sách nhân viên theo chi nhánh (cho role NGANHANG)
+        function loadNhanVienTheoChiNhanh(maCN) {
+            const endpoint = isViewingDeleted
+                ? `/staff/nhan-vien/da-xoa/theo-chi-nhanh/${maCN}`
+                : `/staff/nhan-vien/theo-chi-nhanh/${maCN}`;
+
+            fetch(endpoint)
                 .then(res => res.json())
                 .then(data => {
-                    danhSachChiNhanh = data;
-                    renderChiNhanhOptions(data);
-                    console.log('Đã load', data.length, 'chi nhánh');
+                    danhSachNhanVien = data;
+                    renderNhanVien(data);
+                    updateBadgeCount('NV', data.length);
+                    console.log('Đã load', data.length, 'nhân viên cho chi nhánh', maCN);
                 })
                 .catch(err => {
-                    console.error('Lỗi load chi nhánh:', err);
+                    console.error('Lỗi load nhân viên theo chi nhánh:', err);
+                    alert('Không thể tải danh sách nhân viên: ' + err.message);
+                });
+        }
+
+        // Helper: Update badge count
+        function updateBadgeCount(type, count) {
+            const badge = document.getElementById('badgeCount' + type);
+            if (badge) {
+                const label = type === 'NV' ? 'nhân viên' : 'khách hàng';
+                badge.textContent = `${count} ${label}`;
+            }
+        }
+
+        // Load danh sách chi nhánh
+        function loadChiNhanh() {
+            console.log('[DEBUG] Bắt đầu load chi nhánh...');
+            return fetch('/staff/chi-nhanh')
+                .then(res => {
+                    console.log('[DEBUG] Response status:', res.status);
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    return res.json();
+                })
+                .then(data => {
+                    console.log('[DEBUG] Load chi nhánh thành công, số lượng:', data.length, data);
+                    danhSachChiNhanh = data;
+                    renderChiNhanhOptions(data);
+                    return data;
+                })
+                .catch(err => {
+                    console.error('[ERROR] Lỗi load chi nhánh:', err);
+                    alert('Lỗi khi tải danh sách chi nhánh: ' + err.message);
+                    throw err; // Rữ throw để promise chain có thể catch
                 });
         }
 
@@ -1488,25 +1662,40 @@
             const selectCNMoi = document.getElementById('selectCNMoi');
             const selectKHMaCN = document.getElementById('inputKHMaCN');
             const selectTKMaCN = document.getElementById('inputTKMaCN');
+            const selectChiNhanhNV = document.getElementById('selectChiNhanhNV');
+            const selectChiNhanhKH = document.getElementById('selectChiNhanhKH');
 
-            selectMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
-            selectNVMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
-            selectCNMoi.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
-            selectKHMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
-            selectTKMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            // Add null checks before accessing innerHTML
+            if (selectMaCN) selectMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            if (selectNVMaCN) selectNVMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            if (selectCNMoi) selectCNMoi.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            if (selectKHMaCN) selectKHMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            if (selectTKMaCN) selectTKMaCN.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            if (selectChiNhanhNV) selectChiNhanhNV.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+            if (selectChiNhanhKH) selectChiNhanhKH.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
 
             data.forEach(cn => {
-                selectMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
-                selectNVMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
-                selectCNMoi.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
-                selectKHMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
-                selectTKMaCN.innerHTML += `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
+                const option = `<option value="${cn.maCN}">${cn.maCN} - ${cn.tenCN}</option>`;
+                if (selectMaCN) selectMaCN.innerHTML += option;
+                if (selectNVMaCN) selectNVMaCN.innerHTML += option;
+                if (selectCNMoi) selectCNMoi.innerHTML += option;
+                if (selectKHMaCN) selectKHMaCN.innerHTML += option;
+                if (selectTKMaCN) selectTKMaCN.innerHTML += option;
+                if (selectChiNhanhNV) selectChiNhanhNV.innerHTML += option;
+                if (selectChiNhanhKH) selectChiNhanhKH.innerHTML += option;
             });
+
+            console.log('[DEBUG] Render chi nhánh options xong. Role:', currentNhanVien.role, 'MaCN:', currentNhanVien.maCN);
         }
 
         // Render danh sách nhân viên
         function renderNhanVien(data) {
             const tbody = document.getElementById('tbodyNhanVien');
+
+            if (!tbody) {
+                console.warn('[WARNING] tbody element not found');
+                return;
+            }
 
             if (data.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="9" class="text-center py-4 text-muted">
@@ -1584,10 +1773,13 @@
 
             // Enable/disable buttons (chỉ áp dụng khi KHÔNG xem danh sách đã xóa)
             if (!isViewingDeleted) {
-                document.getElementById('btnSua').disabled = false;
-                document.getElementById('btnXoa').disabled = false;
-                document.getElementById('btnChuyenCN').disabled = false;
-                document.getElementById('btnTaoLogin').disabled = false;
+                // Kiểm tra role: NGANHANG chỉ được phép enable nút Tạo Login
+                const isNganHang = currentNhanVien.role === 'NGANHANG';
+
+                document.getElementById('btnSua').disabled = isNganHang ? true : false;
+                document.getElementById('btnXoa').disabled = isNganHang ? true : false;
+                document.getElementById('btnChuyenCN').disabled = isNganHang ? true : false;
+                document.getElementById('btnTaoLogin').disabled = false; // Luôn enable cho cả NGANHANG và CHINHANH
                 // btnUndo giữ nguyên state (tùy thuộc vào stack)
             }
         }
@@ -1747,12 +1939,18 @@
                 : '<i class="bi bi-eye"></i> Xem đã xóa';
 
             // Ẩn/hiện các nút khi xem danh sách đã xóa
-            document.getElementById('btnThem').style.display = isViewingDeleted ? 'none' : 'inline-block';
-            document.getElementById('btnSua').style.display = isViewingDeleted ? 'none' : 'inline-block';
-            document.getElementById('btnXoa').style.display = isViewingDeleted ? 'none' : 'inline-block';
-            document.getElementById('btnChuyenCN').style.display = isViewingDeleted ? 'none' : 'inline-block';
+            // QUAN TRỌNG: Chỉ hiện nút nếu KHÔNG xem đã xóa VÀ role KHÔNG phải NGANHANG
+            const isNganHang = currentNhanVien.role === 'NGANHANG';
+
+            document.getElementById('btnThem').style.display = (isViewingDeleted || isNganHang) ? 'none' : 'inline-block';
+            document.getElementById('btnSua').style.display = (isViewingDeleted || isNganHang) ? 'none' : 'inline-block';
+            document.getElementById('btnXoa').style.display = (isViewingDeleted || isNganHang) ? 'none' : 'inline-block';
+            document.getElementById('btnChuyenCN').style.display = (isViewingDeleted || isNganHang) ? 'none' : 'inline-block';
+
+            // Nút Tạo Login: Ẩn khi xem đã xóa, nhưng vẫn hiện cho NGANHANG khi xem hiện tại
             document.getElementById('btnTaoLogin').style.display = isViewingDeleted ? 'none' : 'inline-block';
-            document.getElementById('btnUndo').style.display = isViewingDeleted ? 'none' : 'inline-block';
+
+            document.getElementById('btnUndo').style.display = (isViewingDeleted || isNganHang) ? 'none' : 'inline-block';
 
             selectedNV = null;
             document.getElementById('btnSua').disabled = true;
@@ -1982,6 +2180,14 @@
                 .then(data => {
                     allKhachHang = data;
                     renderKhachHang(data);
+                    updateBadgeCount('KH', data.length);
+
+                    // Sau khi load xong, đảm bảo ẩn các nút nếu role NGANHANG
+                    if (currentNhanVien.role === 'NGANHANG') {
+                        document.querySelectorAll('.btn-edit-action').forEach(btn => {
+                            btn.style.display = 'none';
+                        });
+                    }
                 })
                 .catch(err => {
                     console.error('Lỗi:', err);
@@ -1989,9 +2195,33 @@
                 });
         }
 
+        // Load danh sách khách hàng theo chi nhánh (cho role NGANHANG)
+        function loadKhachHangTheoChiNhanh(maCN) {
+            selectedKH = null;
+
+            fetch(`/staff/khach-hang/theo-chi-nhanh/${maCN}`)
+                .then(res => res.json())
+                .then(data => {
+                    allKhachHang = data;
+                    renderKhachHang(data);
+                    updateBadgeCount('KH', data.length);
+                    console.log('Đã load', data.length, 'khách hàng cho chi nhánh', maCN);
+                })
+                .catch(err => {
+                    console.error('Lỗi load khách hàng theo chi nhánh:', err);
+                    alert('Không thể tải danh sách khách hàng: ' + err.message);
+                });
+        }
+
         // Hiển thị khách hàng ra table
         function renderKhachHang(data) {
             const tbody = document.getElementById('tableKH');
+
+            if (!tbody) {
+                console.warn('[WARNING] tableKH element not found');
+                return;
+            }
+
             if (data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="7" class="text-center">Không có dữ liệu</td></tr>';
                 return;
@@ -2020,11 +2250,14 @@
             });
             event.target.closest('tr').classList.add('table-active');
 
-            // Enable buttons
-            document.getElementById('btnSuaKH').disabled = false;
-            document.getElementById('btnXoaKH').disabled = false;
+            // Enable buttons (chỉ cho CHINHANH, NGANHANG chỉ xem)
+            const isNganHang = currentNhanVien.role === 'NGANHANG';
+
+            document.getElementById('btnSuaKH').disabled = isNganHang ? true : false;
+            document.getElementById('btnXoaKH').disabled = isNganHang ? true : false;
+            // Nút Xem tài khoản và Mở tài khoản: NGANHANG vẫn được xem nhưng không được mở
             document.getElementById('btnXemTaiKhoan').disabled = false;
-            document.getElementById('btnMoTaiKhoan').disabled = false;
+            document.getElementById('btnMoTaiKhoan').disabled = isNganHang ? true : false;
 
             // Enable Tạo login button (chỉ khi role CHINHANH)
             const btnTaoLoginKH = document.getElementById('btnTaoLoginKH');
@@ -2967,6 +3200,30 @@
                     console.error('Error:', error);
                     alert('❌ Lỗi khi xuất PDF');
                 });
+        });
+
+        /* ==================== EVENT LISTENERS CHO DROPDOWN CHI NHÁNH ==================== */
+
+        // Dropdown chọn chi nhánh cho Nhân viên (role NGANHANG)
+        document.getElementById('selectChiNhanhNV').addEventListener('change', function () {
+            const maCN = this.value;
+            if (maCN) {
+                selectedMaCNNV = maCN;
+                if (isViewingDeleted) {
+                    loadNhanVienTheoChiNhanh(maCN);
+                } else {
+                    loadNhanVienTheoChiNhanh(maCN);
+                }
+            }
+        });
+
+        // Dropdown chọn chi nhánh cho Khách hàng (role NGANHANG)
+        document.getElementById('selectChiNhanhKH').addEventListener('change', function () {
+            const maCN = this.value;
+            if (maCN) {
+                selectedMaCNKH = maCN;
+                loadKhachHangTheoChiNhanh(maCN);
+            }
         });
     </script>
 </body>

@@ -57,6 +57,46 @@ public class KhachHangService {
     }
 
     /**
+     * Lấy danh sách khách hàng theo chi nhánh (cho role NGANHANG)
+     * Sử dụng SP_Lay_DS_KhachHang_TheoChiNhanh để lấy từ 2 site
+     */
+    public List<KhachHang> layDanhSachKhachHangTheoChiNhanh(String tenServer, String maCN, String username,
+            String password) {
+        List<KhachHang> danhSach = new ArrayList<>();
+        String connectionString = fragmentConfig.getConnectionString(tenServer);
+
+        try (Connection conn = DriverManager.getConnection(connectionString, username, password)) {
+            String sql = "{call dbo.SP_Lay_DS_KhachHang_TheoChiNhanh(?)}";
+
+            try (CallableStatement stmt = conn.prepareCall(sql)) {
+                stmt.setString(1, maCN);
+
+                try (ResultSet rs = stmt.executeQuery()) {
+                    while (rs.next()) {
+                        KhachHang kh = new KhachHang();
+                        kh.setCmnd(rs.getString("CMND"));
+                        kh.setHo(rs.getString("HO"));
+                        kh.setTen(rs.getString("TEN"));
+                        kh.setHoten(rs.getString("HOTEN"));
+                        kh.setDiaChi(rs.getString("DIACHI"));
+                        kh.setPhai(rs.getString("PHAI"));
+                        kh.setNgayCap(rs.getDate("NGAYCAP"));
+                        kh.setSoDT(rs.getString("SODT"));
+                        kh.setMaCN(rs.getString("MACN"));
+                        kh.setTenChiNhanh(rs.getString("TENCN"));
+                        danhSach.add(kh);
+                    }
+                    System.out.println("[DEBUG] Tìm thấy " + danhSach.size() + " khách hàng cho chi nhánh " + maCN);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[ERROR] Lỗi khi lấy danh sách khách hàng theo chi nhánh: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return danhSach;
+    }
+
+    /**
      * Lấy danh sách khách hàng tất cả chi nhánh
      * Dùng cho role NGANHANG
      */

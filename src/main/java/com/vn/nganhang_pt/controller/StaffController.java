@@ -60,6 +60,25 @@ public class StaffController {
     }
 
     /**
+     * Lấy danh sách nhân viên theo chi nhánh (cho role NGANHANG)
+     */
+    @GetMapping("/nhan-vien/theo-chi-nhanh/{maCN}")
+    @ResponseBody
+    public List<NhanVien> layDanhSachNhanVienTheoChiNhanh(@PathVariable String maCN, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
+        System.out
+                .println("[DEBUG StaffController] Lấy DS nhân viên theo chi nhánh=" + maCN + " từ server=" + tenServer);
+        return nhanVienService.layDanhSachNhanVienTheoChiNhanh(tenServer, maCN, username, password);
+    }
+
+    /**
      * Lấy danh sách nhân viên đã xóa
      */
     @GetMapping("/nhan-vien/da-xoa")
@@ -78,6 +97,25 @@ public class StaffController {
     }
 
     /**
+     * Lấy danh sách nhân viên đã xóa theo chi nhánh (cho role NGANHANG)
+     */
+    @GetMapping("/nhan-vien/da-xoa/theo-chi-nhanh/{maCN}")
+    @ResponseBody
+    public List<NhanVien> layDanhSachNhanVienDaXoaTheoChiNhanh(@PathVariable String maCN, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
+        System.out.println(
+                "[DEBUG StaffController] Lấy DS nhân viên đã xóa theo chi nhánh=" + maCN + " từ server=" + tenServer);
+        return nhanVienService.layDanhSachNhanVienDaXoaTheoChiNhanh(tenServer, maCN, username, password);
+    }
+
+    /**
      * Lấy danh sách chi nhánh
      */
     @GetMapping("/chi-nhanh")
@@ -86,6 +124,11 @@ public class StaffController {
         NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
         if (nhanVien == null) {
             throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        if ("NGANHANG".equalsIgnoreCase(nhanVien.getRole())) {
+            System.out.println("[DEBUG StaffController] NGANHANG: lấy DS chi nhánh từ trụ sở");
+            return nhanVienService.layDanhSachChiNhanhTuTruSo();
         }
 
         String tenServer = nhanVien.getTenServer();
@@ -279,6 +322,25 @@ public class StaffController {
             System.out.println("[DEBUG] Role CHINHANH - Lấy KH chi nhánh hiện tại");
             return khachHangService.layDanhSachKhachHang(tenServer);
         }
+    }
+
+    /**
+     * Lấy danh sách khách hàng theo chi nhánh (cho role NGANHANG)
+     */
+    @GetMapping("/khach-hang/theo-chi-nhanh/{maCN}")
+    @ResponseBody
+    public List<KhachHang> layDanhSachKhachHangTheoChiNhanh(@PathVariable String maCN, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
+        System.out.println(
+                "[DEBUG StaffController] Lấy DS khách hàng theo chi nhánh=" + maCN + " từ server=" + tenServer);
+        return khachHangService.layDanhSachKhachHangTheoChiNhanh(tenServer, maCN, username, password);
     }
 
     /**
