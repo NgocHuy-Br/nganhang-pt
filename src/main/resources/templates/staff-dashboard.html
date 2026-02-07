@@ -1316,22 +1316,27 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="row g-3">
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Từ ngày</label>
                                             <input type="date" id="tkMoiTuNgay" class="form-control">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3">
                                             <label class="form-label">Đến ngày</label>
                                             <input type="date" id="tkMoiDenNgay" class="form-control">
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-3" id="tkMoiChiNhanhGroup" style="display: none;">
+                                            <label class="form-label">Chi nhánh</label>
+                                            <select id="tkMoiChiNhanh" class="form-select">
+                                                <option value="">-- Đang tải --</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-3">
                                             <label class="form-label">&nbsp;</label>
                                             <button id="btnXemTKMoi" class="btn btn-primary w-100">
                                                 <i class="bi bi-search"></i> Xem danh sách
                                             </button>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label">&nbsp;</label>
+                                        <div class="col-md-3 ms-auto">
                                             <button id="btnXuatPDFTKMoi" class="btn btn-success w-100" disabled>
                                                 <i class="bi bi-file-pdf"></i> Xuất PDF
                                             </button>
@@ -2975,6 +2980,8 @@
                 document.getElementById('formSaoKe').style.display = 'block';
             } else if (loai === 'tai-khoan-moi') {
                 document.getElementById('formTKMoi').style.display = 'block';
+                // Load danh sách chi nhánh cho báo cáo tài khoản mở mới
+                loadChiNhanhForTKMoi();
             } else {
                 document.getElementById('placeholderBaoCao').style.display = 'block';
             }
@@ -2996,8 +3003,7 @@
                         saoKeTKInfo = data;
                         document.getElementById('saoKeTenKH').value = data.tenKH || '';
                         document.getElementById('saoKeChiNhanh').value = data.tenChiNhanh || '';
-                        // Hiển thị placeholder nếu SP chưa trả về field này
-                        document.getElementById('saoKeNgayMo').value = data.ngayMoTK ? formatDate(data.ngayMoTK) : 'Cần cập nhật SP để hiển thị';
+                        document.getElementById('saoKeNgayMo').value = data.ngayMoTK ? formatDate(data.ngayMoTK) : '';
                     } else {
                         alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
                         saoKeTKInfo = null;
@@ -3118,16 +3124,23 @@
         document.getElementById('btnXemTKMoi').addEventListener('click', function () {
             const tuNgay = document.getElementById('tkMoiTuNgay').value;
             const denNgay = document.getElementById('tkMoiDenNgay').value;
+            const maCN = document.getElementById('tkMoiChiNhanh').value;
 
             if (!tuNgay || !denNgay) {
                 alert('Vui lòng nhập đầy đủ thông tin');
                 return;
             }
 
+            // Nếu là NGANHANG, bắt buộc chọn chi nhánh
+            if (currentNhanVien.role === 'NGANHANG' && !maCN) {
+                alert('Vui lòng chọn chi nhánh');
+                return;
+            }
+
             fetch('/staff/bao-cao/tai-khoan-moi', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tuNgay, denNgay })
+                body: JSON.stringify({ tuNgay, denNgay, maCN })
             })
                 .then(res => res.json())
                 .then(data => {
@@ -3169,16 +3182,23 @@
         document.getElementById('btnXuatPDFTKMoi').addEventListener('click', function () {
             const tuNgay = document.getElementById('tkMoiTuNgay').value;
             const denNgay = document.getElementById('tkMoiDenNgay').value;
+            const maCN = document.getElementById('tkMoiChiNhanh').value;
 
             if (!tuNgay || !denNgay) {
                 alert('Vui lòng nhập đầy đủ thông tin');
                 return;
             }
 
+            // Nếu là NGANHANG, bắt buộc chọn chi nhánh
+            if (currentNhanVien.role === 'NGANHANG' && !maCN) {
+                alert('Vui lòng chọn chi nhánh');
+                return;
+            }
+
             fetch('/staff/bao-cao/tai-khoan-moi/pdf', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ tuNgay, denNgay })
+                body: JSON.stringify({ tuNgay, denNgay, maCN })
             })
                 .then(response => {
                     if (response.ok) {
@@ -3201,6 +3221,47 @@
                     alert('❌ Lỗi khi xuất PDF');
                 });
         });
+
+        // Load danh sách chi nhánh cho báo cáo tài khoản mở mới
+        function loadChiNhanhForTKMoi() {
+            const dropdown = document.getElementById('tkMoiChiNhanh');
+            const dropdownGroup = document.getElementById('tkMoiChiNhanhGroup');
+
+            // Chỉ hiển thị dropdown cho NGANHANG
+            if (currentNhanVien.role === 'NGANHANG') {
+                dropdownGroup.style.display = 'block';
+
+                fetch('/staff/chi-nhanh')
+                    .then(res => {
+                        if (!res.ok) throw new Error('HTTP ' + res.status);
+                        return res.json();
+                    })
+                    .then(data => {
+                        dropdown.innerHTML = '<option value="">-- Chọn chi nhánh --</option>';
+
+                        if (data && data.length > 0) {
+                            data.forEach(cn => {
+                                const option = document.createElement('option');
+                                option.value = cn.maCN;
+                                option.textContent = cn.maCN + ' - ' + cn.tenCN;
+                                dropdown.appendChild(option);
+                            });
+
+                            // Đặt giá trị mặc định là chi nhánh của người đăng nhập
+                            if (currentNhanVien && currentNhanVien.maCN) {
+                                dropdown.value = currentNhanVien.maCN;
+                            }
+                        }
+                    })
+                    .catch(err => {
+                        console.error('[ERROR] Lỗi load chi nhánh:', err);
+                        dropdown.innerHTML = '<option value="">-- Lỗi tải dữ liệu --</option>';
+                    });
+            } else {
+                // Role CHINHANH: ẩn dropdown
+                dropdownGroup.style.display = 'none';
+            }
+        }
 
         /* ==================== EVENT LISTENERS CHO DROPDOWN CHI NHÁNH ==================== */
 

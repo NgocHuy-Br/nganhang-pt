@@ -20,22 +20,26 @@ public class GiaoDichService {
 
     /**
      * Lấy thông tin tài khoản (tên KH, chi nhánh, số dư)
-     * Sử dụng SP_TimThongTinKhachHangTheoSTK
+     * Sử dụng SP_TimThongTinKhachHangTheoSTK hoặc SP_TimThongTinKhachHangTheoSTK_TatCaChiNhanh
      * 
      * @param soTK      Số tài khoản
      * @param tenServer Tên server
      * @param username  Username đăng nhập
      * @param password  Password đăng nhập
+     * @param role      Role của user (NGANHANG sử dụng SP khác)
      * @return Map chứa tenKH, tenChiNhanh, soDu, cmnd
      */
-    public Map<String, Object> layThongTinTaiKhoan(String soTK, String tenServer, String username, String password) {
+    public Map<String, Object> layThongTinTaiKhoan(String soTK, String tenServer, String username, String password, String role) {
         Map<String, Object> result = new HashMap<>();
         String jdbcUrl = fragmentConfig.getConnectionString(tenServer);
 
         try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password)) {
 
-            // Gọi SP để lấy thông tin khách hàng
-            String spCall = "{call SP_TimThongTinKhachHangTheoSTK(?)}";
+            // Chọn SP phù hợp theo role
+            String spCall = "NGANHANG".equals(role) 
+                ? "{call SP_TimThongTinKhachHangTheoSTK_TatCaChiNhanh(?)}"
+                : "{call SP_TimThongTinKhachHangTheoSTK(?)}";
+                
             try (CallableStatement stmt = conn.prepareCall(spCall)) {
                 stmt.setString(1, soTK);
                 ResultSet rs = stmt.executeQuery();
@@ -45,9 +49,12 @@ public class GiaoDichService {
                     result.put("tenKH", rs.getString("HOTEN"));
                     result.put("tenChiNhanh", rs.getString("TENCN"));
                     result.put("cmnd", rs.getString("CMND"));
-
-                    // TODO: Cần cập nhật SP để trả về SODU và NGAYMOTK
-                    // Hiện tại SP chỉ trả về HOTEN, TENCN, CMND
+                    
+                    // Lấy ngày mở tài khoản (đã được thêm vào SP)
+                    java.sql.Date ngayMoTK = rs.getDate("NGAYMOTK");
+                    if (ngayMoTK != null) {
+                        result.put("ngayMoTK", ngayMoTK.toString()); // Format: yyyy-MM-dd
+                    }
                 } else {
                     result.put("success", false);
                     result.put("message", "Tài khoản không tồn tại");

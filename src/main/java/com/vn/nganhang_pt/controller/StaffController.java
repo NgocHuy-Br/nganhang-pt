@@ -482,8 +482,9 @@ public class StaffController {
         String tenServer = nhanVien.getTenServer();
         String username = (String) session.getAttribute("username");
         String password = (String) session.getAttribute("password");
+        String role = nhanVien.getRole(); // Lấy role từ session
 
-        return giaoDichService.layThongTinTaiKhoan(soTK, tenServer, username, password);
+        return giaoDichService.layThongTinTaiKhoan(soTK, tenServer, username, password, role);
     }
 
     /**
@@ -576,9 +577,10 @@ public class StaffController {
             String tenServer = nhanVien.getTenServer();
             String username = (String) session.getAttribute("username");
             String password = (String) session.getAttribute("password");
+            String role = nhanVien.getRole(); // Lấy role từ session
 
             List<GiaoDich> transactions = baoCaoService.saoKeGiaoDich(soTK, tuNgay, denNgay, tenServer, username,
-                    password);
+                    password, role);
 
             response.put("success", true);
             response.put("transactions", transactions);
@@ -608,6 +610,7 @@ public class StaffController {
             String tenServer = nhanVien.getTenServer();
             String username = (String) session.getAttribute("username");
             String password = (String) session.getAttribute("password");
+            String role = nhanVien.getRole(); // Lấy role từ session
 
             // Lấy thông tin tài khoản
             String chuTK = data.get("chuTK");
@@ -615,7 +618,7 @@ public class StaffController {
             String nguoiXuat = nhanVien.getHo() + " " + nhanVien.getTen();
 
             byte[] pdfBytes = baoCaoService.xuatPDFSaoKe(soTK, tuNgay, denNgay, tenServer, username, password, chuTK,
-                    chiNhanh, nguoiXuat);
+                    chiNhanh, nguoiXuat, role);
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
@@ -649,15 +652,22 @@ public class StaffController {
 
             LocalDate tuNgay = LocalDate.parse(data.get("tuNgay"));
             LocalDate denNgay = LocalDate.parse(data.get("denNgay"));
+            String maCNRequest = data.get("maCN");
 
             String tenServer = nhanVien.getTenServer();
             String role = nhanVien.getRole();
-            String maCN = nhanVien.getMaCN();
             String username = (String) session.getAttribute("username");
             String password = (String) session.getAttribute("password");
 
-            List<Map<String, Object>> accounts = baoCaoService.lietKeTaiKhoanMoi(tuNgay, denNgay, role, maCN, tenServer,
-                    username, password);
+            // Luôn dùng SP_LietKeTaiKhoanMoiMo_TheoChiNhanh
+            // - Role NGANHANG: maCNRequest từ dropdown (bắt buộc chọn)
+            // - Role CHINHANH: maCN từ nhân viên (tự động)
+            String maCN = (maCNRequest != null && !maCNRequest.isEmpty())
+                    ? maCNRequest
+                    : nhanVien.getMaCN();
+
+            List<Map<String, Object>> accounts = baoCaoService.lietKeTaiKhoanMoiTheoChiNhanh(
+                    tuNgay, denNgay, maCN, tenServer, username, password);
 
             response.put("success", true);
             response.put("accounts", accounts);
@@ -682,18 +692,26 @@ public class StaffController {
 
             LocalDate tuNgay = LocalDate.parse(data.get("tuNgay"));
             LocalDate denNgay = LocalDate.parse(data.get("denNgay"));
+            String maCNRequest = data.get("maCN");
 
             String tenServer = nhanVien.getTenServer();
             String role = nhanVien.getRole();
-            String maCN = nhanVien.getMaCN();
             String username = (String) session.getAttribute("username");
             String password = (String) session.getAttribute("password");
 
             // Lấy tên người xuất
             String nguoiXuat = nhanVien.getHo() + " " + nhanVien.getTen();
 
-            byte[] pdfBytes = baoCaoService.xuatPDFTaiKhoanMoi(tuNgay, denNgay, role, maCN, tenServer, username,
-                    password, nguoiXuat);
+            byte[] pdfBytes;
+            if (maCNRequest != null && !maCNRequest.isEmpty()) {
+                pdfBytes = baoCaoService.xuatPDFTaiKhoanMoiTheoChiNhanh(tuNgay, denNgay, maCNRequest, tenServer,
+                        username,
+                        password, nguoiXuat);
+            } else {
+                String maCN = nhanVien.getMaCN();
+                pdfBytes = baoCaoService.xuatPDFTaiKhoanMoi(tuNgay, denNgay, role, maCN, tenServer, username,
+                        password, nguoiXuat);
+            }
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_PDF);
