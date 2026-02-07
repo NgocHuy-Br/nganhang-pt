@@ -134,7 +134,7 @@
         }
 
         .btn-logout {
-            background: rgba(220, 38, 38, 0.9);
+            background: rgba(108, 117, 125, 0.9);
             color: white;
             border: none;
             padding: 10px 20px;
@@ -148,7 +148,7 @@
         }
 
         .btn-logout:hover {
-            background: rgba(220, 38, 38, 1);
+            background: rgba(108, 117, 125, 1);
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
         }
@@ -368,12 +368,6 @@
                             <div class="info-item mb-3">
                                 <label class="text-muted mb-1">Chi nhánh gốc</label>
                                 <div class="fw-bold" th:text="${khachHang.tenChiNhanh}">Chi nhánh Bến Thành</div>
-                            </div>
-                            <!-- Server info hidden but kept for debugging -->
-                            <div class="info-item mb-3" style="display: none;">
-                                <label class="text-muted mb-1">Server phân mảnh</label>
-                                <div class="fw-bold text-primary" th:text="${khachHang.tenServer}">
-                                    HCM-LAPT-001\SQLSRV_NH01</div>
                             </div>
                         </div>
                     </div>

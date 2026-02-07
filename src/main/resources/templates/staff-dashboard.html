@@ -189,6 +189,57 @@
                 font-size: 1.4rem;
             }
         }
+
+        /* Form Validation Styles */
+        .was-validated .form-control:invalid,
+        .form-control.is-invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .was-validated .form-control:valid,
+        .form-control.is-valid {
+            border-color: #198754;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+
+        .invalid-feedback {
+            display: none;
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: 0.875em;
+            color: #dc3545;
+        }
+
+        .was-validated .form-control:invalid~.invalid-feedback,
+        .form-control.is-invalid~.invalid-feedback {
+            display: block;
+        }
+
+        .form-control:focus:invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+
+        .form-control:focus:valid {
+            border-color: #198754;
+            box-shadow: 0 0 0 0.25rem rgba(25, 135, 84, 0.25);
+        }
+
+        /* Placeholder styling */
+        input::placeholder {
+            color: #6c757d;
+            opacity: 0.6;
+            font-style: italic;
+        }
     </style>
 </head>
 
@@ -280,15 +331,7 @@
                                     <div class="fw-bold" th:text="${nhanVien.maNV}">NV001</div>
                                 </div>
                                 <div class="info-item mb-3">
-                                    <label class="text-muted mb-1">Họ</label>
-                                    <div class="fw-bold" th:text="${nhanVien.ho}">Nguyễn</div>
-                                </div>
-                                <div class="info-item mb-3">
-                                    <label class="text-muted mb-1">Tên</label>
-                                    <div class="fw-bold" th:text="${nhanVien.ten}">Văn A</div>
-                                </div>
-                                <div class="info-item mb-3">
-                                    <label class="text-muted mb-1">Họ tên đầy đủ</label>
+                                    <label class="text-muted mb-1">Họ Tên</label>
                                     <div class="fw-bold" th:text="${nhanVien.hoTen}">Nguyễn Văn A</div>
                                 </div>
                                 <div class="info-item mb-3">
@@ -323,20 +366,7 @@
                                     <label class="text-muted mb-1">Chi nhánh</label>
                                     <div class="fw-bold" th:text="${nhanVien.tenChiNhanh}">Chi nhánh Bến Thành</div>
                                 </div>
-                                <div class="info-item mb-3">
-                                    <label class="text-muted mb-1">Server phân mảnh</label>
-                                    <div class="fw-bold text-primary" th:text="${nhanVien.tenServer}">
-                                        HCM-LAPT-001\SQLSRV_NH01</div>
-                                </div>
                             </div>
-                        </div>
-
-                        <hr class="my-4">
-
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i>
-                            <strong>Lưu ý:</strong> Thông tin được lưu trữ phân tán trên server
-                            <code th:text="${nhanVien.tenServer}">HCM-LAPT-001\SQLSRV_NH01</code>
                         </div>
                     </div>
 
@@ -455,21 +485,36 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">Mã nhân viên <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputMaNV" required>
+                                                <input type="text" class="form-control" id="inputMaNV"
+                                                    placeholder="4-10 ký tự" minlength="4" maxlength="10" required>
+                                                <div class="invalid-feedback">
+                                                    Mã nhân viên phải từ 4 đến 10 ký tự
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">CMND <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputNVCMND" required
-                                                    maxlength="10">
+                                                <input type="text" class="form-control" id="inputNVCMND"
+                                                    placeholder="10 chữ số" pattern="[0-9]{10}" maxlength="10" required>
+                                                <div class="invalid-feedback">
+                                                    CMND phải là 10 chữ số
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Họ <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputNVHo" required>
+                                                <input type="text" class="form-control" id="inputNVHo" placeholder=""
+                                                    pattern="[\p{L}\s]+" required>
+                                                <div class="invalid-feedback">
+                                                    Họ không được chứa số và ký tự đặc biệt
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Tên <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputNVTen" required>
+                                                <input type="text" class="form-control" id="inputNVTen" placeholder=""
+                                                    pattern="[\p{L}\s]+" required>
+                                                <div class="invalid-feedback">
+                                                    Tên không được chứa số và ký tự đặc biệt
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Giới tính <span
@@ -483,8 +528,12 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">Số điện thoại <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputNVSDT" required
-                                                    maxlength="15">
+                                                <input type="text" class="form-control" id="inputNVSDT"
+                                                    placeholder="10 số, bắt đầu từ 0" pattern="0[0-9]{9}" maxlength="10"
+                                                    required>
+                                                <div class="invalid-feedback">
+                                                    Số điện thoại phải là 10 số, bắt đầu bằng số 0
+                                                </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <label class="form-label">Địa chỉ <span
@@ -640,8 +689,11 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">CMND <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputCMND" required
-                                                    maxlength="10">
+                                                <input type="text" class="form-control" id="inputCMND"
+                                                    placeholder="10 chữ số" pattern="[0-9]{10}" maxlength="10" required>
+                                                <div class="invalid-feedback">
+                                                    CMND phải là 10 chữ số
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Ngày cấp <span
@@ -650,13 +702,19 @@
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Họ <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputKHHo" required
-                                                    maxlength="50">
+                                                <input type="text" class="form-control" id="inputKHHo" placeholder=""
+                                                    pattern="[\p{L}\s]+" maxlength="50" required>
+                                                <div class="invalid-feedback">
+                                                    Họ không được chứa số và ký tự đặc biệt
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Tên <span class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputKHTen" required
-                                                    maxlength="10">
+                                                <input type="text" class="form-control" id="inputKHTen" placeholder=""
+                                                    pattern="[\p{L}\s]+" maxlength="10" required>
+                                                <div class="invalid-feedback">
+                                                    Tên không được chứa số và ký tự đặc biệt
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Giới tính <span
@@ -670,8 +728,12 @@
                                             <div class="col-md-6">
                                                 <label class="form-label">Số điện thoại <span
                                                         class="text-danger">*</span></label>
-                                                <input type="text" class="form-control" id="inputKHSDT" required
-                                                    maxlength="15">
+                                                <input type="text" class="form-control" id="inputKHSDT"
+                                                    placeholder="10 số, bắt đầu từ 0" pattern="0[0-9]{9}" maxlength="10"
+                                                    required>
+                                                <div class="invalid-feedback">
+                                                    Số điện thoại phải là 10 số, bắt đầu bằng số 0
+                                                </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <label class="form-label">Địa chỉ <span
@@ -718,12 +780,11 @@
                                                     <th>Số dư</th>
                                                     <th>Ngày mở</th>
                                                     <th>Chi nhánh</th>
-                                                    <th>Site</th>
                                                 </tr>
                                             </thead>
                                             <tbody id="tableTaiKhoan">
                                                 <tr>
-                                                    <td colspan="5" class="text-center">Đang tải...</td>
+                                                    <td colspan="4" class="text-center">Đang tải...</td>
                                                 </tr>
                                             </tbody>
                                         </table>
@@ -752,12 +813,15 @@
                                             <label class="form-label">CMND khách hàng <span
                                                     class="text-danger">*</span></label>
                                             <div class="input-group">
-                                                <input type="text" class="form-control" id="inputMoTKCMND" required
-                                                    maxlength="10" placeholder="Nhập CMND">
+                                                <input type="text" class="form-control" id="inputMoTKCMND"
+                                                    placeholder="10 chữ số" pattern="[0-9]{10}" maxlength="10" required>
                                                 <button type="button" class="btn btn-info" id="btnKiemTraCMND"
                                                     style="display: inline-block;">
                                                     <i class="bi bi-search"></i> Kiểm tra
                                                 </button>
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                CMND phải là 10 chữ số
                                             </div>
                                         </div>
 
@@ -773,8 +837,11 @@
                                         <div class="mb-3">
                                             <label class="form-label">Số tài khoản <span
                                                     class="text-danger">*</span></label>
-                                            <input type="text" class="form-control" id="inputSoTK" required
-                                                maxlength="9" placeholder="Nhập 9 ký tự">
+                                            <input type="text" class="form-control" id="inputSoTK"
+                                                placeholder="9 chữ số" pattern="[0-9]{9}" maxlength="9" required>
+                                            <div class="invalid-feedback">
+                                                Số tài khoản phải là 9 chữ số
+                                            </div>
                                         </div>
 
                                         <!-- Chi nhánh mở tài khoản -->
@@ -832,9 +899,12 @@
                                         <div class="mb-3">
                                             <label class="form-label">Mật khẩu đăng nhập <span
                                                     class="text-danger">*</span></label>
-                                            <input type="password" class="form-control" id="inputKHPassword" required
-                                                placeholder="Nhập mật khẩu">
+                                            <input type="password" class="form-control" id="inputKHPassword"
+                                                placeholder="" minlength="6" required>
                                             <small class="text-muted">Mật khẩu cho tài khoản đăng nhập</small>
+                                            <div class="invalid-feedback">
+                                                Mật khẩu phải có tối thiểu 6 ký tự
+                                            </div>
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Vai trò</label>
@@ -915,6 +985,9 @@
                                         <button class="btn btn-success btn-edit-action" id="btnMoTaiKhoan">
                                             <i class="bi bi-plus-square"></i> Mở tài khoản
                                         </button>
+                                        <button class="btn btn-dark btn-edit-action" id="btnUndoKH" disabled>
+                                            <i class="bi bi-arrow-counterclockwise"></i> Phục hồi
+                                        </button>
                                         <button class="btn btn-primary" id="btnTaoLoginKH" disabled
                                             style="display: none;">
                                             <i class="bi bi-key"></i> Tạo login
@@ -984,7 +1057,10 @@
                                                 <label class="form-label">Số tài khoản <span
                                                         class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="inputRutTienSoTKCheck"
-                                                    placeholder="Nhập số tài khoản" maxlength="9" required>
+                                                    placeholder="9 chữ số" pattern="[0-9]{9}" maxlength="9" required>
+                                                <div class="invalid-feedback">
+                                                    Số tài khoản phải là 9 chữ số
+                                                </div>
                                             </div>
                                             <div class="col-md-4 d-flex align-items-end">
                                                 <button type="button" class="btn btn-info w-100"
@@ -1016,8 +1092,10 @@
                                             <label class="form-label">Số tiền rút (VNĐ) <span
                                                     class="text-danger">*</span></label>
                                             <input type="number" class="form-control" id="inputRutTienSoTien"
-                                                placeholder="Nhập số tiền" min="100000" step="1000" required>
-                                            <small class="text-muted">Tối thiểu 100,000 VNĐ</small>
+                                                placeholder="" min="1" step="1000" required>
+                                            <div class="invalid-feedback">
+                                                Số tiền phải lớn hơn 0
+                                            </div>
                                         </div>
 
                                         <div class="d-flex gap-2">
@@ -1041,7 +1119,10 @@
                                                 <label class="form-label">Số tài khoản <span
                                                         class="text-danger">*</span></label>
                                                 <input type="text" class="form-control" id="inputGoiTienSoTKCheck"
-                                                    placeholder="Nhập số tài khoản" maxlength="9" required>
+                                                    placeholder="9 chữ số" pattern="[0-9]{9}" maxlength="9" required>
+                                                <div class="invalid-feedback">
+                                                    Số tài khoản phải là 9 chữ số
+                                                </div>
                                             </div>
                                             <div class="col-md-4 d-flex align-items-end">
                                                 <button type="button" class="btn btn-info w-100"
@@ -1073,8 +1154,10 @@
                                             <label class="form-label">Số tiền gửi (VNĐ) <span
                                                     class="text-danger">*</span></label>
                                             <input type="number" class="form-control" id="inputGoiTienSoTien"
-                                                placeholder="Nhập số tiền" min="100000" step="1000" required>
-                                            <small class="text-muted">Tối thiểu 100,000 VNĐ</small>
+                                                placeholder="" min="1" step="1000" required>
+                                            <div class="invalid-feedback">
+                                                Số tiền phải lớn hơn 0
+                                            </div>
                                         </div>
 
                                         <div class="d-flex gap-2">
@@ -1105,8 +1188,11 @@
                                                         <label class="form-label">Số tài khoản <span
                                                                 class="text-danger">*</span></label>
                                                         <input type="text" class="form-control"
-                                                            id="inputChuyenTienSoTKGuiCheck"
-                                                            placeholder="Nhập số tài khoản" maxlength="9" required>
+                                                            id="inputChuyenTienSoTKGuiCheck" placeholder="9 chữ số"
+                                                            pattern="[0-9]{9}" maxlength="9" required>
+                                                        <div class="invalid-feedback">
+                                                            Số tài khoản phải là 9 chữ số
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-4 d-flex align-items-end">
                                                         <button type="button" class="btn btn-info w-100"
@@ -1146,8 +1232,11 @@
                                                         <label class="form-label">Số tài khoản <span
                                                                 class="text-danger">*</span></label>
                                                         <input type="text" class="form-control"
-                                                            id="inputChuyenTienSoTKNhanCheck"
-                                                            placeholder="Nhập số tài khoản" maxlength="9" required>
+                                                            id="inputChuyenTienSoTKNhanCheck" placeholder="9 chữ số"
+                                                            pattern="[0-9]{9}" maxlength="9" required>
+                                                        <div class="invalid-feedback">
+                                                            Số tài khoản phải là 9 chữ số
+                                                        </div>
                                                     </div>
                                                     <div class="col-md-4 d-flex align-items-end">
                                                         <button type="button" class="btn btn-info w-100"
@@ -1176,7 +1265,10 @@
                                             <label class="form-label">Số tiền chuyển (VNĐ) <span
                                                     class="text-danger">*</span></label>
                                             <input type="number" class="form-control" id="inputChuyenTienSoTien"
-                                                placeholder="Nhập số tiền" min="1" step="1" required>
+                                                placeholder="" min="1" step="1000" required>
+                                            <div class="invalid-feedback">
+                                                Số tiền phải lớn hơn 0
+                                            </div>
                                         </div>
 
                                         <div class="d-flex gap-2">
@@ -1234,7 +1326,10 @@
                                         <div class="col-md-8">
                                             <label class="form-label">Số tài khoản</label>
                                             <input type="text" id="saoKeSoTK" class="form-control"
-                                                placeholder="Nhập số TK" maxlength="9">
+                                                placeholder="9 chữ số" pattern="[0-9]{9}" maxlength="9">
+                                            <div class="invalid-feedback">
+                                                Số tài khoản phải là 9 chữ số
+                                            </div>
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label">&nbsp;</label>
@@ -1462,6 +1557,11 @@
                                     dropdown.value = currentNhanVien.maCN;
                                     console.log('[DEBUG] Dropdown set to:', dropdown.value);
                                     loadNhanVienTheoChiNhanh(selectedMaCNNV);
+
+                                    // **ENABLE TẠO LOGIN KHI INIT VỚI CHI NHÁNH HIỆN TẠI**
+                                    const btnTaoLogin = document.getElementById('btnTaoLogin');
+                                    btnTaoLogin.disabled = false; // Enable vì đang xem chi nhánh hiện tại
+                                    btnTaoLogin.title = "Tạo login cho nhân viên chi nhánh hiện tại";
                                 }
                             })
                             .catch(err => {
@@ -1747,6 +1847,9 @@
         // Undo Stack
         let undoStack = [];
 
+        // Undo Stack for Customer
+        let undoStackKH = [];
+
         function enableUndo(action, employeeData) {
             undoStack.push({
                 action: action, // 'DELETE', 'UPDATE', 'TRANSFER'
@@ -1760,6 +1863,25 @@
         function disableUndo() {
             undoStack = [];
             document.getElementById('btnUndo').disabled = true;
+        }
+
+        function enableUndoKH(action, customerData, accountsData = []) {
+            undoStackKH.push({
+                action: action, // 'DELETE', 'UPDATE'
+                customer: JSON.parse(JSON.stringify(customerData)), // Deep copy
+                accounts: JSON.parse(JSON.stringify(accountsData)), // Deep copy of accounts array
+                timestamp: Date.now()
+            });
+            // Only enable undo button for CHINHANH role
+            if (currentNhanVien.role !== 'NGANHANG') {
+                document.getElementById('btnUndoKH').disabled = false;
+            }
+            console.log('[DEBUG] Undo KH enabled:', action, customerData, accountsData);
+        }
+
+        function disableUndoKH() {
+            undoStackKH = [];
+            document.getElementById('btnUndoKH').disabled = true;
         }
 
         // Chọn nhân viên
@@ -1784,7 +1906,22 @@
                 document.getElementById('btnSua').disabled = isNganHang ? true : false;
                 document.getElementById('btnXoa').disabled = isNganHang ? true : false;
                 document.getElementById('btnChuyenCN').disabled = isNganHang ? true : false;
-                document.getElementById('btnTaoLogin').disabled = false; // Luôn enable cho cả NGANHANG và CHINHANH
+
+                // **TẠO LOGIN: CHỈ ENABLE KHI XEM CHI NHÁNH HIỆN TẠI (CHO NGANHANG)**
+                const btnTaoLogin = document.getElementById('btnTaoLogin');
+                if (isNganHang) {
+                    // NGANHANG: chỉ enable khi xem chi nhánh hiện tại
+                    if (selectedMaCNNV === currentNhanVien.maCN) {
+                        btnTaoLogin.disabled = false;
+                        btnTaoLogin.title = "Tạo login cho nhân viên chi nhánh hiện tại";
+                    } else {
+                        btnTaoLogin.disabled = true;
+                        btnTaoLogin.title = "Chỉ được tạo login khi xem chi nhánh hiện tại";
+                    }
+                } else {
+                    // CHINHANH: enable bình thường
+                    btnTaoLogin.disabled = false;
+                }
                 // btnUndo giữ nguyên state (tùy thuộc vào stack)
             }
         }
@@ -1961,7 +2098,25 @@
             document.getElementById('btnSua').disabled = true;
             document.getElementById('btnXoa').disabled = true;
             document.getElementById('btnChuyenCN').disabled = true;
-            document.getElementById('btnTaoLogin').disabled = true;
+
+            // **LOGIC TẠO LOGIN DỰA VÀO CHI NHÁNH VÀ VIEW STATE**
+            const btnTaoLogin = document.getElementById('btnTaoLogin');
+            if (isViewingDeleted) {
+                // Xem đã xóa → disable tạo login
+                btnTaoLogin.disabled = true;
+            } else if (currentNhanVien.role === 'NGANHANG') {
+                // Xem hiện tại + NGANHANG → check chi nhánh
+                if (selectedMaCNNV === currentNhanVien.maCN) {
+                    btnTaoLogin.disabled = false;
+                    btnTaoLogin.title = "Tạo login cho nhân viên chi nhánh hiện tại";
+                } else {
+                    btnTaoLogin.disabled = true;
+                    btnTaoLogin.title = "Chỉ được tạo login khi xem chi nhánh hiện tại";
+                }
+            } else {
+                // Role CHINHANH → disable như cũ
+                btnTaoLogin.disabled = true;
+            }
 
             loadNhanVien();
         });
@@ -2263,6 +2418,11 @@
             // Nút Xem tài khoản và Mở tài khoản: NGANHANG vẫn được xem nhưng không được mở
             document.getElementById('btnXemTaiKhoan').disabled = false;
             document.getElementById('btnMoTaiKhoan').disabled = isNganHang ? true : false;
+            // Nút Phục hồi: chỉ CHINHANH mới có quyền
+            // btnUndoKH sẽ được enable/disable bởi enableUndoKH/disableUndoKH, nhưng cần check role
+            if (isNganHang) {
+                document.getElementById('btnUndoKH').disabled = true;
+            }
 
             // Enable Tạo login button (chỉ khi role CHINHANH)
             const btnTaoLoginKH = document.getElementById('btnTaoLoginKH');
@@ -2329,11 +2489,10 @@
             document.getElementById('inputNgayCap').value = selectedKH.ngayCap || '';
             document.getElementById('inputKHSDT').value = selectedKH.soDT || '';
 
-            // Phai: enable → set value → disable
+            // Phai: enable → set value (cho phép edit giới tính)
             const inputPhai = document.getElementById('inputKHPhai');
             inputPhai.disabled = false;
             inputPhai.value = selectedKH.phai || '';
-            inputPhai.disabled = true;
 
             // Chi nhánh: Ẩn select, hiển thị input readonly với tên chi nhánh
             document.getElementById('inputKHMaCN').style.display = 'none';
@@ -2355,8 +2514,8 @@
             const ngayCap = document.getElementById('inputNgayCap').value;
             const soDT = document.getElementById('inputKHSDT').value.trim();
 
-            // Lấy giá trị từ selectedKH khi edit, từ currentNhanVien khi thêm mới (vì input bị disabled)
-            const phai = isEdit ? selectedKH.phai : document.getElementById('inputKHPhai').value;
+            // Lấy giá trị từ input field (cho phép edit giới tính)
+            const phai = document.getElementById('inputKHPhai').value;
             const maCN = isEdit ? selectedKH.macn : currentNhanVien.maCN;
 
             if (!cmnd || !ho || !ten || !ngayCap || !soDT || !phai || !maCN) {
@@ -2365,11 +2524,14 @@
             }
 
             if (isEdit) {
+                // Save old state for undo BEFORE updating
+                enableUndoKH('UPDATE', selectedKH, []);
+
                 // Cập nhật
                 fetch(`/staff/khach-hang/${cmnd}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ ho, ten, diaChi, soDT })
+                    body: JSON.stringify({ ho, ten, diaChi, soDT, phai })
                 })
                     .then(res => res.json())
                     .then(result => {
@@ -2408,7 +2570,126 @@
 
         // Nút Xóa khách hàng
         document.getElementById('btnXoaKH').addEventListener('click', function () {
-            alert('Chức năng đang phát triển');
+            if (!selectedKH) {
+                alert('Vui lòng chọn khách hàng để xóa');
+                return;
+            }
+
+            if (!confirm(`XÁC NHẬN XÓA KHÁCH HÀNG\n\nCMND: ${selectedKH.cmnd}\nHọ tên: ${selectedKH.hoten}\n\nLưu ý: Chỉ có thể xóa khách hàng KHÔNG CÓ tài khoản nào.\nNếu khách hàng có tài khoản, vui lòng xóa tất cả tài khoản trước.\n\nBạn có chắc chắn muốn xóa?`)) {
+                return;
+            }
+
+            // Delete customer directly (SP will validate no accounts exist)
+            fetch(`/staff/khach-hang/${selectedKH.cmnd}`, {
+                method: 'DELETE'
+            }).then(res => res.json())
+                .then(result => {
+                    if (result.result === 0) {
+                        // Successful deletion - customer had no accounts
+                        enableUndoKH('DELETE', selectedKH, []); // Empty accounts since customer had none
+                        alert('✓ Đã xóa khách hàng thành công\n\nKhách hàng này không có tài khoản nào.\nDùng nút "Phục hồi" để khôi phục nếu cần.');
+                        selectedKH = null;
+                        loadKhachHang();
+                        document.getElementById('btnGhiKH').disabled = true;
+                        document.getElementById('btnXoaKH').disabled = true;
+                        document.getElementById('btnXemTaiKhoan').disabled = true;
+                    } else if (result.result === -2) {
+                        // Customer has accounts - cannot delete
+                        alert('⚠️ KHÔNG THỂ XÓA KHÁCH HÀNG\n\n' + result.message +
+                            '\n\nHướng dẫn:\n1. Vào mục "Tài khoản"\n2. Xóa tất cả tài khoản của khách hàng này\n3. Quay lại xóa khách hàng');
+                    } else {
+                        // Other errors
+                        alert('Lỗi: ' + (result.message || 'Không thể xóa khách hàng'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Lỗi: ' + error.message);
+                });
+        });
+
+        // Nút Phục hồi khách hàng
+        document.getElementById('btnUndoKH').addEventListener('click', function () {
+            if (undoStackKH.length === 0) {
+                alert('Không có thao tác nào để hoàn tác');
+                return;
+            }
+
+            const lastAction = undoStackKH.pop();
+            console.log('[DEBUG] Undo KH action:', lastAction);
+
+            if (lastAction.action === 'DELETE') {
+                // Phục hồi khách hàng đã xóa
+                if (!confirm(`Hoàn tác xóa khách hàng ${lastAction.customer.hoten}?\n\nChức năng này sẽ tạo lại khách hàng với thông tin cũ (không có tài khoản).`)) {
+                    undoStackKH.push(lastAction); // Push back nếu hủy
+                    return;
+                }
+
+                // Tạo lại khách hàng bằng sp_ThemKhachHang
+                fetch('/staff/khach-hang/phuc-hoi', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(lastAction.customer)
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.result !== 1) { // Success case is 1
+                            alert('Lỗi khi phục hồi khách hàng: ' + (result.message || 'Không rõ lỗi'));
+                            undoStackKH.push(lastAction); // Push back nếu thất bại
+                            return;
+                        }
+
+                        // Phục hồi thành công
+                        alert('✓ Đã phục hồi khách hàng thành công\n\nKhách hàng đã được tạo lại với thông tin cũ.');
+                        loadKhachHang();
+                        if (undoStackKH.length === 0) {
+                            disableUndoKH();
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Lỗi:', err);
+                        alert('Lỗi khi phục hồi khách hàng');
+                        undoStackKH.push(lastAction); // Push back nếu lỗi
+                    });
+
+            } else if (lastAction.action === 'UPDATE') {
+                // Update lại với dữ liệu cũ
+                if (!confirm(`Hoàn tác cập nhật khách hàng ${lastAction.customer.hoten}?`)) {
+                    undoStackKH.push(lastAction); // Push back nếu hủy
+                    return;
+                }
+
+                const data = {
+                    ho: lastAction.customer.ho,
+                    ten: lastAction.customer.ten,
+                    diaChi: lastAction.customer.diaChi, // Fixed: was diachi
+                    soDT: lastAction.customer.soDT,     // Fixed: was sodt  
+                    phai: lastAction.customer.phai     // Add missing phai field
+                };
+
+                fetch(`/staff/khach-hang/${lastAction.customer.cmnd}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                })
+                    .then(res => res.json())
+                    .then(result => {
+                        alert(result.message);
+                        if (result.result === 1) {
+                            loadKhachHang();
+                            if (undoStackKH.length === 0) {
+                                disableUndoKH();
+                            }
+                        } else {
+                            undoStackKH.push(lastAction); // Push back nếu thất bại
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Lỗi:', err);
+                        alert('Lỗi khi hoàn tác cập nhật');
+                        undoStackKH.push(lastAction); // Push back nếu lỗi
+                    });
+            }
         });
 
         // Nút Xem tài khoản
@@ -2419,13 +2700,13 @@
             }
 
             document.getElementById('lblKHTaiKhoan').textContent = `${selectedKH.cmnd} - ${selectedKH.hoten}`;
-            document.getElementById('tableTaiKhoan').innerHTML = '<tr><td colspan="5" class="text-center">Đang tải...</td></tr>';
+            document.getElementById('tableTaiKhoan').innerHTML = '<tr><td colspan="4" class="text-center">Đang tải...</td></tr>';
 
             fetch(`/staff/khach-hang/${selectedKH.cmnd}/tai-khoan`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.length === 0) {
-                        document.getElementById('tableTaiKhoan').innerHTML = '<tr><td colspan="5" class="text-center">Chưa có tài khoản</td></tr>';
+                        document.getElementById('tableTaiKhoan').innerHTML = '<tr><td colspan="4" class="text-center">Chưa có tài khoản</td></tr>';
                     } else {
                         document.getElementById('tableTaiKhoan').innerHTML = data.map(tk => `
                             <tr>
@@ -2433,14 +2714,13 @@
                                 <td>${new Intl.NumberFormat('vi-VN').format(tk.soDu)} VNĐ</td>
                                 <td>${tk.ngayMoTK ? new Date(tk.ngayMoTK).toLocaleDateString('vi-VN') : ''}</td>
                                 <td>${tk.tenCN || ''}</td>
-                                <td>${tk.site || ''}</td>
                             </tr>
                         `).join('');
                     }
                 })
                 .catch(err => {
                     console.error('Lỗi:', err);
-                    document.getElementById('tableTaiKhoan').innerHTML = '<tr><td colspan="5" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
+                    document.getElementById('tableTaiKhoan').innerHTML = '<tr><td colspan="4" class="text-center text-danger">Lỗi khi tải dữ liệu</td></tr>';
                 });
 
             new bootstrap.Modal(document.getElementById('modalXemTaiKhoan')).show();
@@ -2572,6 +2852,8 @@
             const soTK = document.getElementById('inputSoTK').value.trim();
             const maCN = document.getElementById('inputTKMaCN').value;
 
+            console.log('[DEBUG] Mở tài khoản - CMND:', cmnd, 'SoTK:', soTK, 'MaCN:', maCN);
+
             if (!cmnd || !soTK || !maCN) {
                 alert('Vui lòng điền đầy đủ thông tin');
                 return;
@@ -2586,21 +2868,45 @@
                 return;
             }
 
+            // Disable button và show loading
+            const btnXacNhan = document.getElementById('btnXacNhanMoTK');
+            const originalText = btnXacNhan.innerHTML;
+            btnXacNhan.disabled = true;
+            btnXacNhan.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang xử lý...';
+
+            console.log('[DEBUG] Gửi request mở tài khoản...');
+
             fetch(`/staff/khach-hang/${cmnd}/mo-tai-khoan`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ soTK, maCN })
             })
-                .then(res => res.json())
+                .then(res => {
+                    console.log('[DEBUG] Response status:', res.status);
+                    if (!res.ok) {
+                        throw new Error(`HTTP error! status: ${res.status}`);
+                    }
+                    return res.json();
+                })
                 .then(result => {
-                    alert(result.message);
+                    console.log('[DEBUG] Response result:', result);
+                    alert(result.message || 'Đã xử lý xong');
                     if (result.result === 1) {
                         bootstrap.Modal.getInstance(document.getElementById('modalMoTaiKhoan')).hide();
+                        // Reload danh sách tài khoản nếu đang xem
+                        if (selectedKH && selectedKH.cmnd === cmnd) {
+                            document.getElementById('btnXemTaiKhoan').click();
+                        }
                     }
                 })
                 .catch(err => {
-                    console.error('Lỗi:', err);
-                    alert('Lỗi khi mở tài khoản');
+                    console.error('[ERROR] Lỗi mở tài khoản:', err);
+                    alert('Lỗi: ' + err.message);
+                })
+                .finally(() => {
+                    // Restore button
+                    btnXacNhan.disabled = false;
+                    btnXacNhan.innerHTML = originalText;
                 });
         });
 
@@ -3270,6 +3576,21 @@
             const maCN = this.value;
             if (maCN) {
                 selectedMaCNNV = maCN;
+
+                // **CHỈ CHO PHÉP TẠO LOGIN KHI XEM CHI NHÁNH HIỆN TẠI**
+                const btnTaoLogin = document.getElementById('btnTaoLogin');
+                if (currentNhanVien && currentNhanVien.role === 'NGANHANG') {
+                    if (maCN === currentNhanVien.maCN) {
+                        // Đang xem chi nhánh hiện tại → enable tạo login
+                        btnTaoLogin.disabled = false;
+                        btnTaoLogin.title = "Tạo login cho nhân viên chi nhánh hiện tại";
+                    } else {
+                        // Đang xem chi nhánh khác → disable tạo login  
+                        btnTaoLogin.disabled = true;
+                        btnTaoLogin.title = "Chỉ được tạo login khi xem chi nhánh hiện tại";
+                    }
+                }
+
                 if (isViewingDeleted) {
                     loadNhanVienTheoChiNhanh(maCN);
                 } else {
@@ -3286,6 +3607,100 @@
                 loadKhachHangTheoChiNhanh(maCN);
             }
         });
+
+        /* ==================== VALIDATION HANDLING ==================== */
+        // Enable Bootstrap validation for all forms
+        (function () {
+            'use strict';
+
+            // Fetch all forms that need validation
+            const forms = document.querySelectorAll('form');
+
+            // Loop over them and prevent submission if invalid
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+
+            // Real-time validation for specific patterns
+            const validateInput = (inputId, pattern, errorMessage) => {
+                const input = document.getElementById(inputId);
+                if (!input) return;
+
+                input.addEventListener('input', function () {
+                    const regex = new RegExp(pattern);
+                    if (this.value && !regex.test(this.value)) {
+                        this.setCustomValidity(errorMessage);
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
+            };
+
+            // Validate Họ và Tên (no numbers or special chars except Vietnamese)
+            const namePattern = '^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵýỷỹ\\s]+$';
+
+            validateInput('inputNVHo', namePattern, 'Họ không được chứa số và ký tự đặc biệt');
+            validateInput('inputNVTen', namePattern, 'Tên không được chứa số và ký tự đặc biệt');
+            validateInput('inputKHHo', namePattern, 'Họ không được chứa số và ký tự đặc biệt');
+            validateInput('inputKHTen', namePattern, 'Tên không được chứa số và ký tự đặc biệt');
+
+            // Validate CMND (10 digits)
+            validateInput('inputNVCMND', '^[0-9]{10}$', 'CMND phải là 10 chữ số');
+            validateInput('inputCMND', '^[0-9]{10}$', 'CMND phải là 10 chữ số');
+            validateInput('inputMoTKCMND', '^[0-9]{10}$', 'CMND phải là 10 chữ số');
+
+            // Validate Số điện thoại (10 digits, starts with 0)
+            validateInput('inputNVSDT', '^0[0-9]{9}$', 'Số điện thoại phải là 10 số, bắt đầu bằng số 0');
+            validateInput('inputKHSDT', '^0[0-9]{9}$', 'Số điện thoại phải là 10 số, bắt đầu bằng số 0');
+
+            // Validate Số tài khoản (9 digits)
+            const stkPattern = '^[0-9]{9}$';
+            validateInput('inputSoTK', stkPattern, 'Số tài khoản phải là 9 chữ số');
+            validateInput('inputRutTienSoTKCheck', stkPattern, 'Số tài khoản phải là 9 chữ số');
+            validateInput('inputGoiTienSoTKCheck', stkPattern, 'Số tài khoản phải là 9 chữ số');
+            validateInput('inputChuyenTienSoTKGuiCheck', stkPattern, 'Số tài khoản phải là 9 chữ số');
+            validateInput('inputChuyenTienSoTKNhanCheck', stkPattern, 'Số tài khoản phải là 9 chữ số');
+            validateInput('saoKeSoTK', stkPattern, 'Số tài khoản phải là 9 chữ số');
+
+            // Validate Mã nhân viên (4-10 characters)
+            const mnvInput = document.getElementById('inputMaNV');
+            if (mnvInput) {
+                mnvInput.addEventListener('input', function () {
+                    if (this.value.length > 0 && (this.value.length < 4 || this.value.length > 10)) {
+                        this.setCustomValidity('Mã nhân viên phải từ 4 đến 10 ký tự');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
+            }
+
+            // Validate Số tiền (must be > 0)
+            const validateMoney = (inputId) => {
+                const input = document.getElementById(inputId);
+                if (!input) return;
+
+                input.addEventListener('input', function () {
+                    const value = parseFloat(this.value);
+                    if (isNaN(value) || value <= 0) {
+                        this.setCustomValidity('Số tiền phải lớn hơn 0');
+                    } else {
+                        this.setCustomValidity('');
+                    }
+                });
+            };
+
+            validateMoney('inputRutTienSoTien');
+            validateMoney('inputGoiTienSoTien');
+            validateMoney('inputChuyenTienSoTien');
+
+            // Validate Password (min 6 characters) - handled by HTML5 minlength
+        })();
     </script>
 </body>
 

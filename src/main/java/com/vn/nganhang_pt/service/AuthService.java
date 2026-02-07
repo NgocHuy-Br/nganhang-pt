@@ -48,10 +48,21 @@ public class AuthService {
                 while (rs.next()) {
                     String tenCN = rs.getString("TENCN");
                     String tenServer = rs.getString("TENSERVER");
+
+                    // Filter ra "site tra cứu" và các site không có login thực tế
+                    if (tenCN != null && (tenCN.toLowerCase().contains("tra cứu") ||
+                            tenCN.toLowerCase().contains("tracuu") ||
+                            tenCN.toLowerCase().contains("lookup") ||
+                            tenCN.toLowerCase().equals("site tra cứu"))) {
+                        System.out.println("[DEBUG] Filtered out site: " + tenCN + " (" + tenServer + ")");
+                        continue; // Skip this site
+                    }
+
                     danhSach.add(new ChiNhanh(tenCN, tenServer));
                 }
 
-                System.out.println("[DEBUG] Đã load " + danhSach.size() + " chi nhánh từ view Get_Subscribes");
+                System.out.println(
+                        "[DEBUG] Đã load " + danhSach.size() + " chi nhánh từ view Get_Subscribes (sau filter)");
 
             }
 
@@ -59,11 +70,11 @@ public class AuthService {
             System.err.println("[ERROR] Lỗi khi lấy danh sách chi nhánh từ view: " + e.getMessage());
             e.printStackTrace();
 
-            // Fallback: Nếu lỗi thì dùng danh sách hardcode
+            // Fallback: Nếu lỗi thì dùng danh sách hardcode (chỉ các chi nhánh có login)
             System.out.println("[WARN] Fallback sang danh sách hardcode");
             danhSach.add(new ChiNhanh("Chi nhánh Bến Thành", "HCM-LAPT-001\\SQLSRV_NH01"));
             danhSach.add(new ChiNhanh("Chi nhánh Tân Định", "HCM-LAPT-001\\SQLSRV_NH02"));
-            danhSach.add(new ChiNhanh("Trụ cở", "HCM-LAPT-001\\SQLSRV_NH03"));
+            danhSach.add(new ChiNhanh("Trụ sở", "HCM-LAPT-001\\SQLSRV_NH03"));
         }
 
         return danhSach;

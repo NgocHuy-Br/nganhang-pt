@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
@@ -385,8 +386,9 @@ public class StaffController {
         String ten = data.get("ten");
         String diaChi = data.get("diaChi");
         String soDT = data.get("soDT");
+        String phai = data.get("phai");
 
-        return khachHangService.capNhatKhachHang(tenServer, cmnd, ho, ten, diaChi, soDT);
+        return khachHangService.capNhatKhachHang(tenServer, cmnd, ho, ten, diaChi, soDT, phai);
     }
 
     /**
@@ -427,17 +429,28 @@ public class StaffController {
     public Map<String, Object> moTaiKhoan(@PathVariable String cmnd,
             @RequestBody Map<String, String> data,
             HttpSession session) {
-        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
-        if (nhanVien == null) {
-            throw new RuntimeException("Chưa đăng nhập");
+        try {
+            NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+            if (nhanVien == null) {
+                return Map.of("result", -1, "message", "Chưa đăng nhập");
+            }
+
+            String tenServer = nhanVien.getTenServer();
+            String soTK = data.get("soTK");
+            String maCN = data.get("maCN");
+            String maNV = nhanVien.getMaNV();
+
+            System.out.println("[DEBUG] Mở tài khoản - Server: " + tenServer + ", SoTK: " + soTK +
+                    ", CMND: " + cmnd + ", MaCN: " + maCN + ", MaNV: " + maNV);
+
+            Map<String, Object> result = khachHangService.moTaiKhoan(tenServer, soTK, cmnd, maCN, maNV);
+            System.out.println("[DEBUG] Kết quả mở tài khoản: " + result);
+            return result;
+        } catch (Exception e) {
+            System.err.println("[ERROR] Exception trong moTaiKhoan: " + e.getMessage());
+            e.printStackTrace();
+            return Map.of("result", -99, "message", "Lỗi hệ thống: " + e.getMessage());
         }
-
-        String tenServer = nhanVien.getTenServer();
-        String soTK = data.get("soTK");
-        String maCN = data.get("maCN");
-        String maNV = nhanVien.getMaNV(); // Lấy mã NV từ session
-
-        return khachHangService.moTaiKhoan(tenServer, soTK, cmnd, maCN, maNV);
     }
 
     /**
@@ -724,6 +737,68 @@ public class StaffController {
                     .body(pdfBytes);
         } catch (Exception e) {
             return ResponseEntity.status(500).body(null);
+        }
+    }
+
+    @DeleteMapping("/khach-hang/{cmnd}")
+    public ResponseEntity<Map<String, Object>> xoaKhachHang(@PathVariable String cmnd,
+            HttpSession session) {
+        try {
+            String tenServer = (String) session.getAttribute("tenServer");
+            if (tenServer == null) {
+                return ResponseEntity.status(401).body(Map.of("result", -1, "message", "Chưa đăng nhập"));
+            }
+
+            Map<String, Object> result = khachHangService.xoaKhachHang(tenServer, cmnd);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("result", -1, "message", "Lỗi: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/khach-hang/phuc-hoi")
+    public ResponseEntity<Map<String, Object>> phucHoiKhachHang(@RequestBody KhachHang khachHang,
+            HttpSession session) {
+        try {
+            String tenServer = (String) session.getAttribute("tenServer");
+            if (tenServer == null) {
+                return ResponseEntity.status(401).body(Map.of("result", -1, "message", "Chưa đăng nhập"));
+            }
+
+            Map<String, Object> result = khachHangService.phucHoiKhachHang(tenServer, khachHang);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("result", -1, "message", "Lỗi: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/tai-khoan/tao-lai")
+    public ResponseEntity<Map<String, Object>> taoLaiTaiKhoan(@RequestBody Map<String, Object> request,
+            HttpSession session) {
+        try {
+            String tenServer = (String) session.getAttribute("tenServer");
+            if (tenServer == null) {
+                return ResponseEntity.status(401).body(Map.of("result", -1, "message", "Chưa đăng nhập"));
+            }
+
+            String soTK = (String) request.get("soTK");
+            String cmnd = (String) request.get("cmnd");
+            String maCN = (String) request.get("maCN");
+            String ngayMoTKStr = (String) request.get("ngayMoTK");
+            Double soDu = ((Number) request.get("soDu")).doubleValue();
+
+            // Parse ngayMoTK from string to Date
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date utilDate = sdf.parse(ngayMoTKStr);
+            java.sql.Date ngayMoTK = new java.sql.Date(utilDate.getTime());
+
+            Map<String, Object> result = khachHangService.taoLaiTaiKhoan(tenServer, soTK, cmnd, maCN, ngayMoTK, soDu);
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Map.of("result", -1, "message", "Lỗi: " + e.getMessage()));
         }
     }
 }
