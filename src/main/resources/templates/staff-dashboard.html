@@ -853,10 +853,7 @@
                                                 nhập</small>
                                         </div>
 
-                                        <div class="alert alert-info">
-                                            <i class="bi bi-info-circle"></i> Số dư ban đầu: <strong>100.000.000
-                                                VNĐ</strong>
-                                        </div>
+
                                     </form>
                                 </div>
                                 <div class="modal-footer">
@@ -1091,8 +1088,8 @@
                                         <div class="mb-3">
                                             <label class="form-label">Số tiền rút (VNĐ) <span
                                                     class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="inputRutTienSoTien"
-                                                placeholder="" min="1" step="1000" required>
+                                            <input type="text" class="form-control money-input" id="inputRutTienSoTien"
+                                                placeholder="0" required>
                                             <div class="invalid-feedback">
                                                 Số tiền phải lớn hơn 0
                                             </div>
@@ -1153,8 +1150,8 @@
                                         <div class="mb-3">
                                             <label class="form-label">Số tiền gửi (VNĐ) <span
                                                     class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="inputGoiTienSoTien"
-                                                placeholder="" min="1" step="1000" required>
+                                            <input type="text" class="form-control money-input" id="inputGoiTienSoTien"
+                                                placeholder="0" required>
                                             <div class="invalid-feedback">
                                                 Số tiền phải lớn hơn 0
                                             </div>
@@ -1264,8 +1261,8 @@
                                         <div class="mb-3">
                                             <label class="form-label">Số tiền chuyển (VNĐ) <span
                                                     class="text-danger">*</span></label>
-                                            <input type="number" class="form-control" id="inputChuyenTienSoTien"
-                                                placeholder="" min="1" step="1000" required>
+                                            <input type="text" class="form-control money-input"
+                                                id="inputChuyenTienSoTien" placeholder="0" required>
                                             <div class="invalid-feedback">
                                                 Số tiền phải lớn hơn 0
                                             </div>
@@ -1484,9 +1481,79 @@
             role: /*[[${nhanVien.role}]]*/ 'CHINHANH'
         };
 
+        // ===== HELPER FUNCTIONS - Money Formatting =====
+        /**
+         * Format số tiền với dấu phân cách ngàn
+         * @param {string|number} value - Giá trị cần format
+         * @returns {string} - Số đã được format (VD: "25,000,000")
+         */
+        function formatMoneyInput(value) {
+            // Loại bỏ tất cả ký tự không phải số
+            const numericValue = String(value).replace(/[^\d]/g, '');
+
+            // Nếu rỗng, trả về chuỗi rỗng
+            if (!numericValue) return '';
+
+            // Format với dấu phân cách ngàn
+            return numericValue.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        }
+
+        /**
+         * Parse chuỗi số tiền đã format về số thuần
+         * @param {string} value - Giá trị đã format (VD: "25,000,000")
+         * @returns {number} - Số thuần (VD: 25000000)
+         */
+        function parseMoneyInput(value) {
+            // Loại bỏ tất cả dấu phân cách
+            const numericString = String(value).replace(/,/g, '');
+            return parseFloat(numericString) || 0;
+        }
+
+        /**
+         * Thêm formatting cho input field tiền tệ
+         * @param {string} inputId - ID của input element
+         */
+        function attachMoneyFormatter(inputId) {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+
+            // Format khi user nhập
+            input.addEventListener('input', function (e) {
+                const cursorPosition = e.target.selectionStart;
+                const oldLength = e.target.value.length;
+                const oldValue = e.target.value;
+
+                // Format value
+                const formatted = formatMoneyInput(e.target.value);
+                e.target.value = formatted;
+
+                // Điều chỉnh vị trí con trỏ sau khi format
+                const newLength = formatted.length;
+                const lengthDiff = newLength - oldLength;
+                const newPosition = cursorPosition + lengthDiff;
+
+                // Đảm bảo con trỏ ở vị trí hợp lý
+                if (formatted) {
+                    e.target.setSelectionRange(newPosition, newPosition);
+                }
+            });
+
+            // Format khi mất focus
+            input.addEventListener('blur', function (e) {
+                if (e.target.value) {
+                    e.target.value = formatMoneyInput(e.target.value);
+                }
+            });
+        }
+
+        // ===== END HELPER FUNCTIONS =====
+
         // Ẩn các chức năng chỉnh sửa nếu role là NGANHANG
         if (currentNhanVien.role === 'NGANHANG') {
             document.addEventListener('DOMContentLoaded', function () {
+                // **Clear tất cả undo khi load/refresh trang**
+                clearAllUndoStacks();
+
                 // Ẩn tất cả nút có class btn-edit-action
                 document.querySelectorAll('.btn-edit-action').forEach(btn => {
                     btn.style.display = 'none';
@@ -1499,6 +1566,11 @@
                         '<div class="col-12 mt-2"><small class="text-muted">⚠️ Tài khoản NGÂN HÀNG chỉ có quyền xem, không thể thực hiện giao dịch</small></div>');
                 });
             });
+        } else {
+            // **Clear tất cả undo khi load/refresh trang (cho CHINHANH)**
+            document.addEventListener('DOMContentLoaded', function () {
+                clearAllUndoStacks();
+            });
         }
 
         // Display current date
@@ -1506,6 +1578,13 @@
         const today = new Date();
         const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         dateElement.textContent = today.toLocaleDateString('vi-VN', options);
+
+        // Attach money formatters to all money input fields
+        document.addEventListener('DOMContentLoaded', function () {
+            attachMoneyFormatter('inputRutTienSoTien');
+            attachMoneyFormatter('inputGoiTienSoTien');
+            attachMoneyFormatter('inputChuyenTienSoTien');
+        });
 
         // Tab navigation
         const navLinks = document.querySelectorAll('.nav-link');
@@ -1540,6 +1619,9 @@
 
                 // Load data when switching to employees tab
                 if (tabId === 'employees') {
+                    // **Clear tất cả undo khi chuyển tab**
+                    clearAllUndoStacks();
+
                     console.log('[DEBUG] Switching to employees tab, role:', currentNhanVien.role);
 
                     // Hiển thị/ẩn dropdown lọc chi nhánh theo role
@@ -1589,6 +1671,9 @@
                             });
                     }
                 } else if (tabId === 'customers') {
+                    // **Clear tất cả undo khi chuyển tab**
+                    clearAllUndoStacks();
+
                     console.log('[DEBUG] Switching to customers tab, role:', currentNhanVien.role);
                     selectedKH = null;
 
@@ -1850,14 +1935,26 @@
         // Undo Stack for Customer
         let undoStackKH = [];
 
+        // **Clear tất cả undo stacks khi có thao tác mới**
+        function clearAllUndoStacks() {
+            console.log('[DEBUG] Clearing all undo stacks due to new operation');
+            undoStack = [];
+            undoStackKH = [];
+            document.getElementById('btnUndo').disabled = true;
+            document.getElementById('btnUndoKH').disabled = true;
+        }
+
         function enableUndo(action, employeeData) {
+            // **Clear tất cả undo stacks trước đó (mỗi action chỉ cho phép undo 1 lần)**
+            clearAllUndoStacks();
+
             undoStack.push({
                 action: action, // 'DELETE', 'UPDATE', 'TRANSFER'
                 employee: JSON.parse(JSON.stringify(employeeData)), // Deep copy
                 timestamp: Date.now()
             });
             document.getElementById('btnUndo').disabled = false;
-            console.log('[DEBUG] Undo enabled:', action, employeeData);
+            console.log('[DEBUG] Undo enabled (cleared previous):', action, employeeData);
         }
 
         function disableUndo() {
@@ -1866,6 +1963,9 @@
         }
 
         function enableUndoKH(action, customerData, accountsData = []) {
+            // **Clear tất cả undo stacks trước đó (mỗi action chỉ cho phép undo 1 lần)**
+            clearAllUndoStacks();
+
             undoStackKH.push({
                 action: action, // 'DELETE', 'UPDATE'
                 customer: JSON.parse(JSON.stringify(customerData)), // Deep copy
@@ -1876,7 +1976,7 @@
             if (currentNhanVien.role !== 'NGANHANG') {
                 document.getElementById('btnUndoKH').disabled = false;
             }
-            console.log('[DEBUG] Undo KH enabled:', action, customerData, accountsData);
+            console.log('[DEBUG] Undo KH enabled (cleared previous):', action, customerData, accountsData);
         }
 
         function disableUndoKH() {
@@ -1954,6 +2054,9 @@
 
         // Nút Thêm
         document.getElementById('btnThem').addEventListener('click', function () {
+            // **Clear undo khi thực hiện thao tác thêm mới**
+            clearAllUndoStacks();
+
             isEditMode = false;
             document.getElementById('modalTitle').textContent = 'Thêm nhân viên mới';
             document.getElementById('formNhanVien').reset();
@@ -2454,6 +2557,9 @@
 
         // Nút Thêm khách hàng
         document.getElementById('btnThemKH').addEventListener('click', function () {
+            // **Clear undo khi thực hiện thao tác thêm mới**
+            clearAllUndoStacks();
+
             document.getElementById('modalKHTitle').textContent = 'Thêm khách hàng mới';
             document.getElementById('formKhachHang').reset();
             document.getElementById('inputCMND').disabled = false;
@@ -2575,7 +2681,7 @@
                 return;
             }
 
-            if (!confirm(`XÁC NHẬN XÓA KHÁCH HÀNG\n\nCMND: ${selectedKH.cmnd}\nHọ tên: ${selectedKH.hoten}\n\nLưu ý: Chỉ có thể xóa khách hàng KHÔNG CÓ tài khoản nào.\nNếu khách hàng có tài khoản, vui lòng xóa tất cả tài khoản trước.\n\nBạn có chắc chắn muốn xóa?`)) {
+            if (!confirm(`XÁC NHẬN XÓA KHÁCH HÀNG\n\nCMND: ${selectedKH.cmnd}\nHọ tên: ${selectedKH.hoten}\n\nLưu ý: Chỉ có thể xóa khách hàng KHÔNG CÓ tài khoản nào.\n\nBạn có chắc chắn muốn xóa?`)) {
                 return;
             }
 
@@ -2854,6 +2960,13 @@
 
             console.log('[DEBUG] Mở tài khoản - CMND:', cmnd, 'SoTK:', soTK, 'MaCN:', maCN);
 
+            // Kiểm tra xem đã nhấn nút Kiểm tra chưa
+            const thongTinKHContainer = document.getElementById('thongTinKHContainer');
+            if (thongTinKHContainer.style.display === 'none' || thongTinKHContainer.style.display === '') {
+                alert('Hãy nhấn nút Kiểm tra trước để kiểm tra thông tin khách hàng');
+                return;
+            }
+
             if (!cmnd || !soTK || !maCN) {
                 alert('Vui lòng điền đầy đủ thông tin');
                 return;
@@ -2861,10 +2974,6 @@
 
             if (soTK.length !== 9) {
                 alert('Số tài khoản phải có 9 ký tự');
-                return;
-            }
-
-            if (!confirm(`Xác nhận mở tài khoản ${soTK} với số dư ban đầu 100.000.000 VNĐ?`)) {
                 return;
             }
 
@@ -2998,13 +3107,15 @@
             fetch(`/staff/giao-dich/thong-tin-tai-khoan/${soTK}`)
                 .then(res => res.json())
                 .then(data => {
+                    console.log('[DEBUG Rút tiền] Data received:', data);
+                    console.log('[DEBUG Rút tiền] Số dư:', data.soDu);
                     if (data.success) {
                         rutTienTK = { soTK, ...data };
                         document.getElementById('rutTienInfoTenKH').value = data.tenKH || '';
                         document.getElementById('rutTienInfoChiNhanh').value = data.tenChiNhanh || '';
-                        document.getElementById('rutTienInfoSoDu').value = data.soDu ? new Intl.NumberFormat('vi-VN').format(data.soDu) + ' VNĐ' : '';
+                        document.getElementById('rutTienInfoSoDu').value = (data.soDu !== null && data.soDu !== undefined) ? new Intl.NumberFormat('vi-VN').format(data.soDu) + ' VNĐ' : '';
                     } else {
-                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                        alert('⚠️ ' + (data.message || 'Số tài khoản không tồn tại ở bất kỳ chi nhánh nào'));
                     }
                 })
                 .catch(error => {
@@ -3017,19 +3128,19 @@
         document.getElementById('formRutTien').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const soTien = document.getElementById('inputRutTienSoTien').value;
+            const soTien = parseMoneyInput(document.getElementById('inputRutTienSoTien').value);
 
             if (!rutTienTK) {
                 alert('Vui lòng xác nhận tài khoản trước');
                 return;
             }
 
-            if (parseFloat(soTien) < 100000) {
+            if (soTien < 100000) {
                 alert('Số tiền tối thiểu là 100,000 VNĐ');
                 return;
             }
 
-            if (parseFloat(soTien) > rutTienTK.soDu) {
+            if (soTien > rutTienTK.soDu) {
                 alert('❌ Số dư không đủ! Số dư hiện tại: ' + new Intl.NumberFormat('vi-VN').format(rutTienTK.soDu) + ' VNĐ');
                 return;
             }
@@ -3072,13 +3183,15 @@
             fetch(`/staff/giao-dich/thong-tin-tai-khoan/${soTK}`)
                 .then(res => res.json())
                 .then(data => {
+                    console.log('[DEBUG Gửi tiền] Data received:', data);
+                    console.log('[DEBUG Gửi tiền] Số dư:', data.soDu);
                     if (data.success) {
                         goiTienTK = { soTK, ...data };
                         document.getElementById('goiTienInfoTenKH').value = data.tenKH || '';
                         document.getElementById('goiTienInfoChiNhanh').value = data.tenChiNhanh || '';
-                        document.getElementById('goiTienInfoSoDu').value = data.soDu ? new Intl.NumberFormat('vi-VN').format(data.soDu) + ' VNĐ' : '';
+                        document.getElementById('goiTienInfoSoDu').value = (data.soDu !== null && data.soDu !== undefined) ? new Intl.NumberFormat('vi-VN').format(data.soDu) + ' VNĐ' : '';
                     } else {
-                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                        alert('⚠️ ' + (data.message || 'Số tài khoản không tồn tại ở bất kỳ chi nhánh nào'));
                     }
                 })
                 .catch(error => {
@@ -3091,14 +3204,14 @@
         document.getElementById('formGoiTien').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const soTien = document.getElementById('inputGoiTienSoTien').value;
+            const soTien = parseMoneyInput(document.getElementById('inputGoiTienSoTien').value);
 
             if (!goiTienTK) {
                 alert('Vui lòng xác nhận tài khoản trước');
                 return;
             }
 
-            if (parseFloat(soTien) < 100000) {
+            if (soTien < 100000) {
                 alert('Số tiền tối thiểu là 100,000 VNĐ');
                 return;
             }
@@ -3141,13 +3254,15 @@
             fetch(`/staff/giao-dich/thong-tin-tai-khoan/${soTK}`)
                 .then(res => res.json())
                 .then(data => {
+                    console.log('[DEBUG Chuyển tiền] Data received:', data);
+                    console.log('[DEBUG Chuyển tiền] Số dư:', data.soDu);
                     if (data.success) {
                         chuyenTienTKGui = { soTK, ...data };
                         document.getElementById('chuyenTienInfoTenKHGui').value = data.tenKH || '';
                         document.getElementById('chuyenTienInfoChiNhanhGui').value = data.tenChiNhanh || '';
-                        document.getElementById('chuyenTienInfoSoDuGui').value = data.soDu ? new Intl.NumberFormat('vi-VN').format(data.soDu) + ' VNĐ' : '';
+                        document.getElementById('chuyenTienInfoSoDuGui').value = (data.soDu !== null && data.soDu !== undefined) ? new Intl.NumberFormat('vi-VN').format(data.soDu) + ' VNĐ' : '';
                     } else {
-                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                        alert('⚠️ ' + (data.message || 'Số tài khoản không tồn tại ở bất kỳ chi nhánh nào'));
                     }
                 })
                 .catch(error => {
@@ -3178,7 +3293,7 @@
                         document.getElementById('chuyenTienInfoTenKHNhan').value = data.tenKH || '';
                         document.getElementById('chuyenTienInfoChiNhanhNhan').value = data.tenChiNhanh || '';
                     } else {
-                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                        alert('⚠️ ' + (data.message || 'Số tài khoản không tồn tại ở bất kỳ chi nhánh nào'));
                     }
                 })
                 .catch(error => {
@@ -3191,19 +3306,19 @@
         document.getElementById('formChuyenTien').addEventListener('submit', function (e) {
             e.preventDefault();
 
-            const soTien = document.getElementById('inputChuyenTienSoTien').value;
+            const soTien = parseMoneyInput(document.getElementById('inputChuyenTienSoTien').value);
 
             if (!chuyenTienTKGui || !chuyenTienTKNhan) {
                 alert('Vui lòng xác nhận cả 2 tài khoản trước');
                 return;
             }
 
-            if (parseFloat(soTien) <= 0) {
+            if (soTien <= 0) {
                 alert('Số tiền phải lớn hơn 0');
                 return;
             }
 
-            if (parseFloat(soTien) > chuyenTienTKGui.soDu) {
+            if (soTien > chuyenTienTKGui.soDu) {
                 alert('❌ Số dư không đủ! Số dư TK gửi: ' + new Intl.NumberFormat('vi-VN').format(chuyenTienTKGui.soDu) + ' VNĐ');
                 return;
             }
@@ -3302,7 +3417,7 @@
                 return;
             }
 
-            fetch(`/staff/giao-dich/thong-tin-tai-khoan/${soTK}`)
+            fetch(`/staff/giao-dich/thong-tin-tai-khoan-sao-ke/${soTK}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.success) {
@@ -3311,7 +3426,7 @@
                         document.getElementById('saoKeChiNhanh').value = data.tenChiNhanh || '';
                         document.getElementById('saoKeNgayMo').value = data.ngayMoTK ? formatDate(data.ngayMoTK) : '';
                     } else {
-                        alert('⚠️ ' + (data.message || 'Không tìm thấy tài khoản'));
+                        alert('⚠️ ' + (data.message || 'Không tìm thấy số tài khoản ở chi nhánh hiện tại'));
                         saoKeTKInfo = null;
                         document.getElementById('saoKeTenKH').value = '';
                         document.getElementById('saoKeChiNhanh').value = '';
@@ -3642,8 +3757,8 @@
                 });
             };
 
-            // Validate Họ và Tên (no numbers or special chars except Vietnamese)
-            const namePattern = '^[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵýỷỹ\\s]+$';
+            // Validate Họ và Tên (tất cả ký tự chữ cái tiếng Việt có dấu và khoảng trắng)
+            const namePattern = '^[^0-9!@#$%^&*()_+\\-=\\[\\]{};\':"\\\\|,.<>\\/?`~]+$';
 
             validateInput('inputNVHo', namePattern, 'Họ không được chứa số và ký tự đặc biệt');
             validateInput('inputNVTen', namePattern, 'Tên không được chứa số và ký tự đặc biệt');
@@ -3686,7 +3801,7 @@
                 if (!input) return;
 
                 input.addEventListener('input', function () {
-                    const value = parseFloat(this.value);
+                    const value = parseMoneyInput(this.value);
                     if (isNaN(value) || value <= 0) {
                         this.setCustomValidity('Số tiền phải lớn hơn 0');
                     } else {

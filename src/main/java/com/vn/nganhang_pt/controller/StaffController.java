@@ -482,7 +482,7 @@ public class StaffController {
     }
 
     /**
-     * Lấy thông tin tài khoản
+     * Lấy thông tin tài khoản cho giao dịch (tìm tất cả chi nhánh)
      */
     @GetMapping("/giao-dich/thong-tin-tai-khoan/{soTK}")
     @ResponseBody
@@ -496,8 +496,34 @@ public class StaffController {
         String username = (String) session.getAttribute("username");
         String password = (String) session.getAttribute("password");
         String role = nhanVien.getRole(); // Lấy role từ session
+        String tenChiNhanh = nhanVien.getTenChiNhanh(); // Lấy tên chi nhánh
 
-        return giaoDichService.layThongTinTaiKhoan(soTK, tenServer, username, password, role);
+        return giaoDichService.layThongTinTaiKhoan(soTK, tenServer, username, password, role, tenChiNhanh, true); // true
+                                                                                                                  // =
+                                                                                                                  // transaction
+    }
+
+    /**
+     * Lấy thông tin tài khoản cho sao kê (chỉ tìm chi nhánh hiện tại)
+     */
+    @GetMapping("/giao-dich/thong-tin-tai-khoan-sao-ke/{soTK}")
+    @ResponseBody
+    public Map<String, Object> layThongTinTaiKhoanSaoKe(@PathVariable String soTK, HttpSession session) {
+        NhanVien nhanVien = (NhanVien) session.getAttribute("userInfo");
+        if (nhanVien == null) {
+            throw new RuntimeException("Chưa đăng nhập");
+        }
+
+        String tenServer = nhanVien.getTenServer();
+        String username = (String) session.getAttribute("username");
+        String password = (String) session.getAttribute("password");
+        String role = nhanVien.getRole(); // Lấy role từ session
+        String tenChiNhanh = nhanVien.getTenChiNhanh(); // Lấy tên chi nhánh
+
+        return giaoDichService.layThongTinTaiKhoan(soTK, tenServer, username, password, role, tenChiNhanh, false); // false
+                                                                                                                   // =
+                                                                                                                   // account
+                                                                                                                   // statement
     }
 
     /**
@@ -518,8 +544,9 @@ public class StaffController {
 
         String username = (String) session.getAttribute("username");
         String password = (String) session.getAttribute("password");
+        String tenChiNhanh = nhanVien.getTenChiNhanh(); // Lấy tên chi nhánh
 
-        return giaoDichService.rutTien(soTK, soTien, maNV, tenServer, username, password);
+        return giaoDichService.rutTien(soTK, soTien, maNV, tenServer, username, password, tenChiNhanh);
     }
 
     /**
@@ -540,8 +567,9 @@ public class StaffController {
 
         String username = (String) session.getAttribute("username");
         String password = (String) session.getAttribute("password");
+        String tenChiNhanh = nhanVien.getTenChiNhanh(); // Lấy tên chi nhánh
 
-        return giaoDichService.goiTien(soTK, soTien, maNV, tenServer, username, password);
+        return giaoDichService.goiTien(soTK, soTien, maNV, tenServer, username, password, tenChiNhanh);
     }
 
     /**
@@ -563,8 +591,9 @@ public class StaffController {
 
         String username = (String) session.getAttribute("username");
         String password = (String) session.getAttribute("password");
+        String tenChiNhanh = nhanVien.getTenChiNhanh(); // Lấy tên chi nhánh
 
-        return giaoDichService.chuyenTien(soTKGui, soTKNhan, soTien, maNV, tenServer, username, password);
+        return giaoDichService.chuyenTien(soTKGui, soTKNhan, soTien, maNV, tenServer, username, password, tenChiNhanh);
     }
 
     /**
