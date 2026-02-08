@@ -360,8 +360,9 @@ public class BaoCaoService {
          */
         public byte[] xuatPDFTaiKhoanMoi(LocalDate tuNgay, LocalDate denNgay, String role, String maCN,
                         String tenServer, String username, String password, String nguoiXuat) throws Exception {
-                // Lấy dữ liệu
-                List<Map<String, Object>> danhSach = lietKeTaiKhoanMoi(tuNgay, denNgay, role, maCN, tenServer, username,
+                // Lấy dữ liệu - sử dụng lietKeTaiKhoanMoiTheoChiNhanh thay thế
+                List<Map<String, Object>> danhSach = lietKeTaiKhoanMoiTheoChiNhanh(tuNgay, denNgay, maCN, tenServer,
+                                username,
                                 password);
 
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();

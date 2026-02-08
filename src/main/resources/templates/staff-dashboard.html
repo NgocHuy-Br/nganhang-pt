@@ -650,18 +650,8 @@
                                                     class="text-danger">*</span></label>
                                             <input type="text" class="form-control" id="inputMaNVMoi" required
                                                 placeholder="Nhập mã nhân viên mới tại chi nhánh đích">
-                                            <small class="text-muted">Mã nhân viên tại chi nhánh đích (có thể khác mã
+                                            <small class="text-muted">Mã nhân viên tại chi nhánh đích (phải khác mã
                                                 cũ)</small>
-                                        </div>
-                                        <div class="alert alert-warning">
-                                            <i class="bi bi-exclamation-triangle"></i>
-                                            <strong>Lưu ý:</strong>
-                                            <ul class="mb-0 mt-2">
-                                                <li>Nhân viên sẽ được <strong>soft delete</strong> ở chi nhánh hiện tại
-                                                </li>
-                                                <li>Tài khoản đăng nhập (nếu có) sẽ bị <strong>xóa</strong></li>
-                                                <li>Nhân viên mới sẽ được tạo ở chi nhánh đích với mã mới</li>
-                                            </ul>
                                         </div>
                                     </form>
                                 </div>
@@ -1428,7 +1418,8 @@
                                                 <i class="bi bi-search"></i> Xem danh sách
                                             </button>
                                         </div>
-                                        <div class="col-md-3 ms-auto">
+                                        <div class="col-md-3">
+                                            <label class="form-label">&nbsp;</label>
                                             <button id="btnXuatPDFTKMoi" class="btn btn-success w-100" disabled>
                                                 <i class="bi bi-file-pdf"></i> Xuất PDF
                                             </button>

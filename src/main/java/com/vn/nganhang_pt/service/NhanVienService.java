@@ -294,6 +294,21 @@ public class NhanVienService {
         } catch (Exception e) {
             System.err.println("[ERROR] Lỗi khi thêm nhân viên: " + e.getMessage());
             e.printStackTrace();
+
+            // Parse error message để trả về mã lỗi chi tiết
+            String errorMsg = e.getMessage();
+            if (errorMsg != null) {
+                if (errorMsg.contains("Mã nhân viên đã tồn tại")) {
+                    return -2;
+                } else if (errorMsg.contains("CMND đã tồn tại")) {
+                    return -3;
+                } else if (errorMsg.contains("Chi nhánh không tồn tại")) {
+                    return -1;
+                } else if (errorMsg.contains("Giới tính không hợp lệ")) {
+                    return -4;
+                }
+            }
+
             return -99;
         }
     }
@@ -330,6 +345,21 @@ public class NhanVienService {
         } catch (Exception e) {
             System.err.println("[ERROR] Lỗi khi sửa nhân viên: " + e.getMessage());
             e.printStackTrace();
+
+            // Parse error message để trả về mã lỗi chi tiết
+            String errorMsg = e.getMessage();
+            if (errorMsg != null) {
+                if (errorMsg.contains("CMND đã tồn tại")) {
+                    return -3;
+                } else if (errorMsg.contains("Chi nhánh không tồn tại")) {
+                    return -1;
+                } else if (errorMsg.contains("Giới tính không hợp lệ")) {
+                    return -4;
+                } else if (errorMsg.contains("Nhân viên không tồn tại")) {
+                    return -1;
+                }
+            }
+
             return -99;
         }
     }
@@ -359,6 +389,17 @@ public class NhanVienService {
         } catch (Exception e) {
             System.err.println("[ERROR] Lỗi khi xóa nhân viên: " + e.getMessage());
             e.printStackTrace();
+
+            // Parse error message để trả về mã lỗi chi tiết
+            String errorMsg = e.getMessage();
+            if (errorMsg != null) {
+                if (errorMsg.contains("Nhân viên không tồn tại")) {
+                    return -1;
+                } else if (errorMsg.contains("đã bị xóa")) {
+                    return -2;
+                }
+            }
+
             return -99;
         }
     }
@@ -388,6 +429,17 @@ public class NhanVienService {
         } catch (Exception e) {
             System.err.println("[ERROR] Lỗi khi phục hồi nhân viên: " + e.getMessage());
             e.printStackTrace();
+
+            // Parse error message để trả về mã lỗi chi tiết
+            String errorMsg = e.getMessage();
+            if (errorMsg != null) {
+                if (errorMsg.contains("Nhân viên không tồn tại")) {
+                    return -1;
+                } else if (errorMsg.contains("chưa bị xóa")) {
+                    return -2;
+                }
+            }
+
             return -99;
         }
     }
