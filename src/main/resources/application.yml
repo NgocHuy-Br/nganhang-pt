@@ -12,10 +12,17 @@ spring:
   # DB chính sẽ tự động truy vấn các phân mảnh thông qua Linked Server
   # Kết nối qua VPN/mạng ảo đến IP 10.241.78.94
   datasource:
-    jdbc-url: jdbc:sqlserver://10.241.78.94;databaseName=NGANHANG;encrypt=false
+    jdbc-url: jdbc:sqlserver://10.241.78.94:1433;databaseName=NGANHANG;encrypt=false;trustServerCertificate=true;loginTimeout=10
     username: HTKN
     password: '123456'
     driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    hikari:
+      connection-timeout: 10000
+      maximum-pool-size: 5
+      minimum-idle: 1
+      idle-timeout: 60000
+      connection-test-query: SELECT 1
+      initialization-fail-timeout: -1
 
 # Cấu hình các phân mảnh (Fragment Configuration)
 app:
